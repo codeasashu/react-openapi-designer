@@ -1,0 +1,15 @@
+[ignore]
+.*/node_modules/.*
+./.cache
+./dist
+
+[include]
+
+[libs]
+./flow-typed
+
+[options]
+esproposal.decorators=ignore
+esproposal.optional_chaining=enable
+
+[lints]
