@@ -1,5 +1,5 @@
 {
-    "name": "openapi-designer",
+    "name": "react-openapi-designer",
     "version": "0.1.0",
     "main": "dist/index.js",
     "scripts": {
@@ -37,9 +37,13 @@
     },
     "devDependencies": {
         "@babel/core": "^7.9.0",
+        "@babel/plugin-proposal-class-properties": "^7.12.13",
         "@babel/plugin-proposal-decorators": "^7.8.3",
         "@babel/plugin-proposal-optional-chaining": "^7.9.0",
         "@babel/plugin-transform-runtime": "^7.12.10",
+        "@babel/preset-env": "^7.12.17",
+        "@babel/preset-flow": "^7.12.13",
+        "@babel/preset-react": "^7.12.13",
         "babel-loader": "^8.0.6",
         "jest": "^26.6.3",
         "webpack": "^4.42.1",
