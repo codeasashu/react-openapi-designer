@@ -1,12 +1,27 @@
 import React from 'react';
 import _ from 'lodash';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
-import { Button, SvgIcon } from 'insomnia-components';
+import { Colors, AnchorButton, Button, Intent, TextArea } from "@blueprintjs/core";
+import { Popover2, Tooltip2 } from "@blueprintjs/popover2";
 import LocaleProvider from '../locale';
-import * as ui from '../ui';
 import DropPlus from '../ui/drop-plus';
 import SchemaSelectors from './schema-selectors';
-import FieldInput from './field-input';
+import DebouncedInput from './debounced-input';
+import CustomItem from './advanced-properties';
+
+
+const SchemaItemEntity = ({ text }) => {
+  const color = (text === 'object' && Colors.BLUE5)
+        || (text === 'string' && Colors.GREEN5)
+        || (text === 'boolean' && Colors.YELLOW5)
+        || ((text === 'integer' || text === 'number') && Colors.RED5)
+        || Colors.BLACK;
+  return (
+    <div className="flex flex-no-wrap items-center text-blue-6 dark:text-blue-4 cursor-pointer hover:underline truncate">
+      <div style={{ color }}>{ text }</div>
+    </div>
+  )
+}
 
 @autoBindMethodsForReact()
 class SchemaRow extends React.PureComponent {
@@ -35,9 +50,9 @@ class SchemaRow extends React.PureComponent {
     this.props.handleSchemaType({ key, value });
   }
 
-  _handleChangeTitle(e) {
+  _handleChangeTitle(value) {
     const key = this.addToPrefix(['title']);
-    this.props.handleTitle({ key, value: e.target.value });
+    this.props.handleTitle({ key, value });
   }
 
   _handleChangeDescription(e) {
@@ -65,6 +80,10 @@ class SchemaRow extends React.PureComponent {
     });
   }
 
+  _handleAdvancedProperty(e) {
+    console.log('advanced', e);
+  }
+
   addToPrefix(fields) {
     return [].concat(this.props.fieldPrefix, this.props.fieldName, [...fields]).filter(Boolean);
   }
@@ -78,13 +97,13 @@ class SchemaRow extends React.PureComponent {
     const sidebarOpen = prefix.length ? _.get(sidebar, this.addToPrefix(['properties'])) : true;
     const indent = prefix.length ? prefix.filter(name => name !== 'properties').length : -1;
     let padLeft = 30 * (indent + 1);
-    padLeft += schema.type === 'object' ? 0 : 40;
+    padLeft += schema.type === 'object' ? 0 : 50;
     const styles = { paddingLeft: `${padLeft}px` };
 
     return show ? (
       <>
-        <ui.FlexRow>
-          <ui.FlexItem>
+        <div className="flex">
+          <div className="flex flex-1">
             {!!name && schema.type === 'object' ? (
               <DropPlus
                 handleAddField={this._handleAddField}
@@ -92,70 +111,76 @@ class SchemaRow extends React.PureComponent {
               />
             ) : (
               schema.type === 'object' && (
-                <ui.StyledActions onClick={this._handleAddField}>
-                  <SvgIcon icon="plus" />
-                </ui.StyledActions>
+                  <Button small minimal icon="plus" onClick={this._handleAddField} />
               )
             )}
-            <ui.FlexItem style={styles}>
+            <div className="flex flex-1 bp3-control-group" style={styles}>
               {schema.type === 'object' && (
-                <ui.StyledNavigate show={!!sidebarOpen} onClick={this._handleSidebarOpen}>
-                  <SvgIcon icon="chevron-down" />
-                </ui.StyledNavigate>
+                  <Button
+                    onClick={this._handleSidebarOpen}
+                    small minimal icon={!!sidebarOpen ? 'chevron-down': 'chevron-right'} />
               )}
 
-              {!!name && <FieldInput onChange={this._handleChangeName} value={name} />}
-
-              <ui.StyledTooltip
-                message={
-                  <SchemaSelectors
-                    selectedItem={schema.type}
-                    handleItemClick={this._handleChangeSchemaType}
-                  />
-                }
-                position="top">
-                <Button size="small" variant="text">
-                  {schema.type}
-                </Button>
-              </ui.StyledTooltip>
-
-              {!!name && (
-                <ui.FieldInput
-                  placeholder={LocaleProvider('title')}
-                  value={schema.title || ''}
-                  onChange={this._handleChangeTitle}
-                />
-              )}
-
-              {!!name && (
-                <ui.FieldInput
-                  placeholder={LocaleProvider('description')}
-                  value={schema.description || ''}
-                  onChange={this._handleChangeDescription}
-                />
-              )}
-            </ui.FlexItem>
-            <ui.StyledActions font={1} onClick={this._handleSettings}>
-              <ui.StyledTooltip placement="top" message={LocaleProvider('adv_setting')}>
-                <SvgIcon icon="gear" />
-              </ui.StyledTooltip>
-            </ui.StyledActions>
+              {!!name && 
+              <DebouncedInput
+                className="pl-1 bg-transparent hover:bg-gray-100 focus:bg-gray-200 outline-none" 
+                onChange={this._handleChangeName} value={name} />}&nbsp;:&nbsp;
+              <Popover2
+                className="p-1 pt-0"
+                content={<SchemaSelectors
+                  selectedItem={schema.type}
+                  handleItemClick={this._handleChangeSchemaType}
+                />}
+                placement="right">
+                <SchemaItemEntity
+                      text={schema.type}
+                    />
+              </Popover2>
+            </div>
+            <span>
+              {!!name && (<Popover2
+                  content={
+                    <TextArea
+                      className="outline-none border-0"
+                      growVertically
+                      value={schema.description || ''}
+                      onChange={this._handleChangeDescription}
+                    />}
+                  placement="left">
+                  <Tooltip2 content={<span>{LocaleProvider('adv_setting')}</span>}>
+                    <Button small minimal icon="manual" intent={!!schema.description ? Intent.PRIMARY : null} />
+                  </Tooltip2>
+              </Popover2>)}
+            </span>
+            <span onClick={this._handleSettings}>
+              <Popover2
+                  content={
+                  <CustomItem
+                    data={JSON.stringify(schema, null, 2)}
+                    onChange={this._handleAdvancedProperty} />
+                  }
+                  placement="right">
+                  <Tooltip2 content={<span>{LocaleProvider('adv_setting')}</span>}>
+                    <Button small minimal icon="property" />
+                  </Tooltip2>
+              </Popover2>
+            </span>
             {!!name && (
-              <ui.StyledActions font={1} onClick={this._handleDeleteItem}>
-                <ui.StyledTooltip placement="top" message={LocaleProvider('adv_setting')}>
-                  <SvgIcon icon="trashcan" />
-                </ui.StyledTooltip>
-              </ui.StyledActions>
+              <span  onClick={this._handleDeleteItem}>
+                <Tooltip2 content={LocaleProvider('adv_setting')}>
+                  <Button small minimal icon="cross" />
+                </Tooltip2>
+              </span>
             )}
             {!!name && (
-              <ui.StyledActions font={1} onClick={this._handleToggleRequire}>
-                <ui.StyledTooltip placement="top" message={LocaleProvider('adv_setting')}>
-                  <SvgIcon theme={required ? 'danger' : 'default'} icon="warning-circle" />
-                </ui.StyledTooltip>
-              </ui.StyledActions>
+              <span  onClick={this._handleToggleRequire}>
+                <Tooltip2 content={LocaleProvider('adv_setting')}>
+                  <Button small minimal icon="issue" intent={required ? Intent.DANGER : null} />
+                </Tooltip2>
+              </span>
             )}
-          </ui.FlexItem>
-        </ui.FlexRow>
+          </div>
+        </div>
         {children}
       </>
     ) : null;

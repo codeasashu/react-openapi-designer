@@ -135,6 +135,7 @@ class DebouncedInput extends PureComponent {
       onBlur, // eslint-disable-line no-unused-vars
       delay, // eslint-disable-line no-unused-vars
       textarea,
+      large,
       ...props
     } = this.props;
     if (textarea) {
@@ -149,13 +150,16 @@ class DebouncedInput extends PureComponent {
       );
     } else {
       return (
+        <div className="bp3-input-group">
         <input
+          className={`bp3-input ${!!props.large && 'bp3-small'}`}
           ref={this._setRef}
           {...props}
           onChange={this._handleChange}
           onFocus={this._handleFocus}
           onBlur={this._handleBlur}
         />
+        </div>
       );
     }
   }
@@ -169,6 +173,7 @@ DebouncedInput.propTypes = {
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
   textarea: PropTypes.bool,
+  large: PropTypes.bool,
   delay: PropTypes.number,
 };
 

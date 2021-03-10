@@ -156,7 +156,6 @@ const _handleAddField = (state, { key, value, fieldNum }) => {
 };
 
 const _handleChangeType = (state, { key, value }) => {
-  console.log('key', key, value);
   const clonedState = _.cloneDeep(state);
   const parentKeys = getParentKey(key);
   const parentData = parentKeys.length ? _.get(clonedState, parentKeys) : clonedState;

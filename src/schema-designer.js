@@ -1,11 +1,14 @@
 import React from 'react';
+import { autoBindMethodsForReact } from 'class-autobind-decorator';
 import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import { bindActionCreators } from 'redux';
 import _ from 'lodash';
-
-import { StyledFormInput } from './ui';
+import * as schemaDesignerActions from './redux/modules/schema-designer';
 import SchemaRow from './elements/schema-row';
 import SchemaJson from './elements/schema-json';
 
+@autoBindMethodsForReact()
 class SchemaDesigner extends React.Component {
   constructor(props) {
     super(props);
@@ -21,7 +24,6 @@ class SchemaDesigner extends React.Component {
       checked: false,
       editorModalName: '',
       mock: '',
-      title: '',
     };
     this.jsonSchemaData = null;
     this.jsonData = null;
@@ -33,10 +35,10 @@ class SchemaDesigner extends React.Component {
       const oldData = oldProps.schema || '';
       const title = this.state.title || '';
       newData.title = title;
-      console.log('updatedata', newData);
       if (!_.isEqual(oldData, newData)) return this.props.onChange(newData);
     }
     if (this.props.data && this.props.data !== oldProps.data) {
+      console.log('updatedata', this.props.data);
       this.props.changeEditorSchema({ value: this.props.data });
     }
   }
@@ -55,7 +57,7 @@ class SchemaDesigner extends React.Component {
     this.props.changeEditorSchema({ value: data });
   }
 
-  addChildField = e => {
+  addChildField(e) {
     this.props.addChildField({ key: ['properties'] });
     this.setState({ show: true });
   };
@@ -93,8 +95,6 @@ class SchemaDesigner extends React.Component {
 
   handleAdvCancel = () => this.setState({ advVisible: false });
 
-  _handleTitle = e => this.setState({ title: e.target.value });
-
   showAdv = (itemKey, curItemCustomValue) =>
     this.setState({
       advVisible: true,
@@ -104,17 +104,9 @@ class SchemaDesigner extends React.Component {
 
   render() {
     const { schema } = this.props;
-    const { title, show } = this.state;
+    const { show } = this.state;
     return (
       <div className="json-schema-react-editor">
-        <StyledFormInput>
-          <input
-            type="text"
-            placeholder="Enter schema title..."
-            defaultValue={title}
-            onChange={this._handleTitle}
-          />
-        </StyledFormInput>
         <SchemaRow
           show={true}
           schema={schema}
@@ -145,4 +137,24 @@ SchemaDesigner.propTypes = {
   isMock: PropTypes.bool,
 };
 
-export default SchemaDesigner;
+const mapStateToProps = ({ open, schema }) => {
+  return { schema, open };
+};
+
+const mapDispatchToProps = dispatch => {
+  const schema = bindActionCreators(schemaDesignerActions, dispatch);
+  return {
+    changeEditorSchema: schema.changeEditorSchema,
+    changeName: schema.changeName,
+    changeValue: schema.changeValue,
+    changeType: schema.changeType,
+    enableRequire: schema.enableRequire,
+    requireAll: schema.requireAll,
+    deleteItem: schema.deleteItem,
+    addField: schema.addField,
+    addChildField: schema.addChildField,
+    setOpenValue: schema.setOpenValue,
+  };
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(SchemaDesigner);

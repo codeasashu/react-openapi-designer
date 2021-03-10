@@ -1,21 +1,19 @@
 const path = require('path');
 const webpack = require('webpack')
-const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: {index: './index.js'},
+  mode: 'development',
+  entry: {index: './src/index.js'},
   target: 'web',
   output: {
     filename: '[name].js',
     sourceMapFilename: '[name].js.map',
-    library: 'insomniaComponents',
-    libraryTarget: 'commonjs2',
-    chunkFilename: '[id].[hash:8].js',
+    library: 'react-openapi-designer',
+    libraryTarget: 'umd',
   },
   resolve: {
     extensions: ['.js', '.jsx', '.json']
   },
-  externals: ['react', 'styled-components'],
   module: {
     rules: [
       {
@@ -25,18 +23,28 @@ module.exports = {
           loader: 'babel-loader',
         },
       },
+      {
+        test: /\.css$/,
+        use: [
+          'style-loader',
+          'css-loader',
+          'postcss-loader'
+        ]
+      },
+      {
+         test: /\.svg$/,
+         use: ['svg-loader']
+       },
+       {
+         test: /\.(eot|woff|woff2|svg|ttf)([\?]?.*)$/,
+         use: ['file-loader']
+       }
     ],
   },
   plugins: [
-    new webpack.SourceMapDevToolPlugin({
-      filename: '[file].map[query]'
-    }),
-    new HtmlWebpackPlugin({template: 'dist/index.html', inject: 'body'}),
-  ],
-  optimization: {
-    minimize: true,
-    splitChunks: {
-      chunks: 'all',
-    },
-  }
+    new webpack.DefinePlugin({
+      "process.env": "{}",
+      global: {}
+    })
+  ]
 };

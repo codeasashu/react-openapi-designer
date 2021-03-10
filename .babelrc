@@ -1,6 +1,6 @@
 {
   "plugins": [
-    "babel-plugin-styled-components",
+    "lodash",
     ["@babel/plugin-proposal-decorators", {"legacy": true}],
     "@babel/plugin-proposal-class-properties",
     "@babel/plugin-proposal-optional-chaining",

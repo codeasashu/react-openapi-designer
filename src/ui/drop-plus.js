@@ -1,23 +1,17 @@
 import React from 'react';
-import { SvgIcon, Dropdown, DropdownItem } from 'insomnia-components';
+import { Button, Menu, MenuItem } from "@blueprintjs/core";
+import { Popover2 } from "@blueprintjs/popover2";
 import LocaleProvider from '../locale';
-import { StyledActions } from './index';
 
 const DropPlus = props => {
+  const dropMenu = <Menu>
+      <MenuItem text={LocaleProvider('sibling_node')} onClick={props.handleAddField} />
+      <MenuItem text={LocaleProvider('child_node')} onClick={props.handleAddChildField} />
+    </Menu>;
   return (
-    <Dropdown
-      renderButton={() => (
-        <StyledActions height="100%">
-          <SvgIcon icon="plus" />
-        </StyledActions>
-      )}>
-      <DropdownItem>
-        <span onClick={props.handleAddField}>{LocaleProvider('sibling_node')}</span>
-      </DropdownItem>
-      <DropdownItem>
-        <span onClick={props.handleAddChildField}>{LocaleProvider('child_node')}</span>
-      </DropdownItem>
-    </Dropdown>
+    <Popover2 content={dropMenu} placement="right-end">
+        <Button minimal small icon="plus" />
+    </Popover2>
   );
 };
 
