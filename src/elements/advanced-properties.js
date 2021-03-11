@@ -8,17 +8,29 @@ const changeOtherValue = (value, name, data, change) => {
   change(data);
 };
 
-const mapping = (data, onChange) => {
+const getArrayProperty = (data, onChange, requestedLevel=1, level=1) => {
+  if(level === requestedLevel && data.hasOwnProperty('items') && data.items.hasOwnProperty('type')) {
+    return <Properties.Array
+      onChange={onChange}
+      data={data}
+      isSubtype={level > 1}
+      child={mapping(data.items, onChange, requestedLevel, (level+1))} />
+  } else {
+    return <Properties.Array isSubtype={level > 1} onChange={onChange} data={data} />
+  }
+}
+
+const mapping = (data, onChange, requestedLevel=1, level=1) => {
   return {
-    string: <Properties.String onChange={onChange} data={data} />,
-    number: <Properties.Number onChange={onChange} data={data} />,
-    boolean: <Properties.Boolean onChange={onChange} data={data} />,
-    integer: <Properties.Number onChange={onChange} data={data} />,
-    array: <Properties.Array onChange={onChange} data={data} />
+    string: <Properties.String isSubtype={level > 1} onChange={onChange} data={data} />,
+    number: <Properties.Number isSubtype={level > 1} onChange={onChange} data={data} />,
+    boolean: <Properties.Boolean isSubtype={level > 1} onChange={onChange} data={data} />,
+    integer: <Properties.Number isSubtype={level > 1} onChange={onChange} data={data} />,
+    array: getArrayProperty(data, onChange, requestedLevel, level),
   }[data.type];
 };
 
-const CustomItem = (props, context) => {
+const AdvancedProperties = (props, context) => {
   const { data, onChange } = props;
   const optionForm = mapping(JSON.parse(data), onChange);
 
@@ -34,4 +46,4 @@ const CustomItem = (props, context) => {
   );
 };
 
-export default CustomItem;
+export default AdvancedProperties;

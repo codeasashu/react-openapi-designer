@@ -1,6 +1,7 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
+import { InputGroup, TextArea } from "@blueprintjs/core";
 
 const DEBOUNCE_MILLIS = 100;
 
@@ -136,11 +137,12 @@ class DebouncedInput extends PureComponent {
       delay, // eslint-disable-line no-unused-vars
       textarea,
       large,
+      value,
       ...props
     } = this.props;
     if (textarea) {
       return (
-        <textarea
+        <TextArea
           ref={this._setRef}
           {...props}
           onChange={this._handleChange}
@@ -151,9 +153,9 @@ class DebouncedInput extends PureComponent {
     } else {
       return (
         <div className="bp3-input-group">
-        <input
-          className={`bp3-input ${!!props.large && 'bp3-small'}`}
+        <InputGroup
           ref={this._setRef}
+          value={value || ''}
           {...props}
           onChange={this._handleChange}
           onFocus={this._handleFocus}
@@ -173,7 +175,6 @@ DebouncedInput.propTypes = {
   onFocus: PropTypes.func,
   onBlur: PropTypes.func,
   textarea: PropTypes.bool,
-  large: PropTypes.bool,
   delay: PropTypes.number,
 };
 

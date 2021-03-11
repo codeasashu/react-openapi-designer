@@ -1,46 +1,48 @@
 import React, { PureComponent } from 'react';
+import { clone } from 'lodash';
 import LocaleProvider from '../../locale';
 import * as Keywords from '../keywords';
 
 class StringProperty extends PureComponent {
   changeOtherValue = (value, name) => {
-    const { data, onChangeValue } = this.props;
-    let cloned = _.clone(data);
+    const { data, onChange } = this.props;
+    let cloned = clone(data);
     cloned[name] = value;
     // this.context.changeCustomValue(data);
-    onChangeValue(cloned);
+    onChange(cloned);
   };
 
   changeEnumOtherValue = (arr) => {
-    const { data, onChangeValue } = this.props;
-    let cloned = _.clone(data);
+    const { data, onChange } = this.props;
+    let cloned = clone(data);
     if (arr.length === 0 || (arr.length == 1 && !arr[0])) {
       delete cloned.enum;
-      onChangeValue(cloned);
     } else {
       cloned.enum = arr;
-      onChangeValue(cloned);
     }
+    onChange(cloned);
   };
 
   render() {
-    const { data } = this.props;
+    const { data, isSubtype } = this.props;
+    const heading = `${isSubtype ? 'subtype' : 'other'} properties`;
+    isSubtype
     return (
       <div className="text-sm overflow-auto p-1">
       <div className="pb-6">
-        <div className="uppercase font-semibold pb-3">{LocaleProvider('base_setting')}</div>
+        <div className="uppercase font-semibold pb-3">{heading}</div>
         <div className="flex pb-2">
           <Keywords.Default value={data.default} onChange={
               e => this.changeOtherValue(e, 'default')} />
           <Keywords.Format value={data.format} onChange={
-              e => this.changeOtherValue(e, 'format')} />
+              e => this.changeOtherValue(e.target.value, 'format')} />
         </div>
         <div className="flex pb-2">
           <Keywords.Enum value={data.enum} onChange={this.changeEnumOtherValue} />
         </div>
       </div>
       <div>
-        <div className="uppercase font-semibold pb-3">string properties</div>
+        <div className="uppercase font-semibold pb-3">{isSubtype ? 'subtype': ''} string properties</div>
         <div className="flex pb-2">
           <Keywords.Pattern value={data.pattern} onChange={
               e => this.changeOtherValue(e, 'pattern')} />

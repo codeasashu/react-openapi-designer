@@ -3,7 +3,7 @@ import { autoBindMethodsForReact } from 'class-autobind-decorator';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import _ from 'lodash';
+import { isEqual } from 'lodash';
 import * as schemaDesignerActions from './redux/modules/schema-designer';
 import SchemaRow from './elements/schema-row';
 import SchemaJson from './elements/schema-json';
@@ -35,7 +35,7 @@ class SchemaDesigner extends React.Component {
       const oldData = oldProps.schema || '';
       const title = this.state.title || '';
       newData.title = title;
-      if (!_.isEqual(oldData, newData)) return this.props.onChange(newData);
+      if (!isEqual(oldData, newData)) return this.props.onChange(newData);
     }
     if (this.props.data && this.props.data !== oldProps.data) {
       console.log('updatedata', this.props.data);

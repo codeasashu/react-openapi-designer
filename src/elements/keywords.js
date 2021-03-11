@@ -36,8 +36,10 @@ export const BoolDefault = (props) => {
             </FormGroup>
 }
 
-export const Format = (props) => {
-   const STRING_FORMATS = [
+const getFormat = format => {
+  format = format || String;
+  const formats = {
+    String: [
       { name: 'date-time' },
       { name: 'date' },
       { name: 'email' },
@@ -45,8 +47,18 @@ export const Format = (props) => {
       { name: 'ipv4' },
       { name: 'ipv6' },
       { name: 'uri' }
-  ];
+    ],
+    Number: [
+      { name: 'float' },
+      { name: 'double' }
+    ]
+  };
 
+  return [].concat((formats[format.prototype.constructor.name] || []));
+}
+
+export const Format = (props) => {
+  const format = getFormat(props.format || String);
   return <FormGroup label="format" labelFor="text-input" className="flex-1 ml-3">
             <div className="bp3-select">
               <select
@@ -55,7 +67,8 @@ export const Format = (props) => {
                 placeholder="Select a format"
                 onChange={props.onChange}
               >
-                {STRING_FORMATS.map(item => {
+                <option>None</option>
+                {format.map(item => {
                   return (
                     <option value={item.name} key={item.name}>
                       {item.name}
@@ -124,7 +137,7 @@ export const Minimum = (props) => {
           </FormGroup>
           <FormGroup className="ml-3 mb-0 text-center" label="exclusiveMin">
             <Switch
-              checked={props.exclusiveMinimum}
+              checked={props.exclusiveMinimum || false}
               onChange={props.onToggle}
             />
           </FormGroup>
@@ -143,7 +156,7 @@ export const Maximum = (props) => {
           </FormGroup>
           <FormGroup className="ml-3 mb-0 text-center" label="exclusiveMax">
             <Switch
-              checked={props.exclusiveMaximum}
+              checked={props.exclusiveMaximum || false}
               onChange={props.onToggle}
             />
           </FormGroup>
@@ -164,7 +177,7 @@ export const MultipleOf = (props) => {
 export const UniqueItems = (props) => {
   return <FormGroup className="flex-1 mb-0" label="uniqueItems">
             <Switch
-              checked={props.value}
+              checked={props.value || false}
               onChange={props.onToggle}
             />
         </FormGroup>

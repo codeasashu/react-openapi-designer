@@ -1,5 +1,5 @@
 import React from 'react';
-import _ from 'lodash';
+import { get, isUndefined } from 'lodash';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
 import { Colors, AnchorButton, Button, Intent, TextArea } from "@blueprintjs/core";
 import { Popover2, Tooltip2 } from "@blueprintjs/popover2";
@@ -7,7 +7,7 @@ import LocaleProvider from '../locale';
 import DropPlus from '../ui/drop-plus';
 import SchemaSelectors from './schema-selectors';
 import DebouncedInput from './debounced-input';
-import CustomItem from './advanced-properties';
+import AdvancedProperties from './advanced-properties';
 
 
 const SchemaItemEntity = ({ text }) => {
@@ -45,8 +45,8 @@ class SchemaRow extends React.PureComponent {
     this.props.handleSidebar({ key });
   }
 
-  _handleChangeSchemaType(value) {
-    const key = this.addToPrefix(['type']);
+  _handleChangeSchemaType(value, prefix=['type']) {
+    const key = this.addToPrefix(prefix);
     this.props.handleSchemaType({ key, value });
   }
 
@@ -80,12 +80,17 @@ class SchemaRow extends React.PureComponent {
     });
   }
 
-  _handleAdvancedProperty(e) {
-    console.log('advanced', e);
+  _handleAdvancedProperty(value) {
+    const key = this.addToPrefix([]);
+    this.props.handleAdditionalProperties({ key, value });
   }
 
   addToPrefix(fields) {
     return [].concat(this.props.fieldPrefix, this.props.fieldName, [...fields]).filter(Boolean);
+  }
+
+  getSubType(schema) {
+    return schema.type === 'array' ? (!isUndefined(schema.items) && schema.items.type) : null
   }
 
   render() {
@@ -94,11 +99,12 @@ class SchemaRow extends React.PureComponent {
     const prefix = fieldPrefix || [];
     const name = fieldName || null;
 
-    const sidebarOpen = prefix.length ? _.get(sidebar, this.addToPrefix(['properties'])) : true;
+    const sidebarOpen = prefix.length ? get(sidebar, this.addToPrefix(['properties'])) : true;
     const indent = prefix.length ? prefix.filter(name => name !== 'properties').length : -1;
     let padLeft = 30 * (indent + 1);
     padLeft += schema.type === 'object' ? 0 : 50;
     const styles = { paddingLeft: `${padLeft}px` };
+    const isParentArray = this.props.parent && (this.props.parent === 'array');
 
     return show ? (
       <>
@@ -117,23 +123,28 @@ class SchemaRow extends React.PureComponent {
             <div className="flex flex-1 bp3-control-group" style={styles}>
               {schema.type === 'object' && (
                   <Button
+                    style={{marginRight: '2px'}}
                     onClick={this._handleSidebarOpen}
                     small minimal icon={!!sidebarOpen ? 'chevron-down': 'chevron-right'} />
               )}
 
-              {!!name && 
-              <DebouncedInput
+              {!!name && !isParentArray && <DebouncedInput
                 className="pl-1 bg-transparent hover:bg-gray-100 focus:bg-gray-200 outline-none" 
-                onChange={this._handleChangeName} value={name} />}&nbsp;:&nbsp;
+                onChange={this._handleChangeName} value={name} small />}
+              {!!name && !isParentArray && (<span>&nbsp;:&nbsp;</span>)}
               <Popover2
                 className="p-1 pt-0"
                 content={<SchemaSelectors
-                  selectedItem={schema.type}
-                  handleItemClick={this._handleChangeSchemaType}
+                  schema={schema}
+                  onClick={this._handleChangeSchemaType}
                 />}
                 placement="right">
                 <SchemaItemEntity
-                      text={schema.type}
+                      text={
+                        (schema.type === 'array' && schema.items.hasOwnProperty('type')
+                          ? `${schema.type} [${schema.items.type}]`
+                          : schema.type)
+                      }
                     />
               </Popover2>
             </div>
@@ -152,31 +163,41 @@ class SchemaRow extends React.PureComponent {
                   </Tooltip2>
               </Popover2>)}
             </span>
-            <span onClick={this._handleSettings}>
+            <span>
               <Popover2
                   content={
-                  <CustomItem
+                  <AdvancedProperties
                     data={JSON.stringify(schema, null, 2)}
                     onChange={this._handleAdvancedProperty} />
                   }
                   placement="right">
                   <Tooltip2 content={<span>{LocaleProvider('adv_setting')}</span>}>
-                    <Button small minimal icon="property" />
+                    <Button onClick={this._handleSettings} small minimal icon="property" />
                   </Tooltip2>
               </Popover2>
             </span>
             {!!name && (
-              <span  onClick={this._handleDeleteItem}>
+              <span>
                 <Tooltip2 content={LocaleProvider('adv_setting')}>
-                  <Button small minimal icon="cross" />
+                  <Button onClick={this._handleDeleteItem} small minimal icon="cross" />
                 </Tooltip2>
               </span>
             )}
             {!!name && (
-              <span  onClick={this._handleToggleRequire}>
-                <Tooltip2 content={LocaleProvider('adv_setting')}>
-                  <Button small minimal icon="issue" intent={required ? Intent.DANGER : null} />
-                </Tooltip2>
+              <span>
+                {isParentArray ? (
+                  <Button
+                    disabled={isParentArray}
+                    small minimal icon="issue"
+                    onClick={this._handleToggleRequire}
+                    intent={required ? Intent.DANGER : null} />
+                ) : (<Tooltip2 content={LocaleProvider('adv_setting')}>
+                  <Button
+                    disabled={isParentArray}
+                    small minimal icon="issue"
+                    onClick={this._handleToggleRequire}
+                    intent={required ? Intent.DANGER : null} />
+                </Tooltip2>)}
               </span>
             )}
           </div>

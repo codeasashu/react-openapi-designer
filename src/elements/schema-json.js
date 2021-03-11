@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
-import _ from 'lodash';
+import { isUndefined, get } from 'lodash';
 import SchemaRow from './schema-row';
 
 const mapping = (name, schema, props) => {
@@ -16,14 +16,18 @@ const mapping = (name, schema, props) => {
 };
 
 class SchemaArray extends PureComponent {
+  shouldShowSubItems(schema) {
+    return !isUndefined(schema.items) && ['object', 'array'].indexOf(schema.items.type) >= 0;
+  }
+
   render() {
     const { prefix, schema, wrapperProps } = this.props;
-
-    return (
-      <SchemaRow
-        show={!_.isUndefined(schema.items)}
+    return this.shouldShowSubItems(schema) ? (<SchemaRow
+        show={!isUndefined(schema.items)}
         schema={schema.items}
         sidebar={wrapperProps.open}
+        required={false}
+        parent={schema.type}
         fieldName={'items'}
         fieldPrefix={prefix}
         handleName={() => {}}
@@ -31,14 +35,19 @@ class SchemaArray extends PureComponent {
           wrapperProps.addChildField({ key });
           wrapperProps.setOpenValue({ key, value: true });
         }}
+        handleDelete={({ key }) => {
+          wrapperProps.changeValue({ key, value: {} });
+        }}
         handleSidebar={wrapperProps.setOpenValue}
         handleSchemaType={wrapperProps.changeType}
         handleTitle={wrapperProps.changeValue}
         handleDescription={wrapperProps.changeValue}
-        handleSettings={wrapperProps.showAdv}>
+        handleAdditionalProperties={wrapperProps.changeValue}
+        handleSettings={wrapperProps.showAdv}
+        handleRequire={wrapperProps.enableRequire}>
         {mapping([].concat(prefix, 'items'), schema.items, wrapperProps)}
       </SchemaRow>
-    );
+    ) : (null);
   }
 }
 
@@ -52,13 +61,13 @@ class SchemaItem extends PureComponent {
   render() {
     const { name, prefix, schema, wrapperProps } = this.props;
     const itemSchema = Object.assign({}, { title: '', description: '' }, schema.properties[name]);
-    const isRequired = _.isUndefined(schema.required)
+    const isRequired = isUndefined(schema.required)
       ? false
       : schema.required.indexOf(name) !== -1;
 
     return (
       <SchemaRow
-        show={_.get(wrapperProps.open, prefix)}
+        show={get(wrapperProps.open, prefix)}
         schema={itemSchema}
         sidebar={wrapperProps.open}
         fieldName={name}
@@ -77,6 +86,7 @@ class SchemaItem extends PureComponent {
         handleSchemaType={wrapperProps.changeType}
         handleTitle={wrapperProps.changeValue}
         handleDescription={wrapperProps.changeValue}
+        handleAdditionalProperties={wrapperProps.changeValue}
         handleSettings={wrapperProps.showAdv}
         handleDelete={({ key }) => {
           wrapperProps.deleteItem({ key });

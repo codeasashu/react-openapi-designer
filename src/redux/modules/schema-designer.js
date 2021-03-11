@@ -53,6 +53,7 @@ function handleType(schema) {
 }
 
 function handleSchema(schema) {
+  console.log('handleSchema', schema);
   if (schema && !schema.type && !schema.properties) {
     schema.type = 'string';
   }
@@ -156,6 +157,7 @@ const _handleAddField = (state, { key, value, fieldNum }) => {
 };
 
 const _handleChangeType = (state, { key, value }) => {
+  console.log('handleType', key, value);
   const clonedState = _.cloneDeep(state);
   const parentKeys = getParentKey(key);
   const parentData = parentKeys.length ? _.get(clonedState, parentKeys) : clonedState;
