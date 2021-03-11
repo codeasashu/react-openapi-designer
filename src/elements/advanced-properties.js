@@ -1,12 +1,18 @@
 import React, { PureComponent } from 'react';
+import { clone } from 'lodash';
 import PropTypes from 'prop-types';
 import Properties from './properties';
 // import AceEditor from '../AceEditor/AceEditor.js';
 
-const changeOtherValue = (value, name, data, change) => {
-  data[name] = value;
-  change(data);
-};
+const onChildChange = (data, value, name, onChange) => {
+    let cloned = clone(data);
+    if(!value || value === '') {
+      delete cloned[name];
+    }
+    else cloned[name] = value;
+    // this.context.changeCustomValue(data);
+    onChange(cloned);
+}
 
 const getArrayProperty = (data, onChange, requestedLevel=1, level=1) => {
   if(level === requestedLevel && data.hasOwnProperty('items') && data.items.hasOwnProperty('type')) {
@@ -14,7 +20,7 @@ const getArrayProperty = (data, onChange, requestedLevel=1, level=1) => {
       onChange={onChange}
       data={data}
       isSubtype={level > 1}
-      child={mapping(data.items, onChange, requestedLevel, (level+1))} />
+      child={mapping(data.items, e => onChildChange(data, e, 'items', onChange), requestedLevel, (level+1))} />
   } else {
     return <Properties.Array isSubtype={level > 1} onChange={onChange} data={data} />
   }

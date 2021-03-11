@@ -67,7 +67,7 @@ export const Format = (props) => {
                 placeholder="Select a format"
                 onChange={props.onChange}
               >
-                <option>None</option>
+                <option value="">None</option>
                 {format.map(item => {
                   return (
                     <option value={item.name} key={item.name}>

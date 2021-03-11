@@ -7,7 +7,10 @@ class StringProperty extends PureComponent {
   changeOtherValue = (value, name) => {
     const { data, onChange } = this.props;
     let cloned = clone(data);
-    cloned[name] = value;
+    if(!value || value === '') {
+      delete cloned[name];
+    }
+    else cloned[name] = value;
     // this.context.changeCustomValue(data);
     onChange(cloned);
   };

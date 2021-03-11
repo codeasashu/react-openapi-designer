@@ -8,7 +8,10 @@ class ArrayProperty extends PureComponent {
     changeOtherValue = (name, value) => {
         const { data, onChange } = this.props;
         let cloned = clone(data);
-        cloned[name] = value;
+        if(!value || value === '') {
+            delete cloned[name];
+        }
+        else cloned[name] = value;
         onChange(cloned);
     };
 
