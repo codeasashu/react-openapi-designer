@@ -12,7 +12,15 @@ module.exports = {
     libraryTarget: 'umd',
   },
   resolve: {
-    extensions: ['.js', '.jsx', '.json']
+    aliasFields: ['browser'],
+    mainFields: ['browser', 'module', 'main'],
+    extensions: ['.js', '.jsx', '.json'],
+    fallback: {
+      "http": require.resolve("stream-http"),
+      "https": require.resolve("https-browserify"),
+      "vm": require.resolve("vm-browserify"),
+      "buffer": require.resolve("buffer"),
+    }
   },
   module: {
     rules: [
@@ -44,7 +52,12 @@ module.exports = {
   plugins: [
     new webpack.DefinePlugin({
       "process.env": "{}",
+      'process.platform': JSON.stringify('unix'),
+      'process.browser': true,
       global: {}
+    }),
+    new webpack.ProvidePlugin({
+      Buffer: ['buffer', 'Buffer'],
     })
   ]
 };

@@ -1,7 +1,7 @@
 import React from 'react';
 import { get, isUndefined } from 'lodash';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
-import { Colors, AnchorButton, Button, Intent, TextArea } from "@blueprintjs/core";
+import { Button, Intent, TextArea } from "@blueprintjs/core";
 import { Popover2, Tooltip2 } from "@blueprintjs/popover2";
 import LocaleProvider from '../locale';
 import DropPlus from '../ui/drop-plus';
@@ -10,15 +10,16 @@ import DebouncedInput from './debounced-input';
 import AdvancedProperties from './advanced-properties';
 
 
-const SchemaItemEntity = ({ text }) => {
-  const color = (text === 'object' && Colors.BLUE5)
-        || (text === 'string' && Colors.GREEN5)
-        || (text === 'boolean' && Colors.YELLOW5)
-        || ((text === 'integer' || text === 'number') && Colors.RED5)
-        || Colors.BLACK;
+const SchemaItemEntity = ({ type, text }) => {
+  const textStyles = (type === 'object' && 'text-blue-600 dark:text-blue-600')
+        || (type === 'string' && 'text-green-400 dark:text-green-400')
+        || (type === 'boolean' && 'text-yellow-400 dark:text-yellow-400')
+        || (type === 'array' && 'text-yellow-600 dark:text-yellow-600')
+        || ((type === 'integer' || type === 'number') && 'text-red-400 dark:text-red-400')
+        || 'text-black dark:text-white';
   return (
-    <div className="flex flex-no-wrap items-center text-blue-6 dark:text-blue-4 cursor-pointer hover:underline truncate">
-      <div style={{ color }}>{ text }</div>
+    <div className={`flex flex-no-wrap items-center ${textStyles} cursor-pointer hover:underline truncate`}>
+      <span>{ text }</span>
     </div>
   )
 }
@@ -129,17 +130,20 @@ class SchemaRow extends React.PureComponent {
               )}
 
               {!!name && !isParentArray && <DebouncedInput
-                className="pl-1 bg-transparent hover:bg-gray-100 focus:bg-gray-200 outline-none" 
+                className="pl-1" 
                 onChange={this._handleChangeName} value={name} small />}
               {!!name && !isParentArray && (<span>&nbsp;:&nbsp;</span>)}
               <Popover2
                 className="p-1 pt-0"
+                popoverClassName="bp3-dark"
+                inheritDarkTheme
                 content={<SchemaSelectors
                   schema={schema}
                   onClick={this._handleChangeSchemaType}
                 />}
                 placement="right">
                 <SchemaItemEntity
+                      type={schema.type}
                       text={
                         (schema.type === 'array' && schema.items.hasOwnProperty('type')
                           ? `${schema.type} [${schema.items.type}]`
@@ -150,6 +154,7 @@ class SchemaRow extends React.PureComponent {
             </div>
             <span>
               {!!name && (<Popover2
+                  inheritDarkTheme
                   content={
                     <TextArea
                       className="outline-none border-0"

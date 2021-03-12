@@ -33,7 +33,7 @@ class NumberProperty extends PureComponent {
     return (
       <div className="text-sm overflow-auto p-1">
       <div className="pb-6">
-        <div className="uppercase font-semibold pb-3">{heading}</div>
+        <div className="uppercase font-semibold pb-3 text-black dark:text-white">{heading}</div>
         <div className="flex pb-2">
           <Keywords.Default value={data.default} onChange={
               e => this.changeOtherValue(e, 'default')} />
@@ -45,7 +45,7 @@ class NumberProperty extends PureComponent {
         </div>
       </div>
         <div>
-          <div className="uppercase font-semibold pb-3">{isSubtype ? 'subtype': ''} Number properties</div>
+          <div className="uppercase font-semibold pb-3 text-black dark:text-white">{isSubtype ? 'subtype': ''} Number properties</div>
           <Keywords.Minimum
               value={data.minimum}
               exclusiveMinimum={data.exclusiveMinimum}

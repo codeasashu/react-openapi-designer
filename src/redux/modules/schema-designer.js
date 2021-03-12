@@ -11,6 +11,8 @@ const DELETE_ITEM = 'DELETE_ITEM';
 const ADD_FIELD = 'ADD_FIELD';
 const ADD_CHILD_FIELD = 'ADD_CHILD_FIELD';
 const SET_OPEN_VALUE = 'SET_OPEN_VALUE';
+const ADD_EXAMPLE = 'ADD_EXAMPLE';
+const DELETE_EXAMPLE = 'DELETE_EXAMPLE';
 
 let fieldNum = 1;
 
@@ -44,6 +46,7 @@ const initialSchema = {
   type: 'object',
   properties: {},
   required: [],
+  examples: {}
 };
 
 function handleType(schema) {
@@ -225,6 +228,18 @@ const _handleChangeValue = (state, { keys, value }) => {
   }
 };
 
+const _handleAddExample = (state, {key, value}) => {
+  const clonedState = _.cloneDeep(state);
+  return _.set(clonedState, ['examples', key], value);
+};
+
+const _handleDeleteExample = (state, {key}) => {
+  let clonedState = _.cloneDeep(state);
+  _.unset(clonedState, ['examples', key]);
+  return clonedState;
+};
+
+
 export const schemaReducer = (state = initialSchema, action) => {
   switch (action.type) {
     case CHANGE_EDITOR_SCHEMA:
@@ -243,6 +258,10 @@ export const schemaReducer = (state = initialSchema, action) => {
       return _handleChangeName(state, action.payload);
     case CHANGE_VALUE:
       return _handleChangeValue(state, action.payload);
+    case ADD_EXAMPLE:
+      return _handleAddExample(state, action.payload);
+    case DELETE_EXAMPLE:
+      return _handleDeleteExample(state, action.payload);
     default:
       return state;
   }
@@ -321,4 +340,14 @@ export const addChildField = ({ key }) => ({
 export const setOpenValue = ({ key, value }) => ({
   type: SET_OPEN_VALUE,
   payload: { key, value },
+});
+
+export const addExample = ({ key, value }) => ({
+  type: ADD_EXAMPLE,
+  payload: { key, value },
+});
+
+export const deleteExample = (key) => ({
+  type: DELETE_EXAMPLE,
+  payload: { key },
 });
