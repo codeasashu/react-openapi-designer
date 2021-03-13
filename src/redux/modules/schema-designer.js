@@ -1,4 +1,5 @@
 import _ from 'lodash';
+import OrderedDict from '../../ordered-dict';
 import { combineReducers } from 'redux';
 
 const CHANGE_EDITOR_SCHEMA = 'CHANGE_EDITOR_SCHEMA';
@@ -196,18 +197,21 @@ const _handleEnableRequire = (state, { key, value, required }) => {
 
 const _handleChangeName = (state, { key, name, value }) => {
   if (!value || !value.length) {
-    return state;
+    value = '';
   }
   const clonedState = _.cloneDeep(state);
-  const items = _.get(clonedState, key);
+  let items = _.get(clonedState, key);
 
   const keyExists = Object.keys(items).indexOf(value) >= 0 && items[value] === 'object';
   if (keyExists || !_.has(items, name)) {
     return state;
   }
 
-  items[value] = items[name];
-  delete items[name];
+  let orderDict = new OrderedDict(items);
+  const keyIndex = orderDict.findIndex(name);
+  orderDict.insert(keyIndex, value, items[name]);
+  orderDict.remove(name);
+  _.set(clonedState, key, orderDict.toDict());
 
   const newState = addRequiredFields(clonedState, key, value);
   return removeRequireField(newState, key, name);

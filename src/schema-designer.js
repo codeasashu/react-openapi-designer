@@ -152,7 +152,8 @@ class SchemaDesigner extends React.Component {
       <>
         <Button icon="clean" onClick={e => this._toggleGenerateFromCode(true)}>Generate from JSON</Button>
         <SchemaRow
-          show={true}
+          show
+          root
           schema={schema}
           handleField={this.addChildField}
           handleSidebar={() => this.setState({ show: !show })}

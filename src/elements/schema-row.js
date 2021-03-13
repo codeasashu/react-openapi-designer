@@ -105,7 +105,8 @@ class SchemaRow extends React.PureComponent {
     let padLeft = 30 * (indent + 1);
     padLeft += schema.type === 'object' ? 0 : 50;
     const styles = { paddingLeft: `${padLeft}px` };
-    const isParentArray = this.props.parent && (this.props.parent === 'array');
+    const isParentArray = this.props.root || (
+      this.props.parent && (this.props.parent === 'array'));
 
     return show ? (
       <>
@@ -129,9 +130,9 @@ class SchemaRow extends React.PureComponent {
                     small minimal icon={!!sidebarOpen ? 'chevron-down': 'chevron-right'} />
               )}
 
-              {!!name && !isParentArray && <DebouncedInput
+              {!isParentArray && <DebouncedInput
                 className="pl-1" 
-                onChange={this._handleChangeName} value={name} small />}
+                onChange={this._handleChangeName} value={name || ''} small />}
               {!!name && !isParentArray && (<span>&nbsp;:&nbsp;</span>)}
               <Popover2
                 className="p-1 pt-0"
