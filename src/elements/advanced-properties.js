@@ -32,6 +32,7 @@ const mapping = (data, onChange, requestedLevel=1, level=1) => {
     number: <Properties.Number isSubtype={level > 1} onChange={onChange} data={data} />,
     boolean: <Properties.Boolean isSubtype={level > 1} onChange={onChange} data={data} />,
     integer: <Properties.Number isSubtype={level > 1} onChange={onChange} data={data} />,
+    object: <Properties.Object isSubtype={level > 1} onChange={onChange} data={data} />,
     array: getArrayProperty(data, onChange, requestedLevel, level),
   }[data.type];
 };

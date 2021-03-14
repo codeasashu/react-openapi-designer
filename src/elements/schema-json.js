@@ -33,12 +33,12 @@ class SchemaArray extends PureComponent {
         handleName={() => {}}
         handleChildField={({ key }) => {
           wrapperProps.addChildField({ key });
-          wrapperProps.setOpenValue({ key, value: true });
+          wrapperProps.setOpenDropdownPath({ key, value: true });
         }}
         handleDelete={({ key }) => {
           wrapperProps.changeValue({ key, value: {} });
         }}
-        handleSidebar={wrapperProps.setOpenValue}
+        handleSidebar={wrapperProps.setOpenDropdownPath}
         handleSchemaType={wrapperProps.changeType}
         handleTitle={wrapperProps.changeValue}
         handleDescription={wrapperProps.changeValue}
@@ -80,9 +80,9 @@ class SchemaItem extends PureComponent {
         handleField={wrapperProps.addField}
         handleChildField={({ key }) => {
           wrapperProps.addChildField({ key });
-          wrapperProps.setOpenValue({ key, value: true });
+          wrapperProps.setOpenDropdownPath({ key, value: true });
         }}
-        handleSidebar={wrapperProps.setOpenValue}
+        handleSidebar={wrapperProps.setOpenDropdownPath}
         handleSchemaType={wrapperProps.changeType}
         handleTitle={wrapperProps.changeValue}
         handleDescription={wrapperProps.changeValue}

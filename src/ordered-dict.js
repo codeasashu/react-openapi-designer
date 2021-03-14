@@ -8,20 +8,23 @@ class OrderedDict {
   findIndex = (key) => this.arr.indexOf(key);
 
   insert = (index, key, val) => {
-    if (this.arr.indexOf(key) !== -1) return this;
+    if (this.arr.indexOf(key) !== -1) return false;
 
     this.arr.splice(index, 0, key);
     this.dict[key] = val;
-    return this;
+    return true;
   };
 
   remove = (key) => {
     const index = this.findIndex(key);
     if(index >= 0) {
+      console.log('arr', this.arr, this.dict);
       this.arr.splice(index, 1);
       delete this.dict[key];
+      console.log('arr2', this.arr, this.dict);
+      return true;
     }
-    return this;
+    return false;
   };
 
   toDict = () => {

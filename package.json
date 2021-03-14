@@ -9,13 +9,13 @@
         "test": "npm run typecheck && npm run jest",
         "build": "webpack --config webpack/webpack.prod.js --progress",
         "watch": "webpack --config webpack/webpack.common.js --watch  --progress",
-        "demo": "webpack serve -c webpack/webpack.demo.js --stats-children"
+        "dev": "webpack serve -c webpack/webpack.dev.js --stats-children"
     },
     "dependencies": {
         "@blueprintjs/core": "^3.40.0",
         "@blueprintjs/popover2": "^0.3.1",
+        "@reduxjs/toolkit": "^1.5.0",
         "class-autobind-decorator": "^3.0.1",
-        "generate-schema": "^2.6.0",
         "json-schema-faker": "^0.5.0-rcv.33",
         "lodash": "^4.17.20",
         "prismjs": "^1.23.0",
@@ -23,7 +23,10 @@
         "react": "^16.8.6",
         "react-redux": "^7.0.1",
         "react-simple-code-editor": "^0.11.0",
-        "redux": "^4.0.1"
+        "redux": "^4.0.1",
+        "redux-thunk": "^2.3.0",
+        "tailwindcss": "^2.0.3",
+        "type-of-is": "^3.5.1"
     },
     "peerDependencies": {
         "react-dom": "^16.8.6"
@@ -65,7 +68,7 @@
         "postcss-loader": "^5.1.0",
         "stream-http": "^3.1.1",
         "style-loader": "^2.0.0",
-        "tailwindcss": "^2.0.3",
+        "terser-webpack-plugin": "^5.1.1",
         "vm-browserify": "^1.1.2",
         "webpack": "^5.23.0",
         "webpack-cli": "^4.5.0",

@@ -21,11 +21,8 @@ module.exports = merge(common, {
       title: 'Development',
       inject: 'body'
     }),
-  ]
-  // devServer: {
-  //   contentBase: path.join(__dirname, 'dist'),
-  //   compress: false,
-  //   index: 'dist/index.html',
-  //   port: 8080,
-  // }
+  ],
+  optimization: {
+    minimize: false,
+  }
 })

@@ -6,6 +6,7 @@ class SchemaSelectors extends React.PureComponent {
 
   _handleSelectType(type, prefix) {
     const { onClick } = this.props;
+    console.log('handleTTypeclick', type, prefix);
     onClick(type, prefix);
   }
 
@@ -23,7 +24,7 @@ class SchemaSelectors extends React.PureComponent {
               return (
                 <div className={
                   `flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
-                  ${schema.type === type ? 'bg-green-600 text-white' : 'hover:bg-gray-300'}`}
+                  ${schema.type === type ? 'bg-green-600 text-white' : 'hover:bg-gray-300 dark:hover:bg-gray-600'}`}
                   key={index}
                   onClick={e => this._handleSelectType(type, ['items', 'type'])}
                   selected={schema.type === type}>
@@ -48,7 +49,7 @@ class SchemaSelectors extends React.PureComponent {
               return (
                 <div className={
                   `flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
-                  ${schema.type === type ? 'bg-green-600 text-white' : 'hover:bg-gray-300'}`}
+                  ${schema.type === type ? 'bg-green-600 text-white' : 'hover:bg-gray-300 dark:hover:bg-gray-600'}`}
                   key={index}
                   onClick={e => this._handleSelectType(type, ['type'])}
                   selected={schema.type === type}>

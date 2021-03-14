@@ -1,26 +1,23 @@
 import React from 'react';
-import Editor from "react-simple-code-editor";
-import Prism from 'prismjs';
 import { ButtonGroup, Button, Tab, Tabs } from "@blueprintjs/core";
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
-import { isEqual, isObject } from 'lodash';
-import * as schemaDesignerActions from './redux/modules/schema-designer';
+import { isEqual, isObject, cloneDeep } from 'lodash';
+import { schemaSlice, generateExampleFromSchema } from './redux/modules/schema';
+import { dropdownSlice } from './redux/modules/dropdown';
 import SchemaRow from './elements/schema-row';
 import SchemaJson from './elements/schema-json';
-import GenerateSchema from 'generate-schema/src/schemas/json.js';
-const jsf = require('json-schema-faker');
 import DebouncedInput from './elements/debounced-input';
-
-jsf.option({ requiredOnly: false, fillProperties: true, optionalsProbability: 0 });
+import JsonEditor from './elements/json-editor';
 
 @autoBindMethodsForReact()
 class SchemaDesigner extends React.Component {
   constructor(props) {
     super(props);
     this.state = {
+      validGeneratedJson: false,
       generateCode: false,
       userCode: '{}',
       examples: [],
@@ -45,27 +42,11 @@ class SchemaDesigner extends React.Component {
     if (typeof this.props.onChange === 'function' && this.props.schema !== oldProps.schema) {
       const newData = this.props.schema || '';
       const oldData = oldProps.schema || '';
-      const title = this.state.title || '';
-      newData.title = title;
       if (!isEqual(oldData, newData)) return this.props.onChange(newData);
     }
     if (this.props.data && this.props.data !== oldProps.data) {
       this.props.changeEditorSchema({ value: this.props.data });
     }
-  }
-
-  componentDidMount() {
-    let data = this.props.data;
-    if (!data) {
-      data = {
-        type: 'object',
-        title: 'title',
-        properties: {},
-      };
-    }
-
-    this.setState({ title: this.props.schema.title || '' });
-    this.props.changeEditorSchema({ value: data });
   }
 
   addChildField(e) {
@@ -118,31 +99,41 @@ class SchemaDesigner extends React.Component {
   }
 
   _handleGenerateFromCode() {
-    let generatedJSON = null;
+    const { generateSchema } = this.props;
+    const { userCode } = this.state;
     try {
-      generatedJSON = JSON.parse(this.state.userCode);
+      generateSchema(userCode);
+      this.setState({ userCode: '{}', generateCode: false });
     } catch(error) {
-      console.warn('[JSON parseError]', error);
-    }
-    if(isObject(generatedJSON)) {
-      let schema = GenerateSchema(generatedJSON);
-      console.log('generateCode', schema, generatedJSON);
-      this.props.changeEditorSchema({ value: schema });
-      this.setState({ userCode: '{}' });
-      this._toggleGenerateFromCode(false);
+      console.error(error);
     }
   }
 
   _setUserCode(userCode) {
-    this.setState({ userCode })
+    try {
+      JSON.parse(userCode);
+      this.setState({ validGeneratedJson: true });
+    } catch(error) {
+      this.setState({ validGeneratedJson: false });
+    }
+    this.setState({ userCode });
   }
 
-  async addExample(key, value) {
-    const {schema, addExample} = this.props;
-    if(!key || key === '')
-      key = `example-${Object.keys(schema.examples).length + 1}`;
-    value = value || await jsf.resolve(schema);
-    addExample({ key, value });
+  addExample(key, value) {
+    const { generateExampleFromSchema} = this.props;
+    generateExampleFromSchema({ key, value })
+  }
+
+  _deleteExample(title) {
+    const { deleteExample } = this.props;
+    deleteExample(title);
+    this.setState({ selectedTab: 'schema'});
+  }
+
+  _handleChangeExampleTitle(oldTitle, newTitle) {
+    const { renameExample } = this.props;
+    renameExample({ oldTitle, newTitle });
+    this.setState({ selectedTab: newTitle});
   }
 
   renderForm() {
@@ -175,24 +166,15 @@ class SchemaDesigner extends React.Component {
   }
 
   renderGenerateCode() {
-    const { userCode } = this.state;
+    const { userCode, validGeneratedJson } = this.state;
     return (
       <>
         <ButtonGroup>
-          <Button icon="clean" onClick={this._handleGenerateFromCode}>Generate</Button>
+          <Button icon="clean" disabled={!validGeneratedJson} onClick={this._handleGenerateFromCode}>Generate</Button>
           <Button icon="small-cross" onClick={e => this._toggleGenerateFromCode(false)}>Cancel</Button>
         </ButtonGroup>
         <div>
-          <Editor
-            value={userCode}
-            onValueChange={this._setUserCode}
-            highlight={(code) => code && Prism.highlight(code, Prism.languages.json, 'json')}
-            padding={10}
-            style={{
-              fontFamily: '"Fira code", "Fira Mono", monospace',
-              fontSize: 12,
-            }}
-          />
+          <JsonEditor value={userCode} onChange={this._setUserCode} />
         </div>
       </>
     );
@@ -203,51 +185,20 @@ class SchemaDesigner extends React.Component {
     return generateCode === true ? this.renderGenerateCode() : this.renderForm();
   }
 
-  _deleteExample(title) {
-    const { deleteExample } = this.props;
-    console.log('delexample', title);
-    deleteExample(title);
-    this.setState({ selectedTab: 'schema'});
-  }
-
-  _handleChangeExampleTitle(oldtitle, title) {
-    const { schema, addExample, deleteExample } = this.props;
-    const oldValue = schema.examples[oldtitle];
-    deleteExample(oldtitle);
-    setTimeout(() => {
-      this.addExample(title, oldValue);
-      this.setState({ selectedTab: title});
-    }, 0);
-  }
-
   renderExample(title, content) {
     return (
       <div>
-        <div className="flex">
-        <DebouncedInput className="pl-1 flex-1" 
-          onChange={e => this._handleChangeExampleTitle(title, e)} value={title} />
+        <div className="flex p-1">
+        <DebouncedInput className="pl-1 flex-1" onChange={(e) => {}}
+          onBlur={e => this._handleChangeExampleTitle(title, e)} value={title} />
         <Button
           className="ml-3"
           onClick={e => this._deleteExample(title)}
           icon="trash" />
-          </div>
-        <Editor
-          value={ JSON.stringify(content, null, 4) }
-          highlight={(code) => code && Prism.highlight(code, Prism.languages.json, 'json')}
-          onValueChange={e => this._changeExample(title, e)}
-          padding={10}
-            style={{
-              fontFamily: '"Fira code", "Fira Mono", monospace',
-              fontSize: 12,
-            }}
-        />
+        </div>
+        <JsonEditor value={content} onBlur={e => this.addExample(title, e)} />
       </div>
     );
-  }
-
-  _changeExample(title, e) {
-    console.log('changedex', title, e);
-    this.addExample(title, JSON.parse(e));
   }
 
   handleTabChange(selectedTab) {
@@ -282,25 +233,28 @@ SchemaDesigner.propTypes = {
   isMock: PropTypes.bool,
 };
 
-const mapStateToProps = ({ open, schema }) => {
-  return { schema, open };
+const mapStateToProps = ({ schema, dropdown }) => {
+  return { schema, open: dropdown };
 };
 
 const mapDispatchToProps = dispatch => {
-  const schema = bindActionCreators(schemaDesignerActions, dispatch);
+  const schema = bindActionCreators({...schemaSlice.actions, generateExampleFromSchema}, dispatch);
+  const dropdown = bindActionCreators(dropdownSlice.actions, dispatch);
   return {
     changeEditorSchema: schema.changeEditorSchema,
     changeName: schema.changeName,
     changeValue: schema.changeValue,
     changeType: schema.changeType,
     enableRequire: schema.enableRequire,
-    requireAll: schema.requireAll,
     deleteItem: schema.deleteItem,
     addField: schema.addField,
     addChildField: schema.addChildField,
-    setOpenValue: schema.setOpenValue,
     addExample: schema.addExample,
     deleteExample: schema.deleteExample,
+    setOpenDropdownPath: dropdown.setOpenDropdownPath,
+    generateExampleFromSchema: schema.generateExampleFromSchema,
+    renameExample: schema.renameExample,
+    generateSchema: schema.generateSchema,
   };
 };
 

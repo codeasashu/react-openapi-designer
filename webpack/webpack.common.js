@@ -1,9 +1,13 @@
 const path = require('path');
-const webpack = require('webpack')
+const webpack = require('webpack');
+const TerserPlugin = require("terser-webpack-plugin");
+
 
 module.exports = {
   mode: 'development',
-  entry: {index: './src/index.js'},
+  entry: {
+    app: './src/index.js',
+  },
   target: 'web',
   output: {
     filename: '[name].js',
@@ -59,5 +63,9 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
     })
-  ]
+  ],
+  optimization: {
+    minimize: true,
+    minimizer: [new TerserPlugin()],
+  },
 };

@@ -206,3 +206,49 @@ export const MaxItems = (props) => {
             />
         </FormGroup>
 };
+
+export const DisallowAdditionalProperties = (props) => {
+  return <FormGroup inline className="mb-0 text-center text-black dark:text-white" label="Disallow additional properties">
+            <Switch
+              checked={(props.value===false) || false}
+              onChange={props.onToggle}
+            />
+          </FormGroup>
+}
+
+export const ObjectBehaviour = (props) => {
+  return <FormGroup className="flex-1" label='Behaviour'>
+          <div className="bp3-select">
+              <select
+                value={props.value}
+                onChange={props.onChange}
+                style={{ width: 200 }}>
+                <option value="">Read and write</option>
+                <option value="readOnly">Read Only</option>
+                <option value="writeOnly">Write Only</option>
+              </select>
+          </div>
+        </FormGroup>
+};
+
+export const MinProperty = (props) => {
+  return <FormGroup className="flex-1 mb-0 text-black dark:text-white" label='minProperties'>
+            <DebouncedInput
+              large
+              value={props.value}
+              placeholder=">=0"
+              onChange={props.onChange}
+            />
+        </FormGroup>
+}
+
+export const MaxProperty = (props) => {
+  return <FormGroup className="flex-1 mb-0 ml-3 text-black dark:text-white" label='maxProperties'>
+            <DebouncedInput
+              large
+              value={props.value}
+              placeholder=">=0"
+              onChange={props.onChange}
+            />
+        </FormGroup>
+}

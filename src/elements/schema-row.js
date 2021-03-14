@@ -48,6 +48,7 @@ class SchemaRow extends React.PureComponent {
 
   _handleChangeSchemaType(value, prefix=['type']) {
     const key = this.addToPrefix(prefix);
+    console.log('handleType', value, key);
     this.props.handleSchemaType({ key, value });
   }
 

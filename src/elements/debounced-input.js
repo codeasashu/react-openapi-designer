@@ -36,6 +36,8 @@ class DebouncedInput extends PureComponent {
   constructor(props) {
     super(props);
 
+    this.state = { value: '' };
+
     if (!props.delay) {
       this._handleValueChange = props.onChange;
     } else {
@@ -45,18 +47,34 @@ class DebouncedInput extends PureComponent {
     this._hasFocus = false;
   }
 
+  componentDidMount() {
+    const { value } = this.props;
+    this.setState({ value });
+  }
+
+  componentDidUpdate(oldProps) {
+    const { value } = this.props;
+    if(oldProps.value != value) {
+      this.setState({ value });
+    }
+  }
+
   _handleChange(e) {
+    const { value } = this.state;
+    this.setState({ value: e.target.value });
     this._handleValueChange(e.target.value);
   }
 
   _handleFocus(e) {
+    const { value } = this.state;
     this._hasFocus = true;
-    this.props.onFocus && this.props.onFocus(e);
+    this.props.onFocus && this.props.onFocus(value);
   }
 
   _handleBlur(e) {
+    const { value } = this.state;
     this._hasFocus = false;
-    this.props.onBlur && this.props.onBlur(e);
+    this.props.onBlur && this.props.onBlur(value);
   }
 
   _setRef(n) {
@@ -123,7 +141,7 @@ class DebouncedInput extends PureComponent {
 
   getValue() {
     if (this._input) {
-      return this._input.value;
+      return this.state.value;
     } else {
       return '';
     }
@@ -137,9 +155,10 @@ class DebouncedInput extends PureComponent {
       delay, // eslint-disable-line no-unused-vars
       textarea,
       large,
-      value,
+      value: propValue,
       ...props
     } = this.props;
+    const { value } = this.state;
     if (textarea) {
       return (
         <TextArea
@@ -152,16 +171,14 @@ class DebouncedInput extends PureComponent {
       );
     } else {
       return (
-        <div className="bp3-input-group">
         <InputGroup
           ref={this._setRef}
-          value={value || ''}
+          value={this.state.value || ''}
           {...props}
           onChange={this._handleChange}
           onFocus={this._handleFocus}
           onBlur={this._handleBlur}
         />
-        </div>
       );
     }
   }
