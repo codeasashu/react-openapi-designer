@@ -20,22 +20,8 @@ class SchemaDesigner extends React.Component {
       validGeneratedJson: false,
       generateCode: false,
       userCode: '{}',
-      examples: [],
       selectedTab: 'schema',
-      visible: false,
-      show: true,
-      editVisible: false,
-      description: '',
-      descriptionKey: null,
-      advVisible: false,
-      itemKey: [],
-      curItemCustomValue: null,
-      checked: false,
-      editorModalName: '',
-      mock: '',
     };
-    this.jsonSchemaData = null;
-    this.jsonData = null;
   }
 
   componentDidUpdate(oldProps) {
@@ -57,48 +43,8 @@ class SchemaDesigner extends React.Component {
 
   addChildField(e) {
     this.props.addChildField({ key: ['properties'] });
-    this.setState({ show: true });
+    this.props.setOpenDropdownPath({ key: ['properties'], value: true })
   };
-
-  showEdit = (prefix, name, value, type) => {
-    if (type === 'object' || type === 'array') {
-      return;
-    }
-    const descriptionKey = [].concat(prefix, name);
-
-    value = name === 'mock' ? (value ? value.mock : '') : value;
-    this.setState({
-      editVisible: true,
-      [name]: value,
-      descriptionKey,
-      editorModalName: name,
-    });
-  };
-
-  handleAdvOk = () => {
-    if (this.state.itemKey.length === 0) {
-      this.props.changeEditorSchema({
-        value: this.state.curItemCustomValue,
-      });
-    } else {
-      this.props.changeValue({
-        key: this.state.itemKey,
-        value: this.state.curItemCustomValue,
-      });
-    }
-    this.setState({
-      advVisible: false,
-    });
-  };
-
-  handleAdvCancel = () => this.setState({ advVisible: false });
-
-  showAdv = (itemKey, curItemCustomValue) =>
-    this.setState({
-      advVisible: true,
-      itemKey,
-      curItemCustomValue,
-    });
   
   _toggleGenerateFromCode(desiredState=false) {
     this.setState({ generateCode: desiredState })
@@ -143,30 +89,22 @@ class SchemaDesigner extends React.Component {
   }
 
   renderForm() {
-    const { schema } = this.props;
-    const { show } = this.state;
+    const { schema, open } = this.props;
     return (
       <>
         <Button icon="clean" onClick={e => this._toggleGenerateFromCode(true)}>Generate from JSON</Button>
         <SchemaRow
           show
           root
+          sidebar={open}
           schema={schema}
           handleField={this.addChildField}
-          handleSidebar={() => this.setState({ show: !show })}
+          handleSidebar={this.props.setOpenDropdownPath}
           handleSchemaType={this.props.changeType}
           handleTitle={this.props.changeValue}
           handleDescription={this.props.changeValue}
-          handleSettings={this.showAdv}
         />
-        {this.state.show && (
-          <SchemaJson
-            wrapperProps={{
-              ...this.props,
-              ...{ showEdit: this.showEdit, showAdv: this.showAdv },
-            }}
-          />
-        )}
+        {!!open.properties.show && <SchemaJson wrapperProps={{ ...this.props }} />}
       </>
     );
   }

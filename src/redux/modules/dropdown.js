@@ -4,13 +4,15 @@ import { set, isUndefined, get } from 'lodash';
 export const dropdownSlice = createSlice({
   name: 'dropdown',
   initialState: {
-    properties: true
+    properties: {show: true}
   },
   reducers: {
       setOpenDropdownPath: (state, action) => {
         const { key, value } = action.payload;
-        const status = isUndefined(value) ? !get(state, key) : !!value;
-        return set(state, key, status);
+        const path = [].concat(key, 'show');
+        const isOpen = get(state, path) === true;
+        const status = isUndefined(value) ? !isOpen : !!value;
+        return set(state, path, status);
       },
   }
 });

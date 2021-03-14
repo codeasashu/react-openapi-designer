@@ -62,12 +62,6 @@ class SchemaRow extends React.PureComponent {
     this.props.handleDescription({ key, value: e.target.value });
   }
 
-  _handleSettings(e) {
-    const key = this.addToPrefix([]);
-    const { schema } = this.props;
-    this.props.handleSettings(key, schema);
-  }
-
   _handleDeleteItem(e) {
     const key = this.addToPrefix([]);
     this.props.handleDelete({ key });
@@ -101,7 +95,7 @@ class SchemaRow extends React.PureComponent {
     const prefix = fieldPrefix || [];
     const name = fieldName || null;
 
-    const sidebarOpen = prefix.length ? get(sidebar, this.addToPrefix(['properties'])) : true;
+    const sidebarOpen = get(sidebar, this.addToPrefix(['properties', 'show']));
     const indent = prefix.length ? prefix.filter(name => name !== 'properties').length : -1;
     let padLeft = 30 * (indent + 1);
     padLeft += schema.type === 'object' ? 0 : 50;
@@ -179,7 +173,7 @@ class SchemaRow extends React.PureComponent {
                   }
                   placement="right">
                   <Tooltip2 content={<span>{LocaleProvider('adv_setting')}</span>}>
-                    <Button onClick={this._handleSettings} small minimal icon="property" />
+                    <Button small minimal icon="property" />
                   </Tooltip2>
               </Popover2>
             </span>

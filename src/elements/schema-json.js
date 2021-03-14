@@ -43,7 +43,6 @@ class SchemaArray extends PureComponent {
         handleTitle={wrapperProps.changeValue}
         handleDescription={wrapperProps.changeValue}
         handleAdditionalProperties={wrapperProps.changeValue}
-        handleSettings={wrapperProps.showAdv}
         handleRequire={wrapperProps.enableRequire}>
         {mapping([].concat(prefix, 'items'), schema.items, wrapperProps)}
       </SchemaRow>
@@ -67,7 +66,7 @@ class SchemaItem extends PureComponent {
 
     return (
       <SchemaRow
-        show={get(wrapperProps.open, prefix)}
+        show={get(wrapperProps.open, [].concat(prefix, 'show'))}
         schema={itemSchema}
         sidebar={wrapperProps.open}
         fieldName={name}
@@ -87,7 +86,6 @@ class SchemaItem extends PureComponent {
         handleTitle={wrapperProps.changeValue}
         handleDescription={wrapperProps.changeValue}
         handleAdditionalProperties={wrapperProps.changeValue}
-        handleSettings={wrapperProps.showAdv}
         handleDelete={({ key }) => {
           wrapperProps.deleteItem({ key });
           wrapperProps.enableRequire({
