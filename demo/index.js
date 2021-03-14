@@ -6,5 +6,15 @@ const handleChange = (schema) => {
   console.log('Schema Changed', schema)
 };
 
+const initSchema = {
+    title: 'abc',
+    type: 'object',
+    properties: {
+      a: {type: 'string'}
+    },
+    required: ['a'],
+    examples: {}
+};
+
 const rootElement = document.getElementById("root");
-render(<JsonSchemaDesigner onChange={handleChange} />, rootElement);
+render(<JsonSchemaDesigner onChange={handleChange} schema={initSchema} />, rootElement);

@@ -44,9 +44,15 @@ class SchemaDesigner extends React.Component {
       const oldData = oldProps.schema || '';
       if (!isEqual(oldData, newData)) return this.props.onChange(newData);
     }
-    if (this.props.data && this.props.data !== oldProps.data) {
-      this.props.changeEditorSchema({ value: this.props.data });
+    if (this.props.initschema && this.props.initschema !== oldProps.initschema) {
+      this.props.changeEditorSchema({ value: this.props.initschema });
     }
+  }
+
+  componentDidMount() {
+    const { initschema } = this.props;
+    //@TODO Add schema validation
+    this.props.changeEditorSchema({ value: initschema });
   }
 
   addChildField(e) {
@@ -227,10 +233,8 @@ class SchemaDesigner extends React.Component {
 }
 
 SchemaDesigner.propTypes = {
-  data: PropTypes.object,
+  initschema: PropTypes.object,
   onChange: PropTypes.func,
-  showEditor: PropTypes.bool,
-  isMock: PropTypes.bool,
 };
 
 const mapStateToProps = ({ schema, dropdown }) => {

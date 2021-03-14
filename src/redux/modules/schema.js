@@ -1,4 +1,3 @@
-// import _ from 'lodash';
 import {
   uniq, has, set, unset, update, isUndefined, assign, get, last, dropRight,
   cloneDeep, isObject

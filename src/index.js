@@ -8,9 +8,10 @@ const JsonSchemaDesigner = (props) => {
   return (
     <div>
       <Provider store={store} className="wrapper">
-        <SchemaDesigner onChange={
-          e => (typeof props.onChange === 'function') ? props.onChange(e) : {}
-        } />
+        <SchemaDesigner
+          onChange={e => (typeof props.onChange === 'function') ? props.onChange(e) : {}}
+          initschema={props.schema}
+        />
       </Provider>
     </div>
   );
