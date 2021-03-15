@@ -4,17 +4,16 @@ import store from "./redux/store";
 import SchemaDesigner from './schema-designer';
 import "./index.css";
 
-const JsonSchemaDesigner = (props) => {
+const ReactOpenapiDesigner = (props) => {
   return (
-    <div>
-      <Provider store={store} className="wrapper">
+      <Provider store={store} className="wrapper__reactopenapidesigner">
         <SchemaDesigner
           onChange={e => (typeof props.onChange === 'function') ? props.onChange(e) : {}}
           initschema={props.schema}
+          dark={props.dark}
         />
       </Provider>
-    </div>
   );
 };
 
-export default JsonSchemaDesigner;
+export default ReactOpenapiDesigner;

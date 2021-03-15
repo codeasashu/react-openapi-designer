@@ -225,10 +225,10 @@ const _handleChangeValue = (state, { key, value }) => {
     const parentKeys = getParentKey(key);
     const parentData = parentKeys.length ? get(state, parentKeys) : state;
     const lastKey = last(key);
-    return set(state, parentKeys, {
-      ...parentData,
-      ...{ [lastKey]: value },
-    });
+    if(parentKeys.length)
+      set(state, parentKeys, {...parentData, ...{ [lastKey]: value }});
+    else state = value;
+    return state;
   } else {
     return _handleDelete(state, key);
   }

@@ -88,6 +88,14 @@ class SchemaDesigner extends React.Component {
     this.setState({ selectedTab: newTitle});
   }
 
+  _handleDescription({key, value}) {
+    const { schema, changeValue } = this.props;
+    changeValue({
+      key: [],
+      value: {...schema, ...{description: value}}
+    })
+  }
+
   renderForm() {
     const { schema, open } = this.props;
     return (
@@ -102,7 +110,8 @@ class SchemaDesigner extends React.Component {
           handleSidebar={this.props.setOpenDropdownPath}
           handleSchemaType={this.props.changeType}
           handleTitle={this.props.changeValue}
-          handleDescription={this.props.changeValue}
+          handleDescription={this._handleDescription}
+          handleAdditionalProperties={this.props.changeValue}
         />
         {!!open.properties.show && <SchemaJson wrapperProps={{ ...this.props }} />}
       </>
@@ -150,10 +159,10 @@ class SchemaDesigner extends React.Component {
   }
 
   render() {
-    const { schema } = this.props;
+    const { schema, dark } = this.props;
     const { selectedTab } = this.state;
     return (
-      <div className="json-schema-react-editor bp3-dark bg-white dark:bg-gray-700">
+      <div className={`json-schema-react-editor ${dark && 'bp3-dark'}`}>
         <Tabs className="bp3-simple-tab-list" id="SchemTabs" key={"horizontal"} onChange={this.handleTabChange} selectedTabId={selectedTab}>
           <Tab className="bp3-simple-tab" id="schema" title="Schema" panel={this.renderSchema()} />
           {schema.examples && Object.keys(schema.examples).map((example, i) =>

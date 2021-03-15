@@ -21,7 +21,7 @@ class ArrayProperty extends PureComponent {
       return (
         <div className="text-sm overflow-auto p-1">
             <div className="pb-6">
-                <div className="uppercase font-semibold pb-3 text-black dark:text-white">{heading}</div>
+                <div className="uppercase font-semibold pb-3">{heading}</div>
                 <div className="flex pb-2">
                     <Keywords.UniqueItems value={data.uniqueItems} onToggle={
                         e => this.changeOtherValue('uniqueItems', e.target.checked)} />

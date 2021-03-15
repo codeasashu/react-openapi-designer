@@ -8,10 +8,11 @@ module.exports = {
   },
   target: 'web',
   output: {
-    filename: '[name].js',
+    filename: 'main.js',
     sourceMapFilename: '[name].js.map',
-    library: 'react-openapi-designer',
+    path: path.join(__dirname, '../dist'),
     libraryTarget: 'umd',
+    clean: true,
   },
   resolve: {
     aliasFields: ['browser'],
@@ -50,6 +51,9 @@ module.exports = {
          use: ['file-loader']
        }
     ],
+  },
+  externals: {
+    react: 'react'
   },
   plugins: [
     new webpack.DefinePlugin({

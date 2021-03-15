@@ -4,6 +4,8 @@ const { merge } = require('webpack-merge');
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
 const common = require('./webpack.common');
 
+delete common.externals;
+
 module.exports = merge(common, {
   context: __dirname,
   entry: '../demo/index',
@@ -15,16 +17,18 @@ module.exports = merge(common, {
   devServer: {
 		historyApiFallback: true,
     port: 8080,
+    hot: true,
 	},
+  resolve: {
+    alias: {
+      react: path.resolve('node_modules','react'),
+    }
+  },
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve("demo", "index.html"),
       title: 'Development',
       inject: 'body'
     }),
-    new BundleAnalyzerPlugin(),
-  ],
-  optimization: {
-    minimize: false,
-  }
+  ]
 })

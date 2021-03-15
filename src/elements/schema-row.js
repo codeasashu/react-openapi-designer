@@ -149,7 +149,7 @@ class SchemaRow extends React.PureComponent {
               </Popover2>
             </div>
             <span>
-              {!!name && (<Popover2
+              <Popover2
                   inheritDarkTheme
                   content={
                     <TextArea
@@ -159,10 +159,10 @@ class SchemaRow extends React.PureComponent {
                       onChange={this._handleChangeDescription}
                     />}
                   placement="left">
-                  <Tooltip2 content={<span>{LocaleProvider('adv_setting')}</span>}>
+                  <Tooltip2 content={<span>Description</span>}>
                     <Button small minimal icon="manual" intent={!!schema.description ? Intent.PRIMARY : null} />
                   </Tooltip2>
-              </Popover2>)}
+              </Popover2>
             </span>
             <span>
               <Popover2
@@ -179,7 +179,7 @@ class SchemaRow extends React.PureComponent {
             </span>
             {!!name && (
               <span>
-                <Tooltip2 content={LocaleProvider('adv_setting')}>
+                <Tooltip2 content="Delete field">
                   <Button onClick={this._handleDeleteItem} small minimal icon="cross" />
                 </Tooltip2>
               </span>
@@ -192,7 +192,7 @@ class SchemaRow extends React.PureComponent {
                     small minimal icon="issue"
                     onClick={this._handleToggleRequire}
                     intent={required ? Intent.DANGER : null} />
-                ) : (<Tooltip2 content={LocaleProvider('adv_setting')}>
+                ) : (<Tooltip2 content={LocaleProvider('required')}>
                   <Button
                     disabled={isParentArray}
                     small minimal icon="issue"

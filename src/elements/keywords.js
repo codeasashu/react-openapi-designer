@@ -5,7 +5,7 @@ import LocaleProvider from '../locale';
 
 export const Default = (props) => {
     return  <FormGroup
-                className="flex-1 text-black dark:text-white"
+                className="flex-1"
                 label={LocaleProvider('default')}
                 labelFor="text-input"
             >
@@ -59,7 +59,7 @@ const getFormat = format => {
 
 export const Format = (props) => {
   const format = getFormat(props.format || String);
-  return <FormGroup label="format" className="flex-1 ml-3 text-black dark:text-white">
+  return <FormGroup label="format" className="flex-1 ml-3">
             <div className="bp3-select">
               <select
                 style={{ width: 150 }}
@@ -81,7 +81,7 @@ export const Format = (props) => {
 }
 
 export const Enum = (props) => {
-  return <FormGroup className="flex-1 mb-0 text-black dark:text-white" label='enum'>
+  return <FormGroup className="flex-1 mb-0" label='enum'>
             <TagInput
               values={props.value || []}
               placeholder={LocaleProvider('enum_msg')}
@@ -91,7 +91,7 @@ export const Enum = (props) => {
 };
 
 export const Pattern = (props) => {
-  return <FormGroup className="flex-1 mb-0 text-black dark:text-white" label='pattern'>
+  return <FormGroup className="flex-1 mb-0" label='pattern'>
             <DebouncedInput
               large
               value={props.value}
@@ -102,7 +102,7 @@ export const Pattern = (props) => {
 };
 
 export const MinLength = (props) => {
-  return <FormGroup className="flex-1 mb-0 text-black dark:text-white" label={LocaleProvider('minLength')}
+  return <FormGroup className="flex-1 mb-0" label={LocaleProvider('minLength')}
             labelFor="text-input">
             <DebouncedInput
               large
@@ -114,7 +114,7 @@ export const MinLength = (props) => {
 };
 
 export const MaxLength = (props) => {
-  return <FormGroup className="flex-1 mb-0 ml-3 text-black dark:text-white" label={LocaleProvider('maxLength')}
+  return <FormGroup className="flex-1 mb-0 ml-3" label={LocaleProvider('maxLength')}
             labelFor="text-input">
             <DebouncedInput
               large
@@ -127,7 +127,7 @@ export const MaxLength = (props) => {
 
 export const Minimum = (props) => {
   return <div className="flex pb-2">
-          <FormGroup className="flex-1 mb-0 text-black dark:text-white" label='minimum'>
+          <FormGroup className="flex-1 mb-0" label='minimum'>
             <DebouncedInput
               large
               value={props.value}
@@ -135,7 +135,7 @@ export const Minimum = (props) => {
               onChange={props.onChange}
             />
           </FormGroup>
-          <FormGroup className="ml-3 mb-0 text-center text-black dark:text-white" label="exclusiveMin">
+          <FormGroup className="ml-3 mb-0 text-center" label="exclusiveMin">
             <Switch
               checked={props.exclusiveMinimum || false}
               onChange={props.onToggle}
@@ -146,7 +146,7 @@ export const Minimum = (props) => {
 
 export const Maximum = (props) => {
   return <div className="flex pb-2">
-          <FormGroup className="flex-1 mb-0 text-black dark:text-white" label="maximum">
+          <FormGroup className="flex-1 mb-0" label="maximum">
             <DebouncedInput
               large
               value={props.value}
@@ -154,7 +154,7 @@ export const Maximum = (props) => {
               onChange={props.onChange}
             />
           </FormGroup>
-          <FormGroup className="ml-3 mb-0 text-black dark:text-white text-center" label="exclusiveMax">
+          <FormGroup className="ml-3 mb-0 text-center" label="exclusiveMax">
             <Switch
               checked={props.exclusiveMaximum || false}
               onChange={props.onToggle}
@@ -164,7 +164,7 @@ export const Maximum = (props) => {
 };
 
 export const MultipleOf = (props) => {
-  return <FormGroup className="flex-1 mb-0 text-black dark:text-white" label="multipleOf" labelFor="text-input">
+  return <FormGroup className="flex-1 mb-0" label="multipleOf" labelFor="text-input">
             <DebouncedInput
               large
               value={props.value}
@@ -175,7 +175,7 @@ export const MultipleOf = (props) => {
 };
 
 export const UniqueItems = (props) => {
-  return <FormGroup className="flex-1 mb-0 text-black dark:text-white" label="uniqueItems">
+  return <FormGroup className="flex-1 mb-0" label="uniqueItems">
             <Switch
               checked={props.value || false}
               onChange={props.onToggle}
@@ -184,7 +184,7 @@ export const UniqueItems = (props) => {
 };
 
 export const MinItems = (props) => {
-  return <FormGroup className="flex-1 mb-0 text-black dark:text-white" label="minitems"
+  return <FormGroup className="flex-1 mb-0" label="minitems"
             labelFor="text-input">
             <DebouncedInput
               large
@@ -196,7 +196,7 @@ export const MinItems = (props) => {
 };
 
 export const MaxItems = (props) => {
-  return <FormGroup className="flex-1 mb-0 ml-3 text-black dark:text-white" label="maxitems"
+  return <FormGroup className="flex-1 mb-0 ml-3" label="maxitems"
             labelFor="text-input">
             <DebouncedInput
               large
@@ -208,7 +208,7 @@ export const MaxItems = (props) => {
 };
 
 export const DisallowAdditionalProperties = (props) => {
-  return <FormGroup inline className="mb-0 text-center text-black dark:text-white" label="Disallow additional properties">
+  return <FormGroup inline className="mb-0 text-center" label="Disallow additional properties">
             <Switch
               checked={(props.value===false) || false}
               onChange={props.onToggle}
@@ -232,7 +232,7 @@ export const ObjectBehaviour = (props) => {
 };
 
 export const MinProperty = (props) => {
-  return <FormGroup className="flex-1 mb-0 text-black dark:text-white" label='minProperties'>
+  return <FormGroup className="flex-1 mb-0" label='minProperties'>
             <DebouncedInput
               large
               value={props.value}
@@ -243,7 +243,7 @@ export const MinProperty = (props) => {
 }
 
 export const MaxProperty = (props) => {
-  return <FormGroup className="flex-1 mb-0 ml-3 text-black dark:text-white" label='maxProperties'>
+  return <FormGroup className="flex-1 mb-0 ml-3" label='maxProperties'>
             <DebouncedInput
               large
               value={props.value}

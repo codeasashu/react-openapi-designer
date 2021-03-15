@@ -16,5 +16,7 @@ const initSchema = {
     examples: {}
 };
 
-const rootElement = document.getElementById("root");
-render(<JsonSchemaDesigner onChange={handleChange} schema={initSchema} />, rootElement);
+render(
+  <JsonSchemaDesigner dark schema={initSchema} onChange={handleChange} />,
+  document.getElementById("root")
+);
