@@ -9,7 +9,7 @@ module.exports = {
   target: 'web',
   output: {
     filename: 'main.js',
-    sourceMapFilename: '[name].js.map',
+    sourceMapFilename: 'main.js.map',
     path: path.join(__dirname, '../dist'),
     libraryTarget: 'umd',
     clean: true,

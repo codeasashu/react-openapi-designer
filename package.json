@@ -7,7 +7,7 @@
         "jest": "jest",
         "jest:watch": "jest --watch",
         "test": "npm run typecheck && npm run jest",
-        "build": "webpack --config webpack/webpack.prod.js --progress",
+        "build": "NODE_ENV=production webpack --config webpack/webpack.prod.js --progress",
         "watch": "webpack --config webpack/webpack.common.js --watch  --progress",
         "dev": "webpack serve -c webpack/webpack.dev.js --hot --open"
     },
