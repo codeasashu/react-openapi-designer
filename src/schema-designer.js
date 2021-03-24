@@ -30,7 +30,7 @@ class SchemaDesigner extends React.Component {
       const oldData = oldProps.schema || '';
       if (!isEqual(oldData, newData)) return this.props.onChange(newData);
     }
-    if (this.props.initschema && this.props.initschema !== oldProps.initschema) {
+    if (!!this.props.initschema && this.props.initschema !== oldProps.initschema) {
       this.props.changeEditorSchema({ value: this.props.initschema });
     }
   }
@@ -38,7 +38,8 @@ class SchemaDesigner extends React.Component {
   componentDidMount() {
     const { initschema } = this.props;
     //@TODO Add schema validation
-    this.props.changeEditorSchema({ value: initschema });
+    if(!!initschema)
+      this.props.changeEditorSchema({ value: initschema });
   }
 
   addChildField(e) {
