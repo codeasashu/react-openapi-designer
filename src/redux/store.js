@@ -3,12 +3,19 @@ import thunkMiddleware from 'redux-thunk';
 import schemaReducer from './modules/schema';
 import dropdownReducer from './modules/dropdown';
 
-export default configureStore({
+const defaultStoreObject = {
     middleware: getDefaultMiddleware =>
       getDefaultMiddleware().concat([thunkMiddleware]),
-    reducer: {
-        schema: schemaReducer,
-        dropdown: dropdownReducer,
-    },
     devTools: true
-})
+};
+
+const schemaStoreObject = {
+  ...defaultStoreObject,
+  reducer: {
+    schema: schemaReducer,
+    dropdown: dropdownReducer,
+  },
+};
+
+export const schemaStore = configureStore(schemaStoreObject);
+export const responseStore = configureStore(schemaStoreObject);

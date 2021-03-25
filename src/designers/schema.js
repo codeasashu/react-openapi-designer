@@ -5,12 +5,12 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { isEqual, isObject, cloneDeep } from 'lodash';
-import { schemaSlice, generateExampleFromSchema } from './redux/modules/schema';
-import { dropdownSlice } from './redux/modules/dropdown';
-import SchemaRow from './elements/schema-row';
-import SchemaJson from './elements/schema-json';
-import DebouncedInput from './elements/debounced-input';
-import JsonEditor from './elements/json-editor';
+import { schemaSlice, generateExampleFromSchema } from '../redux/modules/schema';
+import { dropdownSlice } from '../redux/modules/dropdown';
+import SchemaRow from '../elements/schema-row';
+import SchemaJson from '../elements/schema-json';
+import DebouncedInput from '../elements/debounced-input';
+import JsonEditor from '../editors/json-editor';
 
 @autoBindMethodsForReact()
 class SchemaDesigner extends React.Component {

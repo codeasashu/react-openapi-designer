@@ -1,12 +1,13 @@
 import React from "react";
 import { Provider } from 'react-redux';
-import store from "./redux/store";
-import SchemaDesigner from './schema-designer';
+import { schemaStore, responseStore } from "./redux/store";
+import SchemaDesigner from './designers/schema';
+import ResponseDesigner from './designers/response';
 import "./index.css";
 
-const ReactOpenapiDesigner = (props) => {
+const Schema = (props) => {
   return (
-      <Provider store={store} className="wrapper__reactopenapidesigner">
+      <Provider store={schemaStore} className="wrapper__reactopenapi_schemadesigner">
         <SchemaDesigner
           onChange={e => (typeof props.onChange === 'function') ? props.onChange(e) : {}}
           initschema={props.schema}
@@ -14,6 +15,23 @@ const ReactOpenapiDesigner = (props) => {
         />
       </Provider>
   );
+};
+
+const Response = (props) => {
+  return (
+      <Provider store={responseStore} className="wrapper__reactopenapi_responsedesigner">
+        <ResponseDesigner
+          onChange={e => (typeof props.onChange === 'function') ? props.onChange(e) : {}}
+          initschema={props.schema}
+          dark={props.dark}
+        />
+      </Provider>
+  );
+};
+
+const ReactOpenapiDesigner = {
+  Schema,
+  Response,
 };
 
 export default ReactOpenapiDesigner;

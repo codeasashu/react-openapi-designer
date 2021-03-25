@@ -1,6 +1,6 @@
 import React from "react";
 import { render } from 'react-dom';
-import JsonSchemaDesigner from "../src";
+import ReactOpenapiDesigner from "../src";
 
 const handleChange = (schema) => {
   console.log('Schema Changed', schema)
@@ -16,7 +16,14 @@ const initSchema = {
     examples: {}
 };
 
+const TestDiv = () => {
+  return (<div>
+            {/* <ReactOpenapiDesigner.Schema dark onChange={handleChange} /> */}
+            <ReactOpenapiDesigner.Response />
+          </div>);
+}
+
 render(
-  <JsonSchemaDesigner dark schema={initSchema} onChange={handleChange} />,
+  <TestDiv />,
   document.getElementById("root")
 );
