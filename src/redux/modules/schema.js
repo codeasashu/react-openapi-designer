@@ -2,6 +2,7 @@ import {
   uniq, has, set, unset, update, isUndefined, assign, get, last, dropRight,
   cloneDeep, isObject
 } from 'lodash';
+import { defaultSchema, generateExampleName } from '../../utils';
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import GenerateSchema from '../../generate-schema';
 import OrderedDict from '../../ordered-dict';
@@ -10,57 +11,15 @@ jsf.option({ requiredOnly: false, fillProperties: true, optionalsProbability: 0 
 
 let fieldNum = 1;
 
-const getLongestIndex = (examples) => {
-  let longestExampleIndex = 0;
-  Object.keys(examples).forEach((key) => {
-    const matches = Array.from(key.matchAll(/example\-([\d]+)/g), m => m[1]);
-    let idx = matches.length ? parseInt(matches[0]) : -1;
-    idx = isNaN(idx) ? -1 : idx;
-    if(idx >= 0)
-      longestExampleIndex = Math.max(idx, longestExampleIndex);
-  });
-  return longestExampleIndex;
-}
-
-const generateExampleName = (state, key=null) => {
-  const longestIndex = getLongestIndex(state.examples);
-  return `example-${longestIndex + 1}`;
-};
-
 export const generateExampleFromSchema = createAsyncThunk(
   'schema/generateExample', 
   async ({ key, value }, { getState, dispatch }) => {
     let { schema } = getState();
-    key = key || generateExampleName(schema);
+    key = key || generateExampleName(schema.examples);
     value = value || await jsf.resolve(cloneDeep(schema));
     return { key, value };
   }
 );
-
-const defaultSchema = {
-  string: {
-    type: 'string',
-  },
-  number: {
-    type: 'number',
-  },
-  array: {
-    type: 'array',
-    items: {
-      type: 'string',
-    },
-  },
-  object: {
-    type: 'object',
-    properties: {},
-  },
-  boolean: {
-    type: 'boolean',
-  },
-  integer: {
-    type: 'integer',
-  },
-};
 
 function handleType(schema) {
   if (!schema.type && schema.properties && typeof schema.properties === 'object') {

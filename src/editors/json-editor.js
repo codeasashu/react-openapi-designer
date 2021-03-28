@@ -60,7 +60,7 @@ class JsonEditor extends PureComponent {
         return (
             <>
                 <Editor
-                    textareaClassName="bp3-code bp3-fill"
+                    textareaClassName="bp3-code bp3-input bp3-fill reactopenapidesigner__simple__editor"
                     preClassName=""
                     value={value}
                     highlight={(code) => code && Prism.highlight(code, Prism.languages.json, 'json')}

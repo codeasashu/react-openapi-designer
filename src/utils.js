@@ -11,6 +11,16 @@ export const ContentTypes = {
     png: 'image/png'
 };
 
+export const defaultSchema = {
+  string: {type: 'string'},
+  boolean: {type: 'boolean'},
+  number: {type: 'number'},
+  number: {type: 'integer'},
+  array: {type: 'array', items: {type: 'string'} },
+  object: {type: 'object', properties: {}, required: [] },
+};
+
+
 function escapeRegExpChars(text: string) {
     return text.replace(/([.*+?^=!:${}()|\[\]\/\\])/g, "\\$1");
 }
@@ -43,4 +53,26 @@ export const highlightText = (text: string, query: string) => {
         tokens.push(rest);
     }
     return tokens;
+};
+
+export const getLongestIndex = (items: Array, matcher: Regex = null) => {
+  let longestIndex = 0;
+  items.forEach((key) => {
+    const matches = Array.from(key.matchAll(matcher), m => m[1]);
+    let idx = matches.length ? parseInt(matches[0]) : -1;
+    idx = isNaN(idx) ? -1 : idx;
+    if(idx >= 0)
+      longestIndex = Math.max(idx, longestIndex);
+  });
+  return longestIndex;
+};
+
+export const generateExampleName = (examples: Object) => {
+  const longestIndex = getLongestIndex(Object.keys(items), /example\-([\d]+)/g);
+  return `example-${longestIndex + 1}`;
+}
+
+export const generateHeaderName = (headers: Object) => {
+  const longestIndex = getLongestIndex(Object.keys(headers), /header\-([\d]+)/g);
+  return `header-${longestIndex + 1}`;
 }

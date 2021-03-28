@@ -1,0 +1,7 @@
+@import "@blueprintjs/core/lib/css/blueprint";
+@import "@blueprintjs/popover2/lib/css/blueprint-popover2";
+@import "@blueprintjs/icons/lib/css/blueprint-icons";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

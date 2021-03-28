@@ -3,7 +3,7 @@ import { render } from 'react-dom';
 import ReactOpenapiDesigner from "../src";
 
 const handleChange = (schema) => {
-  console.log('Schema Changed', schema)
+  console.log('Resp Changed', schema)
 };
 
 const initSchema = {
@@ -16,10 +16,27 @@ const initSchema = {
     examples: {}
 };
 
+const params = {
+  in: 'query',
+  name: 'abc',
+  schema: {
+    type: 'string'
+  },
+  description: 'def'
+}
+
 const TestDiv = () => {
   return (<div>
-            {/* <ReactOpenapiDesigner.Schema dark onChange={handleChange} /> */}
-            <ReactOpenapiDesigner.Response />
+            <ReactOpenapiDesigner.Schema dark onChange={handleChange} />
+            <ReactOpenapiDesigner.Parameter
+              dark
+              {...params}
+              onChange={handleChange} 
+            />
+            <ReactOpenapiDesigner.Response
+              dark
+              onChange={handleChange} 
+            />
           </div>);
 }
 

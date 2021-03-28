@@ -5,6 +5,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import { bindActionCreators } from 'redux';
 import { isEqual, isObject, cloneDeep } from 'lodash';
+import { defaultSchema } from '../utils';
 import { schemaSlice, generateExampleFromSchema } from '../redux/modules/schema';
 import { dropdownSlice } from '../redux/modules/dropdown';
 import SchemaRow from '../elements/schema-row';
@@ -30,8 +31,8 @@ class SchemaDesigner extends React.Component {
       const oldData = oldProps.schema || '';
       if (!isEqual(oldData, newData)) return this.props.onChange(newData);
     }
-    if (!!this.props.initschema && this.props.initschema !== oldProps.initschema) {
-      this.props.changeEditorSchema({ value: this.props.initschema });
+    if (this.props.initschema !== oldProps.initschema) {
+      this.props.changeEditorSchema({ value: (this.props.initschema || defaultSchema.object) });
     }
   }
 

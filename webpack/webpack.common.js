@@ -35,6 +35,15 @@ module.exports = {
         },
       },
       {
+        test: /\.s[ac]ss$/i,
+        use: [
+          "style-loader",
+          "css-loader",
+          "postcss-loader",
+          "sass-loader",
+        ],
+      },
+      {
         test: /\.css$/,
         use: [
           'style-loader',
@@ -43,12 +52,12 @@ module.exports = {
         ]
       },
       {
-         test: /\.svg$/,
-         use: ['svg-loader']
+         test: /\.(png|svg|jpg|jpeg|gif)$/i,
+         type: 'asset/resource',
        },
        {
          test: /\.(eot|woff|woff2|svg|ttf)([\?]?.*)$/,
-         use: ['file-loader']
+         type: 'asset/resource',
        }
     ],
   },

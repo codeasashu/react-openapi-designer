@@ -3,7 +3,9 @@ import { Provider } from 'react-redux';
 import { schemaStore, responseStore } from "./redux/store";
 import SchemaDesigner from './designers/schema';
 import ResponseDesigner from './designers/response';
-import "./index.css";
+import ParameterDesigner from './designers/parameter';
+import "./overrides.scss";
+import "./app.css";
 
 const Schema = (props) => {
   return (
@@ -32,6 +34,7 @@ const Response = (props) => {
 const ReactOpenapiDesigner = {
   Schema,
   Response,
+  Parameter: ParameterDesigner,
 };
 
 export default ReactOpenapiDesigner;

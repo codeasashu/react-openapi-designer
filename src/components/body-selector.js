@@ -1,5 +1,6 @@
 import React from 'react';
 import { autoBindMethodsForReact } from 'class-autobind-decorator';
+import { union, head } from 'lodash';
 import { Button, ControlGroup, MenuItem } from "@blueprintjs/core";
 import { Suggest } from "@blueprintjs/select";
 import { ContentTypes, highlightText } from '../utils';
@@ -9,13 +10,19 @@ class BodySelector extends React.PureComponent {
     constructor(props) {
         super(props);
         this._inputRef = null;
-        const selectedContentType = props.contentType || ContentTypes.json;
+        const contentTypeHistory = props.contentTypes;
+        const selectedContentType = head(contentTypeHistory) || ContentTypes.json;
         this.state = {
             selectedContentType,
             validContentTypes: Object.values(ContentTypes),
-            contentTypeHistory: [selectedContentType],
+            contentTypeHistory: union(contentTypeHistory, [selectedContentType]),
             addingContentType: false
         };
+    }
+
+    componentDidMount() {
+        if(typeof this.props.onSelect === 'function')
+            this.props.onSelect(this.state.selectedContentType);
     }
 
     renderCreateContentTypeOption(
@@ -72,6 +79,8 @@ class BodySelector extends React.PureComponent {
             selectedContentType
         } = this.state;
 
+        const oldSelectedContentType = selectedContentType;
+
         if(validContentTypes.indexOf(contentType) < 0) {
             validContentTypes.push(contentType);
         }
@@ -91,14 +100,20 @@ class BodySelector extends React.PureComponent {
             selectedContentType: contentType,
             addingContentType: false
         });
+        if(addingContentType === true)
+            this.props.onAdd(contentType);
+        else
+            this.props.onUpdate(contentType, oldSelectedContentType);
     }
 
     onChangeContentType(e) {
         this.setState({ selectedContentType: e.target.value });
+        this.props.onSelect(e.target.value);
     }
 
     onDeleteContentType(e) {
         let { selectedContentType, contentTypeHistory } = this.state;
+        const toDeleteContentType = selectedContentType;
         const idx = contentTypeHistory.indexOf(selectedContentType);
         contentTypeHistory.splice(idx, 1);
 
@@ -115,6 +130,7 @@ class BodySelector extends React.PureComponent {
             contentTypeHistory,
             selectedContentType
         });
+        this.props.onDelete(toDeleteContentType, selectedContentType)
     }
 
     onAddContentType() {
