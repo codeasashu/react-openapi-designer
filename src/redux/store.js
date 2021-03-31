@@ -1,12 +1,12 @@
-import { configureStore } from '@reduxjs/toolkit';
+import {configureStore} from '@reduxjs/toolkit';
 import thunkMiddleware from 'redux-thunk';
 import schemaReducer from './modules/schema';
 import dropdownReducer from './modules/dropdown';
 
 const defaultStoreObject = {
-    middleware: getDefaultMiddleware =>
-      getDefaultMiddleware().concat([thunkMiddleware]),
-    devTools: true
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware().concat([thunkMiddleware]),
+  devTools: true,
 };
 
 const schemaStoreObject = {

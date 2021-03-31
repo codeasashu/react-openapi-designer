@@ -5,11 +5,11 @@ import ArrayProperty from './array-property';
 import ObjectProperty from './object-property';
 
 const Properties = {
-    String: StringProperty,
-    Number: NumberProperty,
-    Boolean: BooleanProperty,
-    Array: ArrayProperty,
-    Object: ObjectProperty,
+  String: StringProperty,
+  Number: NumberProperty,
+  Boolean: BooleanProperty,
+  Array: ArrayProperty,
+  Object: ObjectProperty,
 };
 
 export default Properties;

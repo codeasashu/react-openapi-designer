@@ -1,5 +1,4 @@
 [ignore]
-.*/node_modules/.*
 ./.cache
 ./dist
 
@@ -11,5 +10,8 @@
 [options]
 esproposal.decorators=ignore
 esproposal.optional_chaining=enable
+module.file_ext=.css
+module.file_ext=.scss
+module.file_ext=.sass
 
 [lints]

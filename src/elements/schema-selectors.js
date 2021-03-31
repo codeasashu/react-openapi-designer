@@ -1,11 +1,19 @@
+// @flow
 import React from 'react';
+import PropTypes from 'prop-types';
 
-const SCHEMA_TYPES = ['object', 'array', 'string', 'boolean', 'integer', 'number'];
+const SCHEMA_TYPES = [
+  'object',
+  'array',
+  'string',
+  'boolean',
+  'integer',
+  'number',
+];
 
 class SchemaSelectors extends React.PureComponent {
-
   _handleSelectType(type, prefix) {
-    const { onClick } = this.props;
+    const {onClick} = this.props;
     console.log('handleTTypeclick', type, prefix);
     onClick(type, prefix);
   }
@@ -14,19 +22,25 @@ class SchemaSelectors extends React.PureComponent {
     console.log('subttype', subType);
   }
 
-  renderSubType(schema, handleOnClick) {
+  renderSubType(schema) {
     return (
       <div>
-      <div className="w-full uppercase font-semibold mb-2">SUBTYPE</div>
-      <div className="mt-2 flex flex-wrap">
+        <div className="w-full uppercase font-semibold mb-2">SUBTYPE</div>
+        <div className="mt-2 flex flex-wrap">
           <div className="flex flex-wrap text-xs">
             {SCHEMA_TYPES.map((type, index) => {
               return (
-                <div className={
-                  `flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
-                  ${schema.type === type ? 'bg-green-600 text-white' : 'hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                <div
+                  className={`flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
+                  ${
+                    schema.type === type
+                      ? 'bg-green-600 text-white'
+                      : 'hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
                   key={index}
-                  onClick={e => this._handleSelectType(type, ['items', 'type'])}
+                  onClick={() =>
+                    this._handleSelectType(type, ['items', 'type'])
+                  }
                   selected={schema.type === type}>
                   {type}
                 </div>
@@ -34,12 +48,12 @@ class SchemaSelectors extends React.PureComponent {
             })}
           </div>
         </div>
-        </div>
+      </div>
     );
   }
 
   render() {
-    const { schema } = this.props;
+    const {schema} = this.props;
     return (
       <div className="flex flex-col text-sm p-3">
         <div className="w-full uppercase font-semibold mb-2">TYPE</div>
@@ -47,11 +61,15 @@ class SchemaSelectors extends React.PureComponent {
           <div className="flex flex-wrap text-xs">
             {SCHEMA_TYPES.map((type, index) => {
               return (
-                <div className={
-                  `flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
-                  ${schema.type === type ? 'bg-green-600 text-white' : 'hover:bg-gray-300 dark:hover:bg-gray-600'}`}
+                <div
+                  className={`flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
+                  ${
+                    schema.type === type
+                      ? 'bg-green-600 text-white'
+                      : 'hover:bg-gray-300 dark:hover:bg-gray-600'
+                  }`}
                   key={index}
-                  onClick={e => this._handleSelectType(type, ['type'])}
+                  onClick={() => this._handleSelectType(type, ['type'])}
                   selected={schema.type === type}>
                   {type}
                 </div>
@@ -64,5 +82,10 @@ class SchemaSelectors extends React.PureComponent {
     );
   }
 }
+
+SchemaSelectors.propTypes = {
+  onClick: PropTypes.func,
+  schema: PropTypes.object,
+};
 
 export default SchemaSelectors;

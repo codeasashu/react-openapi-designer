@@ -38,6 +38,6 @@ const langs = {
   },
 };
 
-export default message => {
+export default (message) => {
   return langs[lang][message];
 };

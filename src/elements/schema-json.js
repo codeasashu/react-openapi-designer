@@ -1,15 +1,18 @@
-import React, { PureComponent } from 'react';
-import { autoBindMethodsForReact } from 'class-autobind-decorator';
-import { isUndefined, get } from 'lodash';
+import React, {PureComponent} from 'react';
+import PropTypes from 'prop-types';
+import {autoBindMethodsForReact} from 'class-autobind-decorator';
+import {isUndefined, get} from 'lodash';
 import SchemaRow from './schema-row';
 
 const mapping = (name, schema, props) => {
+  const nameArray = [].concat(name, 'properties');
   switch (schema.type) {
     case 'array':
       return <SchemaArray prefix={name} schema={schema} wrapperProps={props} />;
     case 'object':
-      const nameArray = [].concat(name, 'properties');
-      return <SchemaObject prefix={nameArray} schema={schema} wrapperProps={props} />;
+      return (
+        <SchemaObject prefix={nameArray} schema={schema} wrapperProps={props} />
+      );
     default:
       return null;
   }
@@ -17,12 +20,16 @@ const mapping = (name, schema, props) => {
 
 class SchemaArray extends PureComponent {
   shouldShowSubItems(schema) {
-    return !isUndefined(schema.items) && ['object', 'array'].indexOf(schema.items.type) >= 0;
+    return (
+      !isUndefined(schema.items) &&
+      ['object', 'array'].indexOf(schema.items.type) >= 0
+    );
   }
 
   render() {
-    const { prefix, schema, wrapperProps } = this.props;
-    return this.shouldShowSubItems(schema) ? (<SchemaRow
+    const {prefix, schema, wrapperProps} = this.props;
+    return this.shouldShowSubItems(schema) ? (
+      <SchemaRow
         show={!isUndefined(schema.items)}
         schema={schema.items}
         sidebar={wrapperProps.open}
@@ -31,12 +38,12 @@ class SchemaArray extends PureComponent {
         fieldName={'items'}
         fieldPrefix={prefix}
         handleName={() => {}}
-        handleChildField={({ key }) => {
-          wrapperProps.addChildField({ key });
-          wrapperProps.setOpenDropdownPath({ key, value: true });
+        handleChildField={({key}) => {
+          wrapperProps.addChildField({key});
+          wrapperProps.setOpenDropdownPath({key, value: true});
         }}
-        handleDelete={({ key }) => {
-          wrapperProps.changeValue({ key, value: {} });
+        handleDelete={({key}) => {
+          wrapperProps.changeValue({key, value: {}});
         }}
         handleSidebar={wrapperProps.setOpenDropdownPath}
         handleSchemaType={wrapperProps.changeType}
@@ -46,11 +53,19 @@ class SchemaArray extends PureComponent {
         handleRequire={wrapperProps.enableRequire}>
         {mapping([].concat(prefix, 'items'), schema.items, wrapperProps)}
       </SchemaRow>
-    ) : (null);
+    ) : null;
   }
 }
 
-const raiseError = ({ key, name, value }) => console.error(`The field "${value}" already exists.`);
+SchemaArray.propTypes = {
+  name: PropTypes.string,
+  prefix: PropTypes.string,
+  schema: PropTypes.object,
+  wrapperProps: PropTypes.object,
+};
+
+const raiseError = ({value}) =>
+  console.error(`The field "${value}" already exists.`);
 
 const exists = (data, value) =>
   data.properties[value] && typeof data.properties[value] === 'object';
@@ -58,8 +73,12 @@ const exists = (data, value) =>
 @autoBindMethodsForReact()
 class SchemaItem extends PureComponent {
   render() {
-    const { name, prefix, schema, wrapperProps } = this.props;
-    const itemSchema = Object.assign({}, { title: '', description: '' }, schema.properties[name]);
+    const {name, prefix, schema, wrapperProps} = this.props;
+    const itemSchema = Object.assign(
+      {},
+      {title: '', description: ''},
+      schema.properties[name],
+    );
     const isRequired = isUndefined(schema.required)
       ? false
       : schema.required.indexOf(name) !== -1;
@@ -72,22 +91,22 @@ class SchemaItem extends PureComponent {
         fieldName={name}
         fieldPrefix={prefix}
         required={isRequired}
-        handleName={({ key, name, value }) => {
-          if (exists(schema, value)) return raiseError({ key, name, value });
-          wrapperProps.changeName({ key, name, value });
+        handleName={({key, name, value}) => {
+          if (exists(schema, value)) return raiseError({key, name, value});
+          wrapperProps.changeName({key, name, value});
         }}
         handleField={wrapperProps.addField}
-        handleChildField={({ key }) => {
-          wrapperProps.addChildField({ key });
-          wrapperProps.setOpenDropdownPath({ key, value: true });
+        handleChildField={({key}) => {
+          wrapperProps.addChildField({key});
+          wrapperProps.setOpenDropdownPath({key, value: true});
         }}
         handleSidebar={wrapperProps.setOpenDropdownPath}
         handleSchemaType={wrapperProps.changeType}
         handleTitle={wrapperProps.changeValue}
         handleDescription={wrapperProps.changeValue}
         handleAdditionalProperties={wrapperProps.changeValue}
-        handleDelete={({ key }) => {
-          wrapperProps.deleteItem({ key });
+        handleDelete={({key}) => {
+          wrapperProps.deleteItem({key});
           wrapperProps.enableRequire({
             key: prefix,
             value: name,
@@ -101,9 +120,16 @@ class SchemaItem extends PureComponent {
   }
 }
 
+SchemaItem.propTypes = {
+  name: PropTypes.string,
+  prefix: PropTypes.string,
+  schema: PropTypes.object,
+  wrapperProps: PropTypes.object,
+};
+
 class SchemaObject extends PureComponent {
   render() {
-    const { prefix, schema, wrapperProps } = this.props;
+    const {prefix, schema, wrapperProps} = this.props;
     return (
       <>
         {Object.keys(schema.properties).map((name, index) => {
@@ -122,10 +148,20 @@ class SchemaObject extends PureComponent {
   }
 }
 
-const SchemaJson = props => {
-  const { wrapperProps } = props;
+SchemaObject.propTypes = {
+  prefix: PropTypes.string,
+  schema: PropTypes.object,
+  wrapperProps: PropTypes.object,
+};
+
+const SchemaJson = (props) => {
+  const {wrapperProps} = props;
   const item = mapping([], wrapperProps.schema, wrapperProps);
   return <React.Fragment>{item}</React.Fragment>;
+};
+
+SchemaJson.propTypes = {
+  wrapperProps: PropTypes.object,
 };
 
 export default SchemaJson;

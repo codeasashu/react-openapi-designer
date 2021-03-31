@@ -19,11 +19,11 @@ module.exports = {
     mainFields: ['browser', 'module', 'main'],
     extensions: ['.js', '.jsx', '.json'],
     fallback: {
-      "http": require.resolve("stream-http"),
-      "https": require.resolve("https-browserify"),
-      "vm": require.resolve("vm-browserify"),
-      "buffer": require.resolve("buffer"),
-    }
+      http: require.resolve('stream-http'),
+      https: require.resolve('https-browserify'),
+      vm: require.resolve('vm-browserify'),
+      buffer: require.resolve('buffer'),
+    },
   },
   module: {
     rules: [
@@ -36,43 +36,34 @@ module.exports = {
       },
       {
         test: /\.s[ac]ss$/i,
-        use: [
-          "style-loader",
-          "css-loader",
-          "postcss-loader",
-          "sass-loader",
-        ],
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
       },
       {
         test: /\.css$/,
-        use: [
-          'style-loader',
-          'css-loader',
-          'postcss-loader'
-        ]
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
-         test: /\.(png|svg|jpg|jpeg|gif)$/i,
-         type: 'asset/resource',
-       },
-       {
-         test: /\.(eot|woff|woff2|svg|ttf)([\?]?.*)$/,
-         type: 'asset/resource',
-       }
+        test: /\.(png|svg|jpg|jpeg|gif)$/i,
+        type: 'asset/resource',
+      },
+      {
+        test: /\.(eot|woff|woff2|svg|ttf)([\\?]?.*)$/,
+        type: 'asset/resource',
+      },
     ],
   },
   externals: {
-    react: 'react'
+    react: 'react',
   },
   plugins: [
     new webpack.DefinePlugin({
-      "process.env": "{}",
+      'process.env': '{}',
       'process.platform': JSON.stringify('unix'),
       'process.browser': true,
-      global: {}
+      global: {},
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
-    })
-  ]
+    }),
+  ],
 };

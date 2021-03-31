@@ -1,15 +1,19 @@
-import React, { PureComponent } from 'react';
+// @flow
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
-import { autoBindMethodsForReact } from 'class-autobind-decorator';
-import { InputGroup, TextArea } from "@blueprintjs/core";
+import {autoBindMethodsForReact} from 'class-autobind-decorator';
+import {InputGroup, TextArea} from '@blueprintjs/core';
 
 const DEBOUNCE_MILLIS = 100;
 
-function keyedDebounce(callback: Function, millis: number = DEBOUNCE_MILLIS): Function {
+function keyedDebounce(
+  callback: Function,
+  millis: number = DEBOUNCE_MILLIS,
+): Function {
   let timeout;
   let results = {};
 
-  return function(key, ...args) {
+  return function (key, ...args) {
     results[key] = args;
 
     clearTimeout(timeout);
@@ -24,9 +28,12 @@ function keyedDebounce(callback: Function, millis: number = DEBOUNCE_MILLIS): Fu
   };
 }
 
-function debounce(callback: Function, millis: number = DEBOUNCE_MILLIS): Function {
+function debounce(
+  callback: Function,
+  millis: number = DEBOUNCE_MILLIS,
+): Function {
   // For regular debounce, just use a keyed debounce with a fixed key
-  return keyedDebounce(results => {
+  return keyedDebounce((results) => {
     callback.apply(null, results.__key__);
   }, millis).bind(null, '__key__');
 }
@@ -36,7 +43,7 @@ class DebouncedInput extends PureComponent {
   constructor(props) {
     super(props);
 
-    this.state = { value: '' };
+    this.state = {value: ''};
 
     if (!props.delay) {
       this._handleValueChange = props.onChange;
@@ -48,31 +55,30 @@ class DebouncedInput extends PureComponent {
   }
 
   componentDidMount() {
-    const { value } = this.props;
-    this.setState({ value });
+    const {value} = this.props;
+    this.setState({value});
   }
 
   componentDidUpdate(oldProps) {
-    const { value } = this.props;
-    if(oldProps.value != value) {
-      this.setState({ value });
+    const {value} = this.props;
+    if (oldProps.value != value) {
+      this.setState({value});
     }
   }
 
   _handleChange(e) {
-    const { value } = this.state;
-    this.setState({ value: e.target.value });
+    this.setState({value: e.target.value});
     this._handleValueChange(e.target.value);
   }
 
-  _handleFocus(e) {
-    const { value } = this.state;
+  _handleFocus() {
+    const {value} = this.state;
     this._hasFocus = true;
     this.props.onFocus && this.props.onFocus(value);
   }
 
-  _handleBlur(e) {
-    const { value } = this.state;
+  _handleBlur() {
+    const {value} = this.state;
     this._hasFocus = false;
     this.props.onBlur && this.props.onBlur(value);
   }
@@ -148,17 +154,7 @@ class DebouncedInput extends PureComponent {
   }
 
   render() {
-    const {
-      onChange, // eslint-disable-line no-unused-vars
-      onFocus, // eslint-disable-line no-unused-vars
-      onBlur, // eslint-disable-line no-unused-vars
-      delay, // eslint-disable-line no-unused-vars
-      textarea,
-      large,
-      value: propValue,
-      ...props
-    } = this.props;
-    const { value } = this.state;
+    const {textarea, ...props} = this.props;
     if (textarea) {
       return (
         <TextArea
@@ -187,6 +183,7 @@ class DebouncedInput extends PureComponent {
 DebouncedInput.propTypes = {
   // Required
   onChange: PropTypes.func.isRequired,
+  value: PropTypes.string.isRequired,
 
   // Optional
   onFocus: PropTypes.func,

@@ -17,7 +17,7 @@ class OrderedDict {
 
   remove = (key) => {
     const index = this.findIndex(key);
-    if(index >= 0) {
+    if (index >= 0) {
       console.log('arr', this.arr, this.dict);
       this.arr.splice(index, 1);
       delete this.dict[key];
