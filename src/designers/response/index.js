@@ -18,8 +18,9 @@ class ResponseDesigner extends PureComponent {
         response: {
           description: '',
           headers: {},
-          content: {[ContentTypes.json]: { schema: defaultSchema.object }}
-        }
+          content: {[ContentTypes.json]: { schema: defaultSchema.object }},
+          ...props.initschema
+        },
       };
     }
 
@@ -95,7 +96,7 @@ class ResponseDesigner extends PureComponent {
 
     render() {
         const { dark } = this.props;
-        const { description, headers } = this.state;
+        const { description, headers } = this.state.response;
         return (
             <div className={`flex flex-col ${dark && 'bp3-dark'}`}>
               <div className="flex-1">

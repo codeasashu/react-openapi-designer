@@ -55,10 +55,10 @@ export const highlightText = (text: string, query: string) => {
     return tokens;
 };
 
-export const getLongestIndex = (items: Array, matcher: Regex = null) => {
+export const getLongestIndex = (items: Array, pattern: Regex) => {
   let longestIndex = 0;
   items.forEach((key) => {
-    const matches = Array.from(key.matchAll(matcher), m => m[1]);
+    const matches = Array.from(key.matchAll(pattern), m => m[1]);
     let idx = matches.length ? parseInt(matches[0]) : -1;
     idx = isNaN(idx) ? -1 : idx;
     if(idx >= 0)
@@ -68,7 +68,7 @@ export const getLongestIndex = (items: Array, matcher: Regex = null) => {
 };
 
 export const generateExampleName = (examples: Object) => {
-  const longestIndex = getLongestIndex(Object.keys(items), /example\-([\d]+)/g);
+  const longestIndex = getLongestIndex(Object.keys(examples), /example\-([\d]+)/g);
   return `example-${longestIndex + 1}`;
 }
 
