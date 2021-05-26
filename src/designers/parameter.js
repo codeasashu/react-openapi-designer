@@ -52,7 +52,7 @@ class Parameter extends PureComponent {
 
   renderRow() {
     const {name, description, schema, required} = this.state;
-    const {disableRequired} = this.props;
+    const {disableRequired, titlePlaceholder} = this.props;
     return (
       <ControlGroup className="mt-2">
         <InputGroup
@@ -60,7 +60,7 @@ class Parameter extends PureComponent {
           onChange={(e) => this.setState({name: e.target.value})}
           onBlur={() => this.handleChange('name')}
           className="flex-auto"
-          placeholder="Header0"
+          placeholder={titlePlaceholder}
         />
         <div className="bp3-select flex-shrink">
           <select
@@ -130,6 +130,7 @@ class Parameter extends PureComponent {
 Parameter.propTypes = {
   disableRequired: PropTypes.bool,
   name: PropTypes.string,
+  titlePlaceholder: PropTypes.string,
   description: PropTypes.string,
   required: PropTypes.string,
   schema: PropTypes.object,
