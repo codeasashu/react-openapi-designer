@@ -183,7 +183,7 @@ class DebouncedInput extends PureComponent {
 DebouncedInput.propTypes = {
   // Required
   onChange: PropTypes.func.isRequired,
-  value: PropTypes.string.isRequired,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
   // Optional
   onFocus: PropTypes.func,

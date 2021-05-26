@@ -7,7 +7,7 @@ import {Button, Intent, TextArea} from '@blueprintjs/core';
 import {Popover2, Tooltip2} from '@blueprintjs/popover2';
 import LocaleProvider from '../locale';
 import DropPlus from '../ui/drop-plus';
-import SchemaSelectors from './schema-selectors';
+import SchemaDropdown from './schema-dropdown';
 import DebouncedInput from './debounced-input';
 import AdvancedProperties from './advanced-properties';
 
@@ -22,6 +22,7 @@ const SchemaItemEntity = ({type, text}) => {
     'text-black dark:text-white';
   return (
     <div
+      role="row-schema"
       className={`flex flex-no-wrap items-center ${textStyles} cursor-pointer hover:underline truncate`}>
       <span>{text}</span>
     </div>
@@ -127,7 +128,7 @@ class SchemaRow extends React.PureComponent {
 
     return show ? (
       <>
-        <div className="flex">
+        <div role="schema-row" className="flex">
           <div className="flex flex-1">
             {!!name && schema.type === 'object' ? (
               <DropPlus
@@ -140,17 +141,21 @@ class SchemaRow extends React.PureComponent {
                   small
                   minimal
                   icon="plus"
+                  aria-label="add row"
                   onClick={this._handleAddField}
                 />
               )
             )}
-            <div className="flex flex-1 bp3-control-group" style={styles}>
+            <div
+              className="flex flex-1 bp3-control-group row-container"
+              style={styles}>
               {schema.type === 'object' && (
                 <Button
                   style={{marginRight: '2px'}}
                   onClick={this._handleSidebarOpen}
                   small
                   minimal
+                  aria-label="child dropdown"
                   icon={sidebarOpen ? 'chevron-down' : 'chevron-right'}
                 />
               )}
@@ -159,22 +164,15 @@ class SchemaRow extends React.PureComponent {
                 <DebouncedInput
                   className="pl-1"
                   onChange={this._handleChangeName}
+                  placeholder="field name"
                   value={name || ''}
                   small
                 />
               )}
               {!!name && !isParentArray && <span>&nbsp;:&nbsp;</span>}
-              <Popover2
-                className="p-1 pt-0"
-                popoverClassName="bp3-dark"
-                inheritDarkTheme
-                content={
-                  <SchemaSelectors
-                    schema={schema}
-                    onClick={this._handleChangeSchemaType}
-                  />
-                }
-                placement="right">
+              <SchemaDropdown
+                handleOnClick={this._handleChangeSchemaType}
+                schema={schema}>
                 <SchemaItemEntity
                   type={schema.type}
                   text={
@@ -184,7 +182,7 @@ class SchemaRow extends React.PureComponent {
                       : schema.type
                   }
                 />
-              </Popover2>
+              </SchemaDropdown>
             </div>
             <span>
               <Popover2
@@ -192,13 +190,16 @@ class SchemaRow extends React.PureComponent {
                 content={
                   <TextArea
                     className="outline-none border-0"
+                    aria-label={'description'}
                     growVertically
                     value={schema.description || ''}
                     onChange={this._handleChangeDescription}
                   />
                 }
                 placement="left">
-                <Tooltip2 content={<span>Description</span>}>
+                <Tooltip2
+                  role={'description'}
+                  content={<span>Description</span>}>
                   <Button
                     small
                     minimal
@@ -218,6 +219,7 @@ class SchemaRow extends React.PureComponent {
                 }
                 placement="right">
                 <Tooltip2
+                  role={'advanced properties'}
                   content={<span>{LocaleProvider('adv_setting')}</span>}>
                   <Button small minimal icon="property" />
                 </Tooltip2>
@@ -228,6 +230,7 @@ class SchemaRow extends React.PureComponent {
                 <Tooltip2 content="Delete field">
                   <Button
                     onClick={this._handleDeleteItem}
+                    role={'delete row'}
                     small
                     minimal
                     icon="cross"
@@ -243,11 +246,14 @@ class SchemaRow extends React.PureComponent {
                     small
                     minimal
                     icon="issue"
+                    role={'required field'}
                     onClick={this._handleToggleRequire}
                     intent={required ? Intent.DANGER : null}
                   />
                 ) : (
-                  <Tooltip2 content={LocaleProvider('required')}>
+                  <Tooltip2
+                    role={'required field'}
+                    content={LocaleProvider('required')}>
                     <Button
                       disabled={isParentArray}
                       small
@@ -269,13 +275,13 @@ class SchemaRow extends React.PureComponent {
 }
 
 SchemaRow.propTypes = {
-  fieldPrefix: PropTypes.string,
+  fieldPrefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   fieldName: PropTypes.string,
   required: PropTypes.bool,
   show: PropTypes.bool,
   schema: PropTypes.object,
-  sidebar: PropTypes.bool,
-  children: PropTypes.string,
+  sidebar: PropTypes.object,
+  children: PropTypes.oneOfType([PropTypes.object, PropTypes.element]),
   parent: PropTypes.string,
   root: PropTypes.bool,
   handleChildField: PropTypes.func,

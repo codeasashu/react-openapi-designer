@@ -113,3 +113,45 @@ it('Renders the parameter with description', () => {
     schema: {type: 'integer'},
   });
 });
+
+it('Renders with empty name on empty name prop', () => {
+  const handleChange = jest.fn();
+  const handleDelete = jest.fn();
+
+  render(
+    <Parameter
+      name=""
+      titlePlaceholder="header0"
+      schema={{type: 'integer'}}
+      onChange={handleChange}
+      onDelete={handleDelete}
+    />,
+  );
+
+  const selector = screen.getByLabelText(/name/i);
+  expect(selector).toBeInTheDocument();
+  expect(selector).toHaveValue('');
+  expect(selector).toHaveProperty('placeholder');
+  expect(handleChange).toHaveBeenCalledTimes(0);
+});
+
+it('Triggers delete onDelete', () => {
+  const handleChange = jest.fn();
+  const handleDelete = jest.fn();
+
+  render(
+    <Parameter
+      name="abc"
+      titlePlaceholder="header0"
+      schema={{type: 'integer'}}
+      onChange={handleChange}
+      onDelete={handleDelete}
+    />,
+  );
+
+  const selector = screen.getByRole('button', {name: /delete/i});
+  expect(selector).toBeInTheDocument();
+  fireEvent.click(selector);
+  expect(handleDelete).toHaveBeenCalledTimes(1);
+  expect(handleChange).toHaveBeenCalledTimes(0);
+});

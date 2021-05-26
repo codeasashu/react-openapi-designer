@@ -36,11 +36,11 @@ class NumberProperty extends PureComponent {
           <div className="uppercase font-semibold pb-3">{heading}</div>
           <div className="flex pb-2">
             <Keywords.Default
-              value={data.default}
+              value={data.default || ''}
               onChange={(e) => this.changeOtherValue(e, 'default')}
             />
             <Keywords.Format
-              format={Number}
+              format={'number'}
               value={data.format}
               onChange={(e) => this.changeOtherValue(e.target.value, 'format')}
             />
@@ -85,9 +85,18 @@ class NumberProperty extends PureComponent {
 NumberProperty.propTypes = {
   // Required
   onChange: PropTypes.func.isRequired,
-  data: PropTypes.string.isRequired,
-  isSubtype: PropTypes.string,
-  child: PropTypes.string, // @TODO: React node
+  data: PropTypes.shape({
+    minimum: PropTypes.any,
+    maximum: PropTypes.any,
+    exclusiveMinimum: PropTypes.any,
+    exclusiveMaximum: PropTypes.any,
+    enum: PropTypes.array,
+    default: PropTypes.any,
+    format: PropTypes.string,
+    multipleOf: PropTypes.any,
+  }),
+  isSubtype: PropTypes.bool,
+  child: PropTypes.element, // @TODO: React node
 };
 
 export default NumberProperty;

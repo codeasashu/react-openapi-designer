@@ -24,7 +24,11 @@ export const defaultSchema = {
 function escapeRegExpChars(text: string) {
   return text.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
 }
+
 export const highlightText = (text: string, query: string) => {
+  if (!text || typeof text != 'string') {
+    return [];
+  }
   let lastIndex = 0;
   const words = query
     .split(/\s+/)
@@ -58,12 +62,14 @@ export const highlightText = (text: string, query: string) => {
 
 export const getLongestIndex = (items: Array, pattern: String) => {
   let longestIndex = 0;
-  items.forEach((key) => {
-    const matches = Array.from(key.matchAll(pattern), (m) => m[1]);
-    let idx = matches.length ? parseInt(matches[0]) : -1;
-    idx = isNaN(idx) ? -1 : idx;
-    if (idx >= 0) longestIndex = Math.max(idx, longestIndex);
-  });
+  items
+    .filter((x) => !!x)
+    .forEach((key) => {
+      const matches = Array.from(key.matchAll(pattern), (m) => m[1]);
+      let idx = matches.length ? parseInt(matches[0]) : -1;
+      idx = isNaN(idx) ? -1 : idx;
+      if (idx >= 0) longestIndex = Math.max(idx, longestIndex);
+    });
   return longestIndex;
 };
 

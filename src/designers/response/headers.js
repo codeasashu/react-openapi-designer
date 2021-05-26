@@ -62,6 +62,7 @@ class Headers extends PureComponent {
             minimal
             className="ml-1"
             icon="plus"
+            aria-label="add row"
             onClick={this._addRow}
           />
         </div>

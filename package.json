@@ -36,6 +36,9 @@
   "peerDependencies": {
     "react": ">=16.13"
   },
+  "eslintIgnore": [
+    "*.test.js"
+  ],
   "jest": {
     "setupFilesAfterEnv": [
       "./__jest__/setup-after-env.js"
@@ -43,11 +46,27 @@
     "testMatch": [
       "**/__tests__/**/*.test.js?(x)"
     ],
+    "transform": {
+      "^.+\\.js$": "babel-jest",
+      ".+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
+    },
+    "moduleNameMapper": {
+      "^.+\\.(css|styl|less|sass|scss|png|jpg|ttf|woff|woff2)$": "jest-transform-stub"
+    },
     "verbose": false,
     "resetMocks": true,
     "resetModules": true,
+    "snapshotSerializers": [
+      "enzyme-to-json/serializer"
+    ],
     "coveragePathIgnorePatterns": [
       "/node_modules/"
+    ],
+    "collectCoverage": false,
+    "coverageDirectory": "./coverage",
+    "coverageReporters": [
+      "clover",
+      "html"
     ]
   },
   "devDependencies": {
@@ -68,16 +87,21 @@
     "babel-plugin-prismjs": "^2.0.1",
     "buffer": "^6.0.3",
     "css-loader": "^5.1.1",
+    "enzyme": "^3.11.0",
+    "enzyme-adapter-react-16": "^1.15.6",
+    "enzyme-to-json": "^3.6.2",
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jest": "^24.3.4",
     "eslint-plugin-react": "^7.23.1",
     "file-loader": "^6.2.0",
+    "flow-bin": "^0.152.0",
     "flow-typed": "^3.3.1",
     "html-webpack-plugin": "^5.2.0",
     "https-browserify": "^1.0.0",
     "husky": "^6.0.0",
     "jest": "^26.6.3",
+    "jest-transform-stub": "^2.0.0",
     "npm-run-all": "^4.1.5",
     "postcss": "^8.2.7",
     "postcss-import": "^14.0.0",
@@ -86,6 +110,8 @@
     "prettier": "^2.2.1",
     "react": "^16.13.1",
     "react-dom": "^16.13.1",
+    "react-popper": "^1.3.11",
+    "redux-mock-store": "^1.5.4",
     "sass": "^1.32.8",
     "sass-loader": "^11.0.1",
     "stream-http": "^3.1.1",

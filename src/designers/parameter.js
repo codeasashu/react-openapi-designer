@@ -56,6 +56,7 @@ class Parameter extends PureComponent {
     return (
       <ControlGroup className="mt-2">
         <InputGroup
+          aria-label="name"
           value={name}
           onChange={(e) => this.setState({name: e.target.value})}
           onBlur={() => this.handleChange('name')}
@@ -115,7 +116,11 @@ class Parameter extends PureComponent {
             </Tooltip2>
           </Popover2>
           <Tooltip2 content="Delete field">
-            <Button onClick={this.props.onDelete} icon="trash" />
+            <Button
+              onClick={this.props.onDelete}
+              aria-label="delete"
+              icon="trash"
+            />
           </Tooltip2>
         </ButtonGroup>
       </ControlGroup>

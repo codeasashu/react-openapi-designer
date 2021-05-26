@@ -14,7 +14,6 @@ const SCHEMA_TYPES = [
 class SchemaSelectors extends React.PureComponent {
   _handleSelectType(type, prefix) {
     const {onClick} = this.props;
-    console.log('handleTTypeclick', type, prefix);
     onClick(type, prefix);
   }
 
@@ -54,18 +53,21 @@ class SchemaSelectors extends React.PureComponent {
 
   render() {
     const {schema} = this.props;
+    if (!schema || Object.keys(schema).length === 0) {
+      throw new Error('A valid schema is required');
+    }
     return (
-      <div className="flex flex-col text-sm p-3">
+      <div className="flex flex-col text-sm p-3" label="schema-selector">
         <div className="w-full uppercase font-semibold mb-2">TYPE</div>
         <div className="mt-2 flex flex-wrap">
           <div className="flex flex-wrap text-xs">
             {SCHEMA_TYPES.map((type, index) => {
               return (
                 <div
-                  className={`flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
+                  className={`schema-literal schema-${type} flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
                   ${
                     schema.type === type
-                      ? 'bg-green-600 text-white'
+                      ? 'bg-green-600 text-white schema-literal-selected'
                       : 'hover:bg-gray-300 dark:hover:bg-gray-600'
                   }`}
                   key={index}

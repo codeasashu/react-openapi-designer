@@ -19,7 +19,7 @@ class ArrayProperty extends PureComponent {
     const heading = `${isSubtype ? 'subtype' : ''} ${data.type} properties`;
     return (
       <div className="text-sm overflow-auto p-1">
-        <div className="pb-6">
+        <div className="pb-6 parent-node">
           <div className="uppercase font-semibold pb-3">{heading}</div>
           <div className="flex pb-2">
             <Keywords.UniqueItems
@@ -31,11 +31,11 @@ class ArrayProperty extends PureComponent {
           </div>
           <div className="flex pb-2">
             <Keywords.MinItems
-              value={data.minItems}
+              value={data.minItems || ''}
               onChange={(e) => this.changeOtherValue('minItems', e)}
             />
             <Keywords.MaxItems
-              value={data.maxItems}
+              value={data.maxItems || ''}
               onChange={(e) => this.changeOtherValue('maxItems', e)}
             />
           </div>
@@ -49,9 +49,13 @@ class ArrayProperty extends PureComponent {
 ArrayProperty.propTypes = {
   // Required
   onChange: PropTypes.func.isRequired,
-  data: PropTypes.string.isRequired,
-  isSubtype: PropTypes.string,
-  child: PropTypes.string, // @TODO: React node
+  data: PropTypes.shape({
+    minItems: PropTypes.any,
+    maxItems: PropTypes.any,
+    uniqueItems: PropTypes.bool,
+  }),
+  isSubtype: PropTypes.bool,
+  child: PropTypes.element, // @TODO: React node
 };
 
 export default ArrayProperty;

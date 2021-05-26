@@ -29,14 +29,14 @@ class StringProperty extends PureComponent {
   render() {
     const {data, isSubtype} = this.props;
     const heading = `${isSubtype ? 'subtype' : 'other'} properties`;
-    isSubtype;
+    //isSubtype;
     return (
       <div className="text-sm overflow-auto p-1">
         <div className="pb-6">
           <div className="uppercase font-semibold pb-3">{heading}</div>
           <div className="flex pb-2">
             <Keywords.Default
-              value={data.default}
+              value={data.default || ''}
               onChange={(e) => this.changeOtherValue(e, 'default')}
             />
             <Keywords.Format
@@ -46,13 +46,13 @@ class StringProperty extends PureComponent {
           </div>
           <div className="flex pb-2">
             <Keywords.Enum
-              value={data.enum}
+              value={data.enum || []}
               onChange={this.changeEnumOtherValue}
             />
           </div>
         </div>
         <div>
-          <div className="uppercase font-semibold pb-3">
+          <div className="uppercase font-semibold pb-3" role="sub-header">
             {isSubtype ? 'subtype' : ''} string properties
           </div>
           <div className="flex pb-2">
@@ -63,11 +63,11 @@ class StringProperty extends PureComponent {
           </div>
           <div className="flex pb-2">
             <Keywords.MinLength
-              value={data.minLength}
+              value={data.minLength || ''}
               onChange={(e) => this.changeOtherValue(e, 'minLength')}
             />
             <Keywords.MaxLength
-              value={data.maxLength}
+              value={data.maxLength || ''}
               onChange={(e) => this.changeOtherValue(e, 'maxLength')}
             />
           </div>
@@ -80,8 +80,15 @@ class StringProperty extends PureComponent {
 StringProperty.propTypes = {
   // Required
   onChange: PropTypes.func.isRequired,
-  data: PropTypes.string.isRequired,
-  isSubtype: PropTypes.string,
+  data: PropTypes.shape({
+    enum: PropTypes.array,
+    pattern: PropTypes.string,
+    format: PropTypes.string,
+    default: PropTypes.string,
+    minLength: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+    maxLength: PropTypes.oneOfType([PropTypes.number, PropTypes.string]),
+  }),
+  isSubtype: PropTypes.bool,
   child: PropTypes.element, // @TODO: React node
 };
 

@@ -1,17 +1,21 @@
 import React from 'react';
 import {render as rtlRender} from '@testing-library/react';
-import {createStore} from 'redux';
+import {configureStore} from '@reduxjs/toolkit';
 import {Provider} from 'react-redux';
 // Import your own reducer
 import schemaReducer from './src/redux/modules/schema';
+import dropdownReducer from './src/redux/modules/dropdown';
+
+const schemaStoreObject = {
+  reducer: {
+    schema: schemaReducer,
+    dropdown: dropdownReducer,
+  },
+};
 
 function render(
   ui,
-  {
-    initialState,
-    store = createStore(schemaReducer, initialState),
-    ...renderOptions
-  } = {},
+  {store = configureStore(schemaStoreObject), ...renderOptions} = {},
 ) {
   // eslint-disable-next-line react/prop-types
   function Wrapper({children}) {
@@ -23,4 +27,4 @@ function render(
 // re-export everything
 export * from '@testing-library/react';
 // override render method
-export {render};
+export {render, schemaStoreObject};

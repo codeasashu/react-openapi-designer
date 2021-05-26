@@ -22,7 +22,7 @@ export const Default = (props) => {
 };
 
 Default.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   onChange: PropTypes.func,
 };
 
@@ -52,9 +52,9 @@ BoolDefault.propTypes = {
 };
 
 const getFormat = (format) => {
-  format = format || String;
+  format = format || 'string';
   const formats = {
-    String: [
+    string: [
       {name: 'date-time'},
       {name: 'date'},
       {name: 'email'},
@@ -63,14 +63,14 @@ const getFormat = (format) => {
       {name: 'ipv6'},
       {name: 'uri'},
     ],
-    Number: [{name: 'float'}, {name: 'double'}],
+    number: [{name: 'float'}, {name: 'double'}],
   };
 
-  return [].concat(formats[format.prototype.constructor.name] || []);
+  return [].concat(formats[format] || []);
 };
 
 export const Format = (props) => {
-  const format = getFormat(props.format || String);
+  const format = getFormat(props.format || 'string');
   return (
     <FormGroup label="format" className="flex-1 ml-3">
       <div className="bp3-select">
@@ -103,6 +103,7 @@ export const Enum = (props) => {
   return (
     <FormGroup className="flex-1 mb-0" label="enum">
       <TagInput
+        addOnBlur={false}
         values={props.value || []}
         placeholder={LocaleProvider('enum_msg')}
         onChange={props.onChange}
@@ -112,7 +113,7 @@ export const Enum = (props) => {
 };
 
 Enum.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.array,
   onChange: PropTypes.func,
 };
 
@@ -121,7 +122,7 @@ export const Pattern = (props) => {
     <FormGroup className="flex-1 mb-0" label="pattern">
       <DebouncedInput
         large
-        value={props.value}
+        value={props.value || ''}
         placeholder="Pattern"
         onChange={props.onChange}
       />
@@ -151,7 +152,7 @@ export const MinLength = (props) => {
 };
 
 MinLength.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.any,
   onChange: PropTypes.func,
 };
 
@@ -172,7 +173,7 @@ export const MaxLength = (props) => {
 };
 
 MaxLength.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.any,
   onChange: PropTypes.func,
 };
 
@@ -189,7 +190,7 @@ export const Minimum = (props) => {
       </FormGroup>
       <FormGroup className="ml-3 mb-0 text-center" label="exclusiveMin">
         <Switch
-          checked={props.exclusiveMinimum || false}
+          checked={!!props.exclusiveMinimum || false}
           onChange={props.onToggle}
         />
       </FormGroup>
@@ -217,7 +218,7 @@ export const Maximum = (props) => {
       </FormGroup>
       <FormGroup className="ml-3 mb-0 text-center" label="exclusiveMax">
         <Switch
-          checked={props.exclusiveMaximum || false}
+          checked={!!props.exclusiveMaximum || false}
           onChange={props.onToggle}
         />
       </FormGroup>
@@ -253,13 +254,13 @@ MultipleOf.propTypes = {
 export const UniqueItems = (props) => {
   return (
     <FormGroup className="flex-1 mb-0" label="uniqueItems">
-      <Switch checked={props.value || false} onChange={props.onToggle} />
+      <Switch checked={!!props.value || false} onChange={props.onToggle} />
     </FormGroup>
   );
 };
 
 UniqueItems.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.bool,
   onToggle: PropTypes.func,
 };
 
@@ -277,7 +278,7 @@ export const MinItems = (props) => {
 };
 
 MinItems.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.any,
   onChange: PropTypes.func,
 };
 
@@ -298,7 +299,7 @@ export const MaxItems = (props) => {
 };
 
 MaxItems.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.any,
   onChange: PropTypes.func,
 };
 
@@ -317,7 +318,7 @@ export const DisallowAdditionalProperties = (props) => {
 };
 
 DisallowAdditionalProperties.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.bool,
   onToggle: PropTypes.func,
 };
 
@@ -348,7 +349,7 @@ export const MinProperty = (props) => {
     <FormGroup className="flex-1 mb-0" label="minProperties">
       <DebouncedInput
         large
-        value={props.value}
+        value={props.value || 0}
         placeholder=">=0"
         onChange={props.onChange}
       />
@@ -357,7 +358,7 @@ export const MinProperty = (props) => {
 };
 
 MinProperty.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.number,
   onChange: PropTypes.func,
 };
 
@@ -366,7 +367,7 @@ export const MaxProperty = (props) => {
     <FormGroup className="flex-1 mb-0 ml-3" label="maxProperties">
       <DebouncedInput
         large
-        value={props.value}
+        value={props.value || 0}
         placeholder=">=0"
         onChange={props.onChange}
       />
@@ -375,6 +376,6 @@ export const MaxProperty = (props) => {
 };
 
 MaxProperty.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.number,
   onChange: PropTypes.func,
 };

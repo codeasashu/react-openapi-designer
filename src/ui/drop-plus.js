@@ -25,7 +25,7 @@ const DropPlus = (props: DropPlusProps) => {
   );
   return (
     <Popover2 content={dropMenu} placement="right-end">
-      <Button minimal small icon="plus" />
+      <Button minimal small icon="plus" aria-label="add child" />
     </Popover2>
   );
 };

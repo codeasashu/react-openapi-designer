@@ -57,6 +57,10 @@ function handleSchema(schema) {
     if (!schema.items) schema.items = {type: 'string'};
     handleSchema(schema.items);
   } else {
+    if (!Object.prototype.hasOwnProperty.call(schema, 'title'))
+      schema.title = '';
+    if (!Object.prototype.hasOwnProperty.call(schema, 'examples'))
+      schema.examples = {};
     return schema;
   }
 }
@@ -103,7 +107,8 @@ const _addChildField = (state, keys, fieldName) => {
 
 const _handleEditorSchemaChange = (state, {value}) => {
   handleSchema(value);
-  return {...state, ...value};
+  //return {...state, ...value};
+  return value;
 };
 
 const _handleAddChildField = (state, {key}) => {

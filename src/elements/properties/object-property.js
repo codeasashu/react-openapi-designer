@@ -65,7 +65,6 @@ class ObjectProperty extends PureComponent {
     let cloned = clone(data);
     const behaviour = e.target.value;
     let modifiedData = cloned;
-    console.log('readonly', behaviour);
     if (behaviour.toLowerCase() === 'readonly') {
       modifiedData = this.changeValues(modifiedData, true, 'readOnly');
       modifiedData = this.changeValues(modifiedData, null, 'writeOnly');
@@ -76,7 +75,6 @@ class ObjectProperty extends PureComponent {
       modifiedData = this.changeValues(modifiedData, null, 'readOnly');
       modifiedData = this.changeValues(modifiedData, null, 'writeOnly');
     }
-    console.log('readonly.2', modifiedData);
     onChange(modifiedData);
   }
 
@@ -84,7 +82,6 @@ class ObjectProperty extends PureComponent {
     const {data, isSubtype} = this.props;
     const {behaviour} = this.state;
     const heading = `${isSubtype ? 'subtype' : 'object'} properties`;
-    isSubtype;
     return (
       <div className="text-sm overflow-auto p-1">
         <div className="pb-6">
@@ -122,8 +119,14 @@ class ObjectProperty extends PureComponent {
 ObjectProperty.propTypes = {
   // Required
   onChange: PropTypes.func.isRequired,
-  data: PropTypes.string.isRequired,
-  isSubtype: PropTypes.string,
+  data: PropTypes.shape({
+    additionalProperties: PropTypes.bool,
+    readOnly: PropTypes.bool,
+    writeOnly: PropTypes.bool,
+    minProperties: PropTypes.number,
+    maxProperties: PropTypes.number,
+  }),
+  isSubtype: PropTypes.bool,
   child: PropTypes.string, // @TODO: React node
 };
 

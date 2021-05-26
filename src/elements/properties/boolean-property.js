@@ -34,8 +34,8 @@ class BooleanProperty extends PureComponent {
 BooleanProperty.propTypes = {
   // Required
   onChange: PropTypes.func.isRequired,
-  data: PropTypes.string.isRequired,
-  isSubtype: PropTypes.string,
+  data: PropTypes.object.isRequired,
+  isSubtype: PropTypes.bool,
   child: PropTypes.string, // @TODO: React node
 };
 

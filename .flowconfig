@@ -4,12 +4,12 @@
 
 [include]
 
-[libs]
-./flow-typed
+;[libs]
+;./flow-typed
 
 [options]
-esproposal.decorators=ignore
-esproposal.optional_chaining=enable
+; esproposal.decorators=ignore
+; esproposal.optional_chaining=enable
 module.file_ext=.css
 module.file_ext=.scss
 module.file_ext=.sass

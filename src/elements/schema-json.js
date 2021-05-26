@@ -122,7 +122,7 @@ class SchemaItem extends PureComponent {
 
 SchemaItem.propTypes = {
   name: PropTypes.string,
-  prefix: PropTypes.string,
+  prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   schema: PropTypes.object,
   wrapperProps: PropTypes.object,
 };
@@ -149,7 +149,7 @@ class SchemaObject extends PureComponent {
 }
 
 SchemaObject.propTypes = {
-  prefix: PropTypes.string,
+  prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   schema: PropTypes.object,
   wrapperProps: PropTypes.object,
 };
