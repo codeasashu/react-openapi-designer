@@ -5,3 +5,8 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+*, :after, :before {
+    border: 0 solid #8694ad80;
+    box-sizing: border-box;
+}
