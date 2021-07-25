@@ -17,9 +17,8 @@ class OasDesigner extends React.Component {
   render() {
     return (
       <div className={this.getDarkMode()}>
-        <div
-          className={'bg-white dark:bg-gray-700 OasContainer h-screen w-full'}>
-          <div className={'Studio h-full flex flex-1 flex-col overflow-hidden'}>
+        <div className={'bg-white dark:bg-gray-700 OasContainer h-full w-full'}>
+          <div className={'Studio h-full flex flex-1 flex-col'}>
             <div className={'flex flex-1'}>
               <Sidebar
                 className={'flex flex-col bg-white dark:bg-gray-900 border-r'}>

@@ -1,6 +1,7 @@
 // @flow
 import React from 'react';
-import {ButtonGroup, Button, Tab, Tabs} from '@blueprintjs/core';
+import {Button, Callout} from '@blueprintjs/core';
+import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
 import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
@@ -22,7 +23,7 @@ class SchemaDesigner extends React.Component {
       validGeneratedJson: false,
       generateCode: false,
       userCode: '{}',
-      selectedTab: 'schema',
+      selectedTab: 0,
     };
   }
 
@@ -107,7 +108,11 @@ class SchemaDesigner extends React.Component {
     const {schema, open} = this.props;
     return (
       <>
-        <Button icon="clean" onClick={() => this._toggleGenerateFromCode(true)}>
+        <Button
+          outlined
+          icon="clean"
+          className="mt-3 ml-4 mb-2"
+          onClick={() => this._toggleGenerateFromCode(true)}>
           Generate from JSON
         </Button>
         <SchemaRow
@@ -132,24 +137,32 @@ class SchemaDesigner extends React.Component {
   renderGenerateCode() {
     const {userCode, validGeneratedJson} = this.state;
     return (
-      <>
-        <ButtonGroup>
+      <div className="mx-4 my-3">
+        <div className="mb-2">
           <Button
             icon="clean"
+            outlined
+            intent="primary"
             disabled={!validGeneratedJson}
             onClick={this._handleGenerateFromCode}>
             Generate
           </Button>
           <Button
             icon="small-cross"
+            outlined
+            className="ml-2"
             onClick={() => this._toggleGenerateFromCode(false)}>
             Cancel
           </Button>
-        </ButtonGroup>
+        </div>
+        <Callout className="mb-2">
+          Paste or write a JSON example below, then click <em>Generate</em>
+          above to build a schema.
+        </Callout>
         <div>
           <JsonEditor value={userCode} onChange={this._setUserCode} />
         </div>
-      </>
+      </div>
     );
   }
 
@@ -191,30 +204,39 @@ class SchemaDesigner extends React.Component {
     return (
       <div className={`json-schema-react-editor ${dark && 'bp3-dark'}`}>
         <Tabs
-          className="bp3-simple-tab-list"
-          id="SchemTabs"
-          key={'horizontal'}
-          onChange={this.handleTabChange}
-          selectedTabId={selectedTab}>
-          <Tab
-            className="bp3-simple-tab"
-            id="schema"
-            title="Schema"
-            panel={this.renderSchema()}
-          />
+          className="react-tabs"
+          selectedTabClassName="selected-tab"
+          selectedTabPanelClassName="block"
+          selectedIndex={selectedTab}
+          onSelect={this.handleTabChange}>
+          <TabList className="bp3-simple-tab-list">
+            <Tab className="bp3-simple-tab">Schema</Tab>
+            {schema.examples &&
+              Object.keys(schema.examples).map((example, i) => (
+                <Tab className="bp3-simple-tab" key={i}>
+                  {example}
+                </Tab>
+              ))}
+            <Button
+              icon="small-plus"
+              minimal
+              small
+              className="ml-2 mb-1/2"
+              onClick={() => this.addExample()}>
+              Example
+            </Button>
+          </TabList>
+          <TabPanel className="bp3-simple-tab-panel">
+            <div className="border border-gray-600">{this.renderSchema()}</div>
+          </TabPanel>
           {schema.examples &&
             Object.keys(schema.examples).map((example, i) => (
-              <Tab
-                className="bp3-simple-tab"
-                id={example}
-                key={i}
-                title={example}
-                panel={this.renderExample(example, schema.examples[example])}
-              />
+              <TabPanel className="bp3-simple-tab-panel" key={i}>
+                <div className="border border-gray-600">
+                  {this.renderExample(example, schema.examples[example])}
+                </div>
+              </TabPanel>
             ))}
-          <Button icon="small-plus" onClick={() => this.addExample()}>
-            Example
-          </Button>
         </Tabs>
       </div>
     );

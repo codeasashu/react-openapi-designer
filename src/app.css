@@ -2,6 +2,30 @@
 @import "@blueprintjs/popover2/lib/css/blueprint-popover2";
 @import "@blueprintjs/icons/lib/css/blueprint-icons";
 
+.bp3-simple-tab-list {
+    margin: 0;
+    padding: 0;
+    user-select: none;
+}
+.bp3-simple-tab {
+    display: inline-block;
+    bottom: -1px;
+    position: relative;
+    list-style: none;
+    cursor: pointer;
+    padding: 7px 15px;
+    z-index: 2;
+    font-weight: 500;
+    border-width: 1px;
+    margin-left: -1px;
+}
+.bp3-simple-tab-panel {
+    /*border-width: 1px;*/
+    display: none;
+    border-radius: 3px;
+    border-top-left-radius: 0;
+}
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -10,3 +34,59 @@
     border: 0 solid #8694ad80;
     box-sizing: border-box;
 }
+
+.bg-canvas {
+    background-color: #0f141b;
+}
+
+.TreeListItem {
+    height: 30px;
+}
+.DesignTreeListItem {
+    padding: 0 7px;
+}
+.DesignTreeListItem__path {
+    padding-left: 22px;
+}
+
+/**
+ * Tab styles
+ */
+.bp3-simple-tab.bp3-dark, .bp3-dark .bp3-simple-tab {
+    /*color: #738694;*/
+    /*background-color: #293742;*/
+    /*border-color: rgba(16,22,26,.4);*/
+}
+.bp3-simple-tab.bp3-dark.selected-tab, .bp3-dark .bp3-simple-tab.selected-tab {
+    /*color: #fff;*/
+    /*background-color: #202b33;*/
+    /*border-bottom-color: #202b33;*/
+}
+.bp3-simple-tab:first-of-type {
+    border-top-left-radius: 3px;
+    margin-left: 0;
+}
+.bp3-simple-tab:last-of-type {
+    border-top-right-radius: 3px;
+}
+.bp3-simple-tab.selected-tab {
+    cursor: default;
+}
+.bp3-simple-tab {
+    /*color: #738694;*/
+    /*@apply bg-gray-100 dark:bg-gray-700*/
+}
+.bp3-simple-tab-panel {
+    /*background-color: #fff;*/
+}
+.bp3-dark .bp3-simple-tab-panel {
+    /*background-color: #202b33;*/
+    /*border-color: rgba(16,22,26,.4);*/
+}
+/*.bp3-simple-tab-panel.block{*/
+    /*display: block;*/
+/*}*/
+
+/*.methodTabs .bp3-tab-list:first-child {*/
+    /*@apply mt-6 px-10 flex*/
+/*}*/

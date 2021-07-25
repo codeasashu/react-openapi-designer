@@ -1,6 +1,8 @@
 // @flow
 import React from 'react';
 
+export const StatusCodes = [200, 201, 202];
+
 export const ContentTypes = {
   json: 'application/json',
   xml: 'application/xml',
