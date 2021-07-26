@@ -20,7 +20,7 @@ export const defaultSchema = {
   number: {type: 'number'},
   integer: {type: 'integer'},
   array: {type: 'array', items: {type: 'string'}},
-  object: {type: 'object', properties: {}, required: []},
+  object: {type: 'object', properties: {}, required: [], examples: {}},
 };
 
 function escapeRegExpChars(text: string) {

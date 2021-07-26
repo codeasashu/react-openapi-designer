@@ -1,3 +1,4 @@
+//@flow
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {autoBindMethodsForReact} from 'class-autobind-decorator';
@@ -86,7 +87,6 @@ class SchemaItem extends PureComponent {
     return (
       <SchemaRow
         show={get(wrapperProps.open, [].concat(prefix, 'show'))}
-        rowIndex={this.props.rowIndex}
         schema={itemSchema}
         sidebar={wrapperProps.open}
         fieldName={name}
@@ -122,7 +122,6 @@ class SchemaItem extends PureComponent {
 }
 
 SchemaItem.propTypes = {
-  rowIndex: PropTypes.number,
   name: PropTypes.string,
   prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   schema: PropTypes.object,
@@ -138,7 +137,6 @@ class SchemaObject extends PureComponent {
           return (
             <SchemaItem
               key={index}
-              rowIndex={index}
               name={name}
               schema={schema}
               prefix={prefix}

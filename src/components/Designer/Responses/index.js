@@ -7,7 +7,7 @@ import produce from 'immer';
 import {defaultSchema, ContentTypes} from '../../../utils';
 import MarkupEditor from '../../Editor/markdown';
 import BodySelector from '../../body-selector';
-import SchemaDesigner from '../../../designers/schema';
+import SchemaDesigner from '../Schema/root';
 import Headers from './headers';
 import StatusCodePicker from '../../Pickers/StatusCode';
 import {ButtonGroup, Button, Icon} from '@blueprintjs/core';
@@ -29,7 +29,10 @@ class ResponseDesigner extends PureComponent {
 
   componentDidUpdate(oldProps, oldState) {
     const {response} = this.state;
-    if (!isEqual(oldState.response, response)) {
+    if (
+      !isEqual(oldState.response, response) &&
+      Object.prototype.hasOwnProperty.call(this.props, 'onChange')
+    ) {
       this.props.onChange(response);
     }
   }

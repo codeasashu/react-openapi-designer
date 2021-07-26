@@ -1,14 +1,12 @@
 // @flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
 import {get, isUndefined} from 'lodash';
 import {autoBindMethodsForReact} from 'class-autobind-decorator';
-import {Button, Icon, Intent, TextArea} from '@blueprintjs/core';
+import {Button, Intent, TextArea} from '@blueprintjs/core';
 import {Popover2, Tooltip2} from '@blueprintjs/popover2';
-import LocaleProvider from '../locale';
-import DropPlus from '../ui/drop-plus';
-import SchemaDropdown from './schema-dropdown';
+import LocaleProvider from '../../../utils/locale';
+import {DropPlus, SchemaDropdown} from '../../Common/dropdown';
 import DebouncedInput from './debounced-input';
 import AdvancedProperties from './advanced-properties';
 
@@ -36,7 +34,7 @@ SchemaItemEntity.propTypes = {
 };
 
 @autoBindMethodsForReact()
-class SchemaRow extends React.PureComponent {
+class Row extends React.PureComponent {
   _handleAddField() {
     const {fieldPrefix, fieldName} = this.props;
     this.props.handleField({key: fieldPrefix, value: fieldName});
@@ -116,51 +114,49 @@ class SchemaRow extends React.PureComponent {
 
     const prefix = fieldPrefix || [];
     const name = fieldName || null;
-    const isEvenRow = this.props.rowIndex % 2 === 0;
 
     const sidebarOpen = get(sidebar, this.addToPrefix(['properties', 'show']));
     const indent = prefix.length
       ? prefix.filter((name) => name !== 'properties').length
       : -1;
-    let padLeft = 20 * (indent + 1);
+    let padLeft = 30 * (indent + 1);
     padLeft += schema.type === 'object' ? 0 : 50;
     const styles = {paddingLeft: `${padLeft}px`};
     const isParentArray =
       this.props.root || (this.props.parent && this.props.parent === 'array');
 
-    const classes = classnames('flex flex-1', {
-      'bg-white bg-opacity-5': isEvenRow,
-    });
-
     return show ? (
       <>
         <div role="schema-row" className="flex">
-          <div className={classes}>
-            {schema.type === 'object' && (
-              <div className="relative flex items-center justify-center cursor-pointer rounded hover:bg-darken-3 z-10 ml-3">
-                <Icon
-                  iconSize={12}
+          <div className="flex flex-1">
+            {!!name && schema.type === 'object' ? (
+              <DropPlus
+                handleAddField={this._handleAddField}
+                handleAddChildField={this._handleAddChildField}
+              />
+            ) : (
+              schema.type === 'object' && (
+                <Button
+                  small
+                  minimal
                   icon="plus"
                   aria-label="add row"
-                  onClick={
-                    name ? this._handleAddChildField : this._handleAddField
-                  }
+                  onClick={this._handleAddField}
                 />
-              </div>
+              )
             )}
             <div
               className="flex flex-1 bp3-control-group row-container"
               style={styles}>
               {schema.type === 'object' && (
-                <div className="relative flex items-center justify-center cursor-pointer rounded hover:bg-darken-3 z-10 ml-3">
-                  <Icon
-                    style={{marginRight: '2px'}}
-                    onClick={this._handleSidebarOpen}
-                    iconSize={12}
-                    aria-label="child dropdown"
-                    icon={sidebarOpen ? 'caret-down' : 'caret-right'}
-                  />
-                </div>
+                <Button
+                  style={{marginRight: '2px'}}
+                  onClick={this._handleSidebarOpen}
+                  small
+                  minimal
+                  aria-label="child dropdown"
+                  icon={sidebarOpen ? 'chevron-down' : 'chevron-right'}
+                />
               )}
 
               {!isParentArray && (
@@ -206,7 +202,7 @@ class SchemaRow extends React.PureComponent {
                   <Button
                     small
                     minimal
-                    icon={<Icon iconSize={12} icon="manual" />}
+                    icon="manual"
                     intent={schema.description ? Intent.PRIMARY : null}
                   />
                 </Tooltip2>
@@ -224,11 +220,7 @@ class SchemaRow extends React.PureComponent {
                 <Tooltip2
                   role={'advanced properties'}
                   content={<span>{LocaleProvider('adv_setting')}</span>}>
-                  <Button
-                    small
-                    minimal
-                    icon={<Icon iconSize={12} icon="property" />}
-                  />
+                  <Button small minimal icon="property" />
                 </Tooltip2>
               </Popover2>
             </span>
@@ -240,7 +232,7 @@ class SchemaRow extends React.PureComponent {
                     role={'delete row'}
                     small
                     minimal
-                    icon={<Icon iconSize={12} icon="cross" />}
+                    icon="cross"
                   />
                 </Tooltip2>
               </span>
@@ -252,7 +244,7 @@ class SchemaRow extends React.PureComponent {
                     disabled={isParentArray}
                     small
                     minimal
-                    icon={<Icon iconSize={12} icon="issue" />}
+                    icon="issue"
                     role={'required field'}
                     onClick={this._handleToggleRequire}
                     intent={required ? Intent.DANGER : null}
@@ -265,7 +257,7 @@ class SchemaRow extends React.PureComponent {
                       disabled={isParentArray}
                       small
                       minimal
-                      icon={<Icon iconSize={12} icon="issue" />}
+                      icon="issue"
                       onClick={this._handleToggleRequire}
                       intent={required ? Intent.DANGER : null}
                     />
@@ -281,8 +273,7 @@ class SchemaRow extends React.PureComponent {
   }
 }
 
-SchemaRow.propTypes = {
-  rowIndex: PropTypes.number,
+Row.propTypes = {
   fieldPrefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   fieldName: PropTypes.string,
   required: PropTypes.bool,
@@ -304,4 +295,4 @@ SchemaRow.propTypes = {
   handleAdditionalProperties: PropTypes.func,
 };
 
-export default SchemaRow;
+export default Row;
