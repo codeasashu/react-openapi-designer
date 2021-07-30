@@ -16,6 +16,7 @@ import {defaultSchema, generateExampleName} from '../../utils';
 import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import GenerateSchema from '../../generate-schema';
 import OrderedDict from '../../ordered-dict';
+import {fillSchema} from '../../utils/schema';
 const jsf = require('json-schema-faker');
 jsf.option({
   requiredOnly: false,
@@ -34,44 +35,6 @@ export const generateExampleFromSchema = createAsyncThunk(
     return {key, value};
   },
 );
-
-function handleType(schema) {
-  if (
-    !schema.type &&
-    schema.properties &&
-    typeof schema.properties === 'object'
-  ) {
-    schema.type = 'object';
-  }
-}
-
-function handleSchema(schema) {
-  if (schema && !schema.type && !schema.properties) {
-    schema.type = 'string';
-  }
-  handleType(schema);
-  if (schema.type === 'object') {
-    if (!schema.properties) schema.properties = {};
-    handleObject(schema.properties, schema);
-  } else if (schema.type === 'array') {
-    if (!schema.items) schema.items = {type: 'string'};
-    handleSchema(schema.items);
-  } else {
-    if (!Object.prototype.hasOwnProperty.call(schema, 'title'))
-      schema.title = '';
-    if (!Object.prototype.hasOwnProperty.call(schema, 'examples'))
-      schema.examples = {};
-    return schema;
-  }
-}
-
-function handleObject(properties) {
-  for (const key in properties) {
-    handleType(properties[key]);
-    if (properties[key].type === 'array' || properties[key].type === 'object')
-      handleSchema(properties[key]);
-  }
-}
 
 const getParentKey = (keys) => (keys.length === 1 ? [] : dropRight(keys, 1));
 
@@ -105,11 +68,7 @@ const _addChildField = (state, keys, fieldName) => {
   );
 };
 
-const _handleEditorSchemaChange = (state, {value}) => {
-  handleSchema(value);
-  //return {...state, ...value};
-  return value;
-};
+const _handleEditorSchemaChange = (state, {value}) => fillSchema(value);
 
 const _handleAddChildField = (state, {key}) => {
   const fieldName = `field_${fieldNum++}`;

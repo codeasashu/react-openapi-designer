@@ -90,3 +90,19 @@
 /*.methodTabs .bp3-tab-list:first-child {*/
     /*@apply mt-6 px-10 flex*/
 /*}*/
+
+.very-hidden-input{
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    visibility: hidden;
+    height: 0px;
+    overflow: scroll;
+    white-space: pre;
+    font-size: 11px;
+    font-family: Inter, ui-sans-serif, system-ui, -apple-system, system-ui, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+    font-weight: 400;
+    font-style: normal;
+    letter-spacing: normal;
+    text-transform: none;
+}

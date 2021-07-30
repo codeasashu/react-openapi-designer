@@ -208,7 +208,7 @@ class RootSchema extends React.Component {
       <div className={`json-schema-react-editor ${dark && 'bp3-dark'}`}>
         <Tabs
           className="react-tabs"
-          selectedTabClassName="selected-tab"
+          selectedTabClassName="selected-tab bg-gray-700"
           selectedTabPanelClassName="block"
           selectedIndex={selectedTab}
           onSelect={this.handleTabChange}>

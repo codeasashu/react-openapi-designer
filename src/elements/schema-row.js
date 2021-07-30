@@ -7,9 +7,8 @@ import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import {Button, Icon, Intent, TextArea} from '@blueprintjs/core';
 import {Popover2, Tooltip2} from '@blueprintjs/popover2';
 import LocaleProvider from '../locale';
-import DropPlus from '../ui/drop-plus';
 import SchemaDropdown from './schema-dropdown';
-import DebouncedInput from './debounced-input';
+import SchemaTitleEditor from '../components/Editor/schemaTitle';
 import AdvancedProperties from './advanced-properties';
 
 const SchemaItemEntity = ({type, text}) => {
@@ -103,6 +102,13 @@ class SchemaRow extends React.PureComponent {
       : null;
   }
 
+  calculatePadding(indentLevel, isObject) {
+    let padLeft = 30 * (indentLevel + 1);
+    // Objects have arrows before them, hence they are already padded
+    padLeft += isObject ? 0 : 60;
+    return padLeft;
+  }
+
   render() {
     const {
       show,
@@ -122,8 +128,7 @@ class SchemaRow extends React.PureComponent {
     const indent = prefix.length
       ? prefix.filter((name) => name !== 'properties').length
       : -1;
-    let padLeft = 20 * (indent + 1);
-    padLeft += schema.type === 'object' ? 0 : 50;
+    const padLeft = this.calculatePadding(indent, schema.type === 'object');
     const styles = {paddingLeft: `${padLeft}px`};
     const isParentArray =
       this.props.root || (this.props.parent && this.props.parent === 'array');
@@ -154,7 +159,7 @@ class SchemaRow extends React.PureComponent {
               {schema.type === 'object' && (
                 <div className="relative flex items-center justify-center cursor-pointer rounded hover:bg-darken-3 z-10 ml-3">
                   <Icon
-                    style={{marginRight: '2px'}}
+                    style={{marginRight: '12px'}}
                     onClick={this._handleSidebarOpen}
                     iconSize={12}
                     aria-label="child dropdown"
@@ -164,8 +169,7 @@ class SchemaRow extends React.PureComponent {
               )}
 
               {!isParentArray && (
-                <DebouncedInput
-                  className="pl-1"
+                <SchemaTitleEditor
                   onChange={this._handleChangeName}
                   placeholder="field name"
                   value={name || ''}

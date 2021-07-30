@@ -59,7 +59,7 @@ class SchemaArray extends PureComponent {
 
 SchemaArray.propTypes = {
   name: PropTypes.string,
-  prefix: PropTypes.string,
+  prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   schema: PropTypes.object,
   wrapperProps: PropTypes.object,
 };
