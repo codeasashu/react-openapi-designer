@@ -83,7 +83,7 @@ class Json extends PureComponent {
 }
 
 Json.propTypes = {
-  value: PropTypes.string,
+  value: PropTypes.any,
   onChange: PropTypes.func,
   onValidJson: PropTypes.func,
   onInValidJson: PropTypes.func,

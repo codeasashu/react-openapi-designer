@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import {Provider} from 'react-redux';
 import {responseStore} from '../../redux/store';
 import {Switch, ButtonGroup, Button} from '@blueprintjs/core';
@@ -7,7 +8,12 @@ import {TitleEditor as Title, MarkdownEditor as Markdown} from '../Editor';
 import RequestBody from '../Designer/RequestBody';
 import Responses from '../Designer/Responses';
 
+@autoBindMethodsForReact()
 class Method extends React.Component {
+  handleDeprecated(value) {
+    console.log('deprecated', value);
+  }
+
   render() {
     const {methodName} = this.props;
     return (
@@ -21,7 +27,11 @@ class Method extends React.Component {
               </div>
               <div className="flex items-baseline">
                 <div className="text-xs uppercase">Deprecated</div>
-                <Switch checked={false} className="ml-2 py-1" />
+                <Switch
+                  checked={false}
+                  onChange={this.handleDeprecated}
+                  className="ml-2 py-1"
+                />
               </div>
             </div>
             <div className="text-xs uppercase px-2 pt-2">Description</div>

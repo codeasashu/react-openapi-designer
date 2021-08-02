@@ -20,7 +20,6 @@ const SchemaTitle = (props) => {
   const [inputValue, setInputValue] = useState(props.value || '');
 
   useEffect(() => {
-    console.log('calculating width', hiddenDiv);
     setWidth(calculateWidth(hiddenDiv));
   });
 

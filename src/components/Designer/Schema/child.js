@@ -3,7 +3,7 @@ import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import {isUndefined, get} from 'lodash';
-import SchemaRow from './schema-row';
+import SchemaRow from './row';
 
 const mapping = (name, schema, props) => {
   const nameArray = [].concat(name, 'properties');
@@ -60,7 +60,7 @@ class SchemaArray extends PureComponent {
 
 SchemaArray.propTypes = {
   name: PropTypes.string,
-  prefix: PropTypes.string,
+  prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   schema: PropTypes.object,
   wrapperProps: PropTypes.object,
 };
@@ -87,6 +87,7 @@ class SchemaItem extends PureComponent {
     return (
       <SchemaRow
         show={get(wrapperProps.open, [].concat(prefix, 'show'))}
+        rowIndex={this.props.rowIndex}
         schema={itemSchema}
         sidebar={wrapperProps.open}
         fieldName={name}
@@ -122,6 +123,7 @@ class SchemaItem extends PureComponent {
 }
 
 SchemaItem.propTypes = {
+  rowIndex: PropTypes.number,
   name: PropTypes.string,
   prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   schema: PropTypes.object,
@@ -137,6 +139,7 @@ class SchemaObject extends PureComponent {
           return (
             <SchemaItem
               key={index}
+              rowIndex={index}
               name={name}
               schema={schema}
               prefix={prefix}
@@ -155,14 +158,14 @@ SchemaObject.propTypes = {
   wrapperProps: PropTypes.object,
 };
 
-const SchemaJson = (props) => {
+const SchemaChild = (props) => {
   const {wrapperProps} = props;
   const item = mapping([], wrapperProps.schema, wrapperProps);
   return <React.Fragment>{item}</React.Fragment>;
 };
 
-SchemaJson.propTypes = {
+SchemaChild.propTypes = {
   wrapperProps: PropTypes.object,
 };
 
-export default SchemaJson;
+export default SchemaChild;

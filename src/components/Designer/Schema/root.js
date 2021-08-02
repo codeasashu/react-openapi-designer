@@ -7,16 +7,15 @@ import PropTypes from 'prop-types';
 import {connect} from 'react-redux';
 import {bindActionCreators} from 'redux';
 import {isEqual} from 'lodash';
-import {defaultSchema} from '../../../utils';
+import {defaultSchema} from '../../../model';
 import {
   schemaSlice,
   generateExampleFromSchema,
 } from '../../../redux/modules/schema';
 import {dropdownSlice} from '../../../redux/modules/dropdown';
-import {JsonEditor} from '../../Editor';
-import SchemaRow from '../../../elements/schema-row';
-import SchemaJson from '../../../elements/schema-json';
-import DebouncedInput from '../../../elements/debounced-input';
+import {JsonEditor, DebouncedEditor} from '../../Editor';
+import SchemaRow from './row';
+import SchemaChild from './child';
 
 @autoBindMethodsForReact()
 class RootSchema extends React.Component {
@@ -131,7 +130,7 @@ class RootSchema extends React.Component {
           handleAdditionalProperties={this.props.changeValue}
         />
         {!!open.properties.show && (
-          <SchemaJson wrapperProps={{...this.props}} />
+          <SchemaChild wrapperProps={{...this.props}} />
         )}
       </>
     );
@@ -180,7 +179,7 @@ class RootSchema extends React.Component {
     return (
       <div>
         <div className="flex p-1">
-          <DebouncedInput
+          <DebouncedEditor
             className="pl-1 flex-1"
             onChange={() => {}}
             onBlur={(e) => this._handleChangeExampleTitle(title, e)}
