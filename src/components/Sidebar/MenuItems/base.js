@@ -9,7 +9,8 @@ const MenuItem = (props) => {
       <div className="relative flex items-stretch w-full h-full DesignTreeListItem--hover group">
         <div
           className="flex-1 flex items-center truncate DesignTreeListItem__row"
-          style={styles}>
+          style={styles}
+          onClick={props.onClick}>
           {props.icon && (
             <span className="TreeListItem__icon relative pl-0">
               <Icon icon={props.icon} />
@@ -27,6 +28,7 @@ MenuItem.propTypes = {
   label: PropTypes.string,
   icon: PropTypes.string,
   inner: PropTypes.bool,
+  onClick: PropTypes.func,
 };
 
 export default MenuItem;

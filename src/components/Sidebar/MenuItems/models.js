@@ -2,12 +2,18 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import MenuItem from './base';
 
-const Models = (props) => {
+const Models = ({models, onClick}) => {
   return (
     <>
       <MenuItem icon="folder-open" label="Models" />
-      {Object.keys(props.models).map((model, i) => (
-        <MenuItem icon="cube" inner label={props.models[model].title} key={i} />
+      {Object.keys(models).map((model, i) => (
+        <MenuItem
+          icon="cube"
+          inner
+          label={models[model].title}
+          onClick={() => onClick({itemPath: `#/components/schemas/${model}`})}
+          key={i}
+        />
       ))}
     </>
   );
@@ -15,6 +21,7 @@ const Models = (props) => {
 
 Models.propTypes = {
   models: PropTypes.object,
+  onClick: PropTypes.func,
 };
 
 export default Models;

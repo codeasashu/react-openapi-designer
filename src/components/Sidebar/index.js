@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
-import {Tag} from '@blueprintjs/core';
 import {MenuItem, Paths, Responses, Models, Parameters} from './MenuItems';
 
 const StyledSidebar = styled.div`
@@ -59,21 +58,36 @@ const paths = {
   },
 };
 
-class Sidebar extends React.Component {
-  render() {
-    return (
-      <StyledSidebar
-        className={'flex flex-col bg-white dark:bg-gray-900 border-r'}>
-        <Title text="Prod" />
-        <div className="TreeList SidebarTreeList flex-1 TreeList--interactive">
-          <MenuItem icon="star" label="API Overview" />
-          <Paths paths={paths} />
-          <Models models={models} />
-          <Parameters parameters={models} />
-        </div>
-      </StyledSidebar>
-    );
-  }
-}
+const Sidebar = ({onClick}) => {
+  return (
+    <StyledSidebar
+      className={'flex flex-col bg-white dark:bg-gray-900 border-r'}>
+      <Title text="Prod" />
+      <div className="TreeList SidebarTreeList flex-1 TreeList--interactive">
+        <MenuItem
+          icon="star"
+          label="API Overview"
+          onClick={() => onClick({menu: 'info'})}
+        />
+        <Paths
+          paths={paths}
+          onClick={(path) => onClick({menu: 'path', ...path})}
+        />
+        <Models
+          models={models}
+          onClick={(path) => onClick({menu: 'model', ...path})}
+        />
+        <Parameters
+          parameters={models}
+          onClick={(path) => onClick({menu: 'parameters', ...path})}
+        />
+      </div>
+    </StyledSidebar>
+  );
+};
+
+Sidebar.propTypes = {
+  onClick: PropTypes.func,
+};
 
 export default Sidebar;
