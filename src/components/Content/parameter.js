@@ -10,7 +10,7 @@ const schema = {
   },
 };
 
-const ModelContent = () => {
+const ParameterContent = () => {
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
@@ -41,4 +41,4 @@ const ModelContent = () => {
   );
 };
 
-export default ModelContent;
+export default ParameterContent;

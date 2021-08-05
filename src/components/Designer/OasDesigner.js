@@ -16,7 +16,8 @@ function OasDesignerBare(props) {
   let history = useHistory();
 
   function handleClick({menu, itemPath}) {
-    const queryParams = new URLSearchParams({menu, path: itemPath});
+    const queryParams = new URLSearchParams({menu});
+    if (itemPath) queryParams.append('path', itemPath);
     console.log('item clicked in sidebar', menu, itemPath);
     history.push(`/designer?${queryParams}`);
   }
@@ -41,7 +42,6 @@ function OasDesignerBare(props) {
 
 OasDesignerBare.propTypes = {
   dark: PropTypes.bool,
-  history: PropTypes.any,
 };
 
 export default function OasDesigner(props) {

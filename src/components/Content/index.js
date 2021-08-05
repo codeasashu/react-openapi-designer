@@ -5,6 +5,8 @@ import styled from 'styled-components';
 import Options from './options';
 import PathContent from './path';
 import ModelContent from './model';
+import Parameter from './parameter';
+import Response from './response';
 
 const StyledContent = styled.div`
   width: calc(80% - 2px);
@@ -25,6 +27,12 @@ function getContentItem() {
       break;
     case 'model':
       contentItem = <ModelContent path={path} />;
+      break;
+    case 'parameter':
+      contentItem = <Parameter path={path} />;
+      break;
+    case 'response':
+      contentItem = <Response path={path} />;
       break;
   }
   return contentItem;

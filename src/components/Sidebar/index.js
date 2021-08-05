@@ -49,6 +49,26 @@ const models = {
   },
 };
 
+const responses = {
+  test: {
+    description: '',
+    content: {
+      'application/json': {
+        schema: {
+          title: 'Users',
+          type: 'object',
+          description: '',
+          properties: {
+            id: {
+              type: 'string',
+            },
+          },
+        },
+      },
+    },
+  },
+};
+
 const paths = {
   '/users': {
     tags: ['get', 'post'],
@@ -79,7 +99,11 @@ const Sidebar = ({onClick}) => {
         />
         <Parameters
           parameters={models}
-          onClick={(path) => onClick({menu: 'parameters', ...path})}
+          onClick={(path) => onClick({menu: 'parameter', ...path})}
+        />
+        <Responses
+          responses={responses}
+          onClick={(path) => onClick({menu: 'response', ...path})}
         />
       </div>
     </StyledSidebar>

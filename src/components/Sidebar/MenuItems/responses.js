@@ -10,7 +10,10 @@ const Responses = (props) => {
         <MenuItem
           icon="exchange"
           inner
-          label={props.responses[response].title}
+          label={props.responses[response].title || response}
+          onClick={() =>
+            props.onClick({itemPath: `#/components/responses/${response}`})
+          }
           key={i}
         />
       ))}
@@ -20,6 +23,7 @@ const Responses = (props) => {
 
 Responses.propTypes = {
   responses: PropTypes.object,
+  onClick: PropTypes.func,
 };
 
 export default Responses;
