@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect} from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import {MenuItem, Paths, Responses, Models, Parameters} from './MenuItems';
@@ -69,16 +69,20 @@ const responses = {
   },
 };
 
-const paths = {
-  '/users': {
-    tags: ['get', 'post'],
-  },
-  '/pet': {
-    tags: ['post'],
-  },
-};
+//const paths = {
+//'/users': {
+//tags: ['get', 'post'],
+//},
+//'/pet': {
+//tags: ['post'],
+//},
+//};
 
-const Sidebar = ({onClick}) => {
+const Sidebar = ({openapi, onClick}) => {
+  console.log('openapi', openapi);
+  useEffect(() => {
+    console.log('openapi2', openapi);
+  }, []);
   return (
     <StyledSidebar
       className={'flex flex-col bg-white dark:bg-gray-900 border-r'}>
@@ -90,7 +94,7 @@ const Sidebar = ({onClick}) => {
           onClick={() => onClick({menu: 'info'})}
         />
         <Paths
-          paths={paths}
+          paths={openapi.paths}
           onClick={(path) => onClick({menu: 'path', ...path})}
         />
         <Models
@@ -112,6 +116,7 @@ const Sidebar = ({onClick}) => {
 
 Sidebar.propTypes = {
   onClick: PropTypes.func,
+  openapi: PropTypes.object,
 };
 
 export default Sidebar;

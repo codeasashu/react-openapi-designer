@@ -6,7 +6,11 @@ const Url = (props) => {
   return (
     <ControlGroup className="flex">
       <Button text="http://localhost" />
-      <InputGroup className="flex-1" />
+      <InputGroup
+        className="flex-1"
+        value={props.value}
+        onChange={props.onChange}
+      />
       <Button text="path params" />
     </ControlGroup>
   );
@@ -15,6 +19,7 @@ const Url = (props) => {
 Url.propTypes = {
   value: PropTypes.any,
   placeholder: PropTypes.any,
+  onChange: PropTypes.func,
 };
 
 export default Url;

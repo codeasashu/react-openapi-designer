@@ -24,6 +24,10 @@ module.exports = {
       vm: require.resolve('vm-browserify'),
       buffer: require.resolve('buffer'),
     },
+    alias: {
+      components: path.resolve(__dirname, '..', 'src', 'components'),
+      store: path.resolve(__dirname, '..', 'src', 'redux'),
+    },
   },
   module: {
     rules: [

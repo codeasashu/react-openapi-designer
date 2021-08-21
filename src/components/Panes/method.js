@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import {Provider} from 'react-redux';
 import {responseStore} from '../../redux/store';
-import {Switch, ButtonGroup, Button} from '@blueprintjs/core';
+import {Switch, ButtonGroup, Button, Intent} from '@blueprintjs/core';
 import {TitleEditor as Title, MarkdownEditor as Markdown} from '../Editor';
 import RequestBody from '../Designer/RequestBody';
 import Responses from '../Designer/Responses';
@@ -14,16 +14,18 @@ class Method extends React.Component {
     console.log('deprecated', value);
   }
 
-  render() {
-    const {methodName} = this.props;
+  renderOperation() {
+    const {methodName, operation, onChange} = this.props;
     return (
       <div className="relative">
         <div className="w-full p-10 pb-16 max-w-6xl">
           <div className="flex flex-col">
             <div className="flex flex-row justify-between">
               <div>
-                <div className="text-xs uppercase p-2">Operation ID</div>
-                <Title small value="get-user" />
+                <div className="uppercase p-2" style={{fontSize: '9px'}}>
+                  Operation ID
+                </div>
+                <Title small value={operation['operationId']} />
               </div>
               <div className="flex items-baseline">
                 <div className="text-xs uppercase">Deprecated</div>
@@ -34,11 +36,15 @@ class Method extends React.Component {
                 />
               </div>
             </div>
-            <div className="text-xs uppercase px-2 pt-2">Description</div>
+            <div className="uppercase px-2 pt-2" style={{fontSize: '9px'}}>
+              Description
+            </div>
             <div className="flex-1">
               <Markdown
                 className="CodeEditor mb-8 relative hover:bg-darken-2 rounded-lg"
                 placeholder="Description...."
+                value={operation['description'] || ''}
+                onChange={(e) => onChange({description: e})}
               />
             </div>
             <div className="my-8 -mx-1 border-t dark:border-darken-4" />
@@ -60,10 +66,34 @@ class Method extends React.Component {
       </div>
     );
   }
+
+  renderAddOperation() {
+    const {methodName} = this.props;
+    return (
+      <div className="pt-24 text-center">
+        <Button
+          large
+          intent={Intent.PRIMARY}
+          icon="plus"
+          onClick={this.props.onAddOperation}
+          text={`${methodName.toUpperCase()} Operation`}
+        />
+      </div>
+    );
+  }
+
+  render() {
+    const {methodName, operation} = this.props;
+    console.log('method', methodName, operation);
+    return operation ? this.renderOperation() : this.renderAddOperation();
+  }
 }
 
 Method.propTypes = {
   methodName: PropTypes.string,
+  operation: PropTypes.object,
+  onChange: PropTypes.func,
+  onAddOperation: PropTypes.func,
 };
 
 export default Method;

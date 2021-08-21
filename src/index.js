@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Provider} from 'react-redux';
-import {schemaStore, responseStore} from './redux/store';
+import {openapiStore, schemaStore, responseStore} from './redux/store';
 import OasDesigner from './components/Designer';
 import SchemaDesigner from './designers/schema';
 import ResponseDesigner from './designers/response';
@@ -48,10 +48,18 @@ const Response = (props: SchemaPropType) => {
   );
 };
 
+const OpenapiSpecDesigner = (props) => {
+  return (
+    <Provider store={openapiStore}>
+      <OasDesigner {...props} />
+    </Provider>
+  );
+};
+
 const ReactOpenapiDesigner = {
   Schema,
   Response,
-  OasDesigner,
+  OasDesigner: OpenapiSpecDesigner,
   Parameter: ParameterDesigner,
 };
 

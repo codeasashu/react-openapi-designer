@@ -11,7 +11,7 @@ const PathItem = (props) => {
         style={{paddingLeft: '22px'}}>
         <span
           className="truncate text-left direction-rtl unicode-bidi"
-          onClick={() => props.onClick({itemPath: `#/paths/${props.label}`})}>
+          onClick={() => props.onClick({itemPath: {path: props.label}})}>
           {props.label}
         </span>
         {props.tags && (
@@ -21,7 +21,7 @@ const PathItem = (props) => {
                 key={tag}
                 className="mr-2 mt-1"
                 onClick={() =>
-                  props.onClick({itemPath: `#/paths/${props.label}/${tag}`})
+                  props.onClick({itemPath: {path: props.label, method: tag}})
                 }>
                 {tag}
               </Tag>
@@ -45,14 +45,15 @@ const Paths = (props) => {
   return (
     <>
       <MenuItem icon="folder-open" label="Paths" />
-      {Object.keys(props.paths).map((path, i) => (
-        <PathItem
-          key={i}
-          label={path}
-          tags={props.paths[path].tags}
-          onClick={props.onClick}
-        />
-      ))}
+      {props.paths &&
+        Object.keys(props.paths).map((path, i) => (
+          <PathItem
+            key={i}
+            label={path}
+            tags={Object.keys(props.paths[path]).map((m) => m.toLowerCase())}
+            onClick={props.onClick}
+          />
+        ))}
     </>
   );
 };

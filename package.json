@@ -25,6 +25,7 @@
     "classnames": "^2.3.1",
     "json-schema-faker": "^0.5.0-rcv.33",
     "lodash": "^4.17.20",
+    "openapi3-ts": "^2.0.1",
     "prismjs": "^1.23.0",
     "prop-types": "^15.7.2",
     "react-redux": "^7.0.1",

@@ -52,3 +52,8 @@ export const fillObject = (properties) => {
   }
   return _properties;
 };
+
+export const generateOperationId = (path, method) => {
+  const newpath = path.replaceAll(/[/]/g, '-').replaceAll(':', '');
+  return `${method.toLowerCase()}-${newpath}`;
+};

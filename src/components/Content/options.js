@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import {Button, ButtonGroup} from '@blueprintjs/core';
 
 const Options = (props) => {
@@ -10,8 +11,8 @@ const Options = (props) => {
       <div className="flex-1" />
       <div>
         <ButtonGroup>
-          <Button small text="Form" />
-          <Button small text="Code" />
+          <Button small text="Form" onClick={props.onToggleView} />
+          <Button small text="Code" onClick={props.onToggleView} />
         </ButtonGroup>
       </div>
       <div className="ml-3">
@@ -21,6 +22,8 @@ const Options = (props) => {
   );
 };
 
-Options.propTypes = {};
+Options.propTypes = {
+  onToggleView: PropTypes.func,
+};
 
 export default Options;
