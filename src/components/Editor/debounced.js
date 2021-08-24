@@ -68,7 +68,9 @@ class DebouncedEditor extends PureComponent {
 
   _handleChange(e) {
     this.setState({value: e.target.value});
-    this._handleValueChange(e.target.value);
+    if (this._handleValueChange) {
+      this._handleValueChange(e.target.value);
+    }
   }
 
   _handleFocus() {
@@ -154,7 +156,7 @@ class DebouncedEditor extends PureComponent {
   }
 
   render() {
-    const {textarea, ...props} = this.props;
+    const {textarea, value, ...props} = this.props;
     if (textarea) {
       return (
         <TextArea
@@ -182,7 +184,7 @@ class DebouncedEditor extends PureComponent {
 
 DebouncedEditor.propTypes = {
   // Required
-  onChange: PropTypes.func.isRequired,
+  onChange: PropTypes.func,
   value: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
 
   // Optional

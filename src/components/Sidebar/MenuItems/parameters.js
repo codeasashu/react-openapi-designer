@@ -10,7 +10,7 @@ const Parameters = (props) => {
         <MenuItem
           icon="clean"
           inner
-          label={props.parameters[parameter].title}
+          label={parameter}
           key={i}
           onClick={() => props.onClick({itemPath: {parameter}})}
         />

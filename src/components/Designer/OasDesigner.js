@@ -40,6 +40,15 @@ function OasDesignerBare({dark, openapi, ...props}) {
               onPathChange={({path, pathItem}) =>
                 props.handlePathChange({path, pathItem})
               }
+              onSchemaChange={({name, schema}) =>
+                props.handleSchemaChange({name, schema})
+              }
+              onParameterChange={({name, schema}) =>
+                props.handleParameterChange({name, schema})
+              }
+              onResponseChange={({name, response}) =>
+                props.handleResponseChange({name, response})
+              }
             />
           </div>
         </div>
@@ -52,6 +61,9 @@ OasDesignerBare.propTypes = {
   dark: PropTypes.bool,
   openapi: PropTypes.object,
   handlePathChange: PropTypes.func,
+  handleSchemaChange: PropTypes.func,
+  handleParameterChange: PropTypes.func,
+  handleResponseChange: PropTypes.func,
 };
 
 const OasDesigner = (props) => {

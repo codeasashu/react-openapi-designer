@@ -34,13 +34,19 @@ const SchemaTitle = (props) => {
             fontSize: '11px',
             fontWeight: 400,
           }}
-          value={inputValue}
+          value={props.value}
           onChange={(e) => {
             setInputValue(e.target.value);
-            props.onChange(e.target.value);
+            props.onChange && props.onChange(e.target.value);
           }}
-          onBlur={() => props.onBlur && props.onBlur(inputValue)}
-          onFocus={() => props.onFocus && props.onFocus(inputValue)}
+          onBlur={(e) => {
+            setInputValue(e.target.value);
+            props.onBlur && props.onBlur(e.target.value);
+          }}
+          onFocus={(e) => {
+            setInputValue(e.target.value);
+            props.onFocus && props.onFocus(e.target.value);
+          }}
         />
       </InlineDiv>
       <div ref={hiddenDiv} className="very-hidden-input">

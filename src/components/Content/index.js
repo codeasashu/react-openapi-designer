@@ -18,12 +18,24 @@ function useQuery() {
   return new URLSearchParams(useLocation().search);
 }
 
-function getContentItem(openapi, handlePathChange) {
+function getContentItem(
+  openapi,
+  {onPathChange, onSchemaChange, onParameterChange, onResponseChange},
+) {
   let query = useQuery();
   let contentItem = null;
   const path = query.get('path');
   const pathItem = openapi.paths[path];
-  console.log('path', path, pathItem);
+  const modelSchema =
+    openapi.components.schemas &&
+    openapi.components.schemas[query.get('model')];
+  const parameterSchema =
+    openapi.components.parameters &&
+    openapi.components.parameters[query.get('parameter')];
+  const responseSchema =
+    openapi.components.responses &&
+    openapi.components.responses[query.get('response')];
+
   switch (query.get('menu')) {
     case 'path':
       contentItem = (
@@ -31,24 +43,48 @@ function getContentItem(openapi, handlePathChange) {
           path={path}
           method={query.get('method')}
           pathItem={pathItem}
-          onChange={handlePathChange}
+          onChange={onPathChange}
         />
       );
       break;
     case 'model':
-      contentItem = <ModelContent query={query} />;
+      contentItem = (
+        <ModelContent
+          name={query.get('model')}
+          schema={modelSchema}
+          onChange={onSchemaChange}
+        />
+      );
       break;
     case 'parameter':
-      contentItem = <Parameter query={query} />;
+      contentItem = (
+        <Parameter
+          name={query.get('parameter')}
+          parameter={parameterSchema}
+          onChange={onParameterChange}
+        />
+      );
       break;
     case 'response':
-      contentItem = <Response query={query} />;
+      contentItem = (
+        <Response
+          name={query.get('response')}
+          response={responseSchema}
+          onChange={onResponseChange}
+        />
+      );
       break;
   }
   return contentItem;
 }
 
-export default function Content({openapi, onPathChange}) {
+export default function Content({
+  openapi,
+  onPathChange,
+  onSchemaChange,
+  onParameterChange,
+  onResponseChange,
+}) {
   const [currentView, setCurrentView] = useState('form');
 
   const toggleView = () =>
@@ -58,7 +94,13 @@ export default function Content({openapi, onPathChange}) {
     <StyledContent className={'flex flex-col flex-1'}>
       <div className="bp3-dark relative flex flex-1 flex-col bg-canvas">
         <Options onToggleView={toggleView} />
-        {currentView === 'form' && getContentItem(openapi, onPathChange)}
+        {currentView === 'form' &&
+          getContentItem(openapi, {
+            onPathChange,
+            onSchemaChange,
+            onParameterChange,
+            onResponseChange,
+          })}
         {currentView === 'code' && (
           <MarkdownEditor
             value={OpenApiBuilder.create(openapi).getSpecAsYaml()}
@@ -73,4 +115,7 @@ export default function Content({openapi, onPathChange}) {
 Content.propTypes = {
   openapi: PropTypes.object,
   onPathChange: PropTypes.func,
+  onSchemaChange: PropTypes.func,
+  onParameterChange: PropTypes.func,
+  onResponseChange: PropTypes.func,
 };

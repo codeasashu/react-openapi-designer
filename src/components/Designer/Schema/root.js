@@ -38,7 +38,7 @@ class RootSchema extends React.Component {
       const oldData = oldProps.schema || '';
       if (!isEqual(oldData, newData)) return this.props.onChange(newData);
     }
-    if (this.props.initschema !== oldProps.initschema) {
+    if (!isEqual(this.props.initschema, oldProps.initschema)) {
       this.props.changeEditorSchema({
         value: this.props.initschema || defaultSchema.object,
       });
@@ -48,7 +48,9 @@ class RootSchema extends React.Component {
   componentDidMount() {
     const {initschema} = this.props;
     //@TODO Add schema validation
-    if (initschema) this.props.changeEditorSchema({value: initschema});
+    if (initschema) {
+      this.props.changeEditorSchema({value: initschema});
+    }
   }
 
   addChildField() {
@@ -267,13 +269,14 @@ RootSchema.propTypes = {
   generateSchema: PropTypes.func,
 };
 
-const mapStateToProps = ({schema, dropdown}) => {
-  return {schema, open: dropdown};
+const mapStateToProps = (state, {namespace}) => {
+  let schema = state[namespace];
+  return {schema, open: state.dropdown};
 };
 
-const mapDispatchToProps = (dispatch) => {
+const mapDispatchToProps = (dispatch, {namespace}) => {
   const schema = bindActionCreators(
-    {...schemaSlice.actions, generateExampleFromSchema},
+    {...schemaSlice(namespace).actions, generateExampleFromSchema},
     dispatch,
   );
   const dropdown = bindActionCreators(dropdownSlice.actions, dispatch);

@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Provider} from 'react-redux';
-import {openapiStore, schemaStore, responseStore} from './redux/store';
+import {openapiStore, schemaStore} from './redux/store';
 import OasDesigner from './components/Designer';
 import SchemaDesigner from './designers/schema';
 import ResponseDesigner from './designers/response';
@@ -35,7 +35,7 @@ const Schema = (props: SchemaPropType) => {
 const Response = (props: SchemaPropType) => {
   return (
     <Provider
-      store={responseStore}
+      store={schemaStore}
       className="wrapper__reactopenapi_responsedesigner">
       <ResponseDesigner
         onChange={(e) =>

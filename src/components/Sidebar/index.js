@@ -79,10 +79,6 @@ const responses = {
 //};
 
 const Sidebar = ({openapi, onClick}) => {
-  console.log('openapi', openapi);
-  useEffect(() => {
-    console.log('openapi2', openapi);
-  }, []);
   return (
     <StyledSidebar
       className={'flex flex-col bg-white dark:bg-gray-900 border-r'}>
@@ -98,15 +94,15 @@ const Sidebar = ({openapi, onClick}) => {
           onClick={(path) => onClick({menu: 'path', ...path})}
         />
         <Models
-          models={models}
+          models={openapi.components.schemas}
           onClick={(path) => onClick({menu: 'model', ...path})}
         />
         <Parameters
-          parameters={models}
+          parameters={openapi.components.parameters}
           onClick={(path) => onClick({menu: 'parameter', ...path})}
         />
         <Responses
-          responses={responses}
+          responses={openapi.components.responses}
           onClick={(path) => onClick({menu: 'response', ...path})}
         />
       </div>

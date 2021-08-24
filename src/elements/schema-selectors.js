@@ -17,10 +17,6 @@ class SchemaSelectors extends React.PureComponent {
     onClick(type, prefix);
   }
 
-  _handleSelectSubType(subType) {
-    console.log('subttype', subType);
-  }
-
   renderSubType(schema) {
     return (
       <div>

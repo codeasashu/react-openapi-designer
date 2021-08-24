@@ -1,44 +1,40 @@
 //@flow
 import React from 'react';
-import SchemaDesigner from '../Designer/Schema';
-import {TitleEditor, MarkdownEditor} from '../Editor';
+import PropTypes from 'prop-types';
+import {TitleEditor} from '../Editor';
+import ResponseBody from '../Designer/Responses/body';
 
-const schema = {
-  type: 'object',
-  properties: {
-    a: {type: 'string'},
-  },
-};
-
-const ResponseContent = () => {
+const ResponseContent = ({name, response, onChange}) => {
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
         <div className="max-w-6xl p-10 flex flex-col">
           <div className="flex pl-2 justify-between">
-            <TitleEditor xl value="abc" />
+            <TitleEditor
+              disabled
+              xl
+              value={response['title'] || name}
+              onChange={(e) =>
+                onChange({name, response: {...response, title: e.target.value}})
+              }
+            />
           </div>
           <div className="flex-1">
-            <div className="mt-6">
-              <MarkdownEditor
-                className="CodeEditor mb-8 relative hover:bg-darken-2 rounded-lg"
-                placeholder="Description...."
-              />
-            </div>
-          </div>
-          <div className="mt-10">
-            <SchemaDesigner
-              dark
-              initschema={schema}
-              onChange={(e) => {
-                console.log('schema changed', e);
-              }}
+            <ResponseBody
+              response={response}
+              onChange={(e) => onChange({name, response: {...response, ...e}})}
             />
           </div>
         </div>
       </div>
     </div>
   );
+};
+
+ResponseContent.propTypes = {
+  name: PropTypes.string,
+  response: PropTypes.object,
+  onChange: PropTypes.func,
 };
 
 export default ResponseContent;

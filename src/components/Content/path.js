@@ -49,7 +49,6 @@ const PathContent = ({path, pathItem, method: apiMethod, onChange}) => {
   };
 
   const updateOperation = (methodName, operation) => {
-    console.log('methodUpdate', methodName, operation);
     onChange({
       path,
       pathItem: {
@@ -61,7 +60,6 @@ const PathContent = ({path, pathItem, method: apiMethod, onChange}) => {
 
   const onTabClick = (selectedIndex) => {
     const methodName = invert(tabIndexes)[selectedIndex];
-    console.log('methodName2', methodName, selectedIndex, selectedTab);
     setSelectedTab(selectedIndex);
     query.set('method', methodName);
     history.push(`/designer?${query}`);
@@ -72,8 +70,6 @@ const PathContent = ({path, pathItem, method: apiMethod, onChange}) => {
   const [selectedTab, setSelectedTab] = useState(
     tabIndexes[apiMethod.toLowerCase()],
   );
-
-  console.log('pathItem', operationObj);
 
   return (
     <div className="flex-1 relative">

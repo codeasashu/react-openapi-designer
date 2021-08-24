@@ -22,19 +22,25 @@ jsf.option({
   requiredOnly: false,
   fillProperties: true,
   optionalsProbability: 0,
+  alwaysFakeOptionals: true,
 });
 
 let fieldNum = 1;
 
-export const generateExampleFromSchema = createAsyncThunk(
-  'schema/generateExample',
-  async ({key, value}, {getState}) => {
-    let {schema} = getState();
-    key = key || generateExampleName(schema.examples);
-    value = value || (await jsf.resolve(cloneDeep(schema)));
-    return {key, value};
-  },
-);
+export const generateExampleFromSchema = (namespace) => {
+  return createAsyncThunk(
+    `${namespace}/schema/generateExample`,
+    async (params, {getState}) => {
+      const state = getState();
+      const schema = state[namespace];
+      const key = generateExampleName(schema.examples || {});
+      const value = jsf.generate(
+        cloneDeep({...schema, additionalProperties: false}),
+      );
+      return {key, value};
+    },
+  );
+};
 
 const getParentKey = (keys) => (keys.length === 1 ? [] : dropRight(keys, 1));
 
@@ -187,6 +193,9 @@ const _handleDeleteExample = (state, key) => {
 };
 
 const _handleRenameExample = (state, {oldTitle, newTitle}) => {
+  if (oldTitle === newTitle) {
+    return state;
+  }
   const oldValue = state.examples[oldTitle];
   let orderDict = new OrderedDict(state.examples);
   const newKeyIndex = orderDict.findIndex(newTitle);
@@ -215,40 +224,39 @@ const _handleGenerateSchema = (state, code) => {
   return state;
 };
 
-export const schemaSlice = createSlice({
-  name: 'schema',
-  initialState: {
-    title: '',
-    type: 'object',
-    properties: {},
-    required: [],
-    examples: {},
-  },
-  reducers: {
-    changeEditorSchema: (state, action) =>
-      _handleEditorSchemaChange(state, action.payload),
-    changeName: (state, action) => _handleChangeName(state, action.payload),
-    changeValue: (state, action) => _handleChangeValue(state, action.payload),
-    changeType: (state, action) => _handleChangeType(state, action.payload),
-    enableRequire: (state, action) =>
-      _handleEnableRequire(state, action.payload),
-    deleteItem: (state, action) => _handleDelete(state, action.payload),
-    addField: (state, action) => _handleAddField(state, action.payload),
-    addChildField: (state, action) =>
-      _handleAddChildField(state, action.payload),
-    addExample: (state, action) => _handleAddExample(state, action.payload),
-    deleteExample: (state, action) =>
-      _handleDeleteExample(state, action.payload),
-    renameExample: (state, action) =>
-      _handleRenameExample(state, action.payload),
-    generateSchema: (state, action) =>
-      _handleGenerateSchema(state, action.payload),
-  },
-  extraReducers: {
-    [generateExampleFromSchema.fulfilled]: (state, action) => {
-      _handleAddExample(state, action.payload);
+export const schemaSlice = (namespace) =>
+  createSlice({
+    name: `${namespace}/schema`,
+    //initialState: defaultSchema.object,
+    initialState: {},
+    reducers: {
+      changeEditorSchema: (state, action) =>
+        _handleEditorSchemaChange(state, action.payload),
+      changeName: (state, action) => _handleChangeName(state, action.payload),
+      changeValue: (state, action) => _handleChangeValue(state, action.payload),
+      changeType: (state, action) => _handleChangeType(state, action.payload),
+      enableRequire: (state, action) =>
+        _handleEnableRequire(state, action.payload),
+      deleteItem: (state, action) => _handleDelete(state, action.payload),
+      addField: (state, action) => _handleAddField(state, action.payload),
+      addChildField: (state, action) =>
+        _handleAddChildField(state, action.payload),
+      addExample: (state, action) => _handleAddExample(state, action.payload),
+      deleteExample: (state, action) =>
+        _handleDeleteExample(state, action.payload),
+      renameExample: (state, action) =>
+        _handleRenameExample(state, action.payload),
+      generateSchema: (state, action) =>
+        _handleGenerateSchema(state, action.payload),
     },
-  },
-});
+    extraReducers: {
+      [generateExampleFromSchema(namespace).fulfilled]: (state, action) => {
+        _handleAddExample(state, action.payload);
+      },
+      [generateExampleFromSchema(namespace).rejected]: (state, action) => {
+        console.error('Error generating example', action);
+      },
+    },
+  });
 
 export default schemaSlice.reducer;

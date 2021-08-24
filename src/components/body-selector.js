@@ -161,26 +161,32 @@ class BodySelector extends React.PureComponent {
     return addingContentType === true ? items : [...items, selectedContentType];
   }
 
-  render() {
+  renderSelectedContentTypes() {
     const {selectedContentType, contentTypeHistory} = this.state;
+    return (
+      <div className="bp3-select flex-shrink">
+        <select value={selectedContentType} onChange={this.onChangeContentType}>
+          <option label="any" value="">
+            any
+          </option>
+          {contentTypeHistory.map((k, i) => (
+            <option value={k} key={i}>
+              {k}
+            </option>
+          ))}
+        </select>
+      </div>
+    );
+  }
+
+  render() {
+    const {selectedContentType} = this.state;
     return (
       <div className="flex items-center">
         <ControlGroup className="flex-1">
           <Button icon="plus" text="Add Body" onClick={this.onAddContentType} />
-          <div className="bp3-select flex-shrink">
-            <select
-              value={selectedContentType}
-              onChange={this.onChangeContentType}>
-              <option label="any" value="">
-                any
-              </option>
-              {contentTypeHistory.map((k, i) => (
-                <option value={k} key={i}>
-                  {k}
-                </option>
-              ))}
-            </select>
-          </div>
+          {this.state.contentTypeHistory.length > 0 &&
+            this.renderSelectedContentTypes()}
         </ControlGroup>
         <ControlGroup>
           <Suggest

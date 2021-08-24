@@ -1,44 +1,40 @@
 //@flow
 import React from 'react';
-import SchemaDesigner from '../Designer/Schema';
-import {TitleEditor, MarkdownEditor} from '../Editor';
+import PropTypes from 'prop-types';
+import Parameter from '../../designers/parameter';
+//import SchemaDesigner from '../Designer/Schema';
+//import {TitleEditor, MarkdownEditor} from '../Editor';
 
-const schema = {
-  type: 'object',
-  properties: {
-    a: {type: 'string'},
-  },
-};
-
-const ParameterContent = () => {
+const ParameterContent = ({name, parameter, onChange}) => {
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
-        <div className="max-w-6xl p-10 flex flex-col">
-          <div className="flex pl-2 justify-between">
-            <TitleEditor xl value="abc" />
+        <div className="w-full max-w-6xl m-auto p-10 flex flex-col">
+          <div className="capitalize px-2 py-1 mb-6 font-medium text-2xl">
+            {parameter['in']} Parameter
           </div>
-          <div className="flex-1">
-            <div className="mt-6">
-              <MarkdownEditor
-                className="CodeEditor mb-8 relative hover:bg-darken-2 rounded-lg"
-                placeholder="Description...."
-              />
-            </div>
-          </div>
-          <div className="mt-10">
-            <SchemaDesigner
-              dark
-              initschema={schema}
-              onChange={(e) => {
-                console.log('schema changed', e);
-              }}
-            />
-          </div>
+          <Parameter
+            name={name}
+            schema={parameter['schema']}
+            description={parameter['description']}
+            disableRequired={true}
+            onChange={(e) => {
+              onChange({name, schema: {...parameter, ...e}});
+            }}
+            onDelete={() => {
+              console.log('parameter delete', parameter);
+            }}
+          />
         </div>
       </div>
     </div>
   );
+};
+
+ParameterContent.propTypes = {
+  name: PropTypes.string,
+  parameter: PropTypes.object,
+  onChange: PropTypes.func,
 };
 
 export default ParameterContent;

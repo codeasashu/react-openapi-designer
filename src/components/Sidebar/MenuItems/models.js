@@ -10,7 +10,7 @@ const Models = ({models, onClick}) => {
         <MenuItem
           icon="cube"
           inner
-          label={models[model].title}
+          label={model}
           onClick={() => onClick({itemPath: {model}})}
           key={i}
         />

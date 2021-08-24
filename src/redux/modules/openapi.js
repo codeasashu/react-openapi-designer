@@ -13,6 +13,21 @@ export const openapi = createSlice({
       return OpenApiBuilder.create(cloneDeep(state)).addPath(path, pathItem)
         .rootDoc;
     },
+    handleSchemaChange: (state, action) => {
+      const {name, schema} = action.payload;
+      return OpenApiBuilder.create(cloneDeep(state)).addSchema(name, schema)
+        .rootDoc;
+    },
+    handleParameterChange: (state, action) => {
+      const {name, schema} = action.payload;
+      return OpenApiBuilder.create(cloneDeep(state)).addParameter(name, schema)
+        .rootDoc;
+    },
+    handleResponseChange: (state, action) => {
+      const {name, response} = action.payload;
+      return OpenApiBuilder.create(cloneDeep(state)).addResponse(name, response)
+        .rootDoc;
+    },
     addUrl: (state, action) => ({...state, name: action.payload}),
   },
 });

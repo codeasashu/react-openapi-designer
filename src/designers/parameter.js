@@ -60,10 +60,10 @@ class Parameter extends PureComponent {
           value={name}
           onChange={(e) => this.setState({name: e.target.value})}
           onBlur={() => this.handleChange('name')}
-          className="flex-auto"
+          className="flex-auto border border-r-0"
           placeholder={titlePlaceholder}
         />
-        <div className="bp3-select flex-shrink">
+        <div className="bp3-select flex-shrink border border-l-0 border-r-0">
           <select
             onChange={(e) =>
               this.setState({
@@ -83,7 +83,7 @@ class Parameter extends PureComponent {
           value={description}
           onChange={(e) => this.setState({description: e.target.value})}
           onBlur={() => this.handleChange('description')}
-          className="flex-auto"
+          className="flex-auto border border-l-0 border-r-0"
           placeholder="Description"
         />
         <ButtonGroup>

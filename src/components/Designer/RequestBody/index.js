@@ -1,42 +1,85 @@
-import React from 'react';
+// @flow
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 //import {Switch, ButtonGroup, Button, ControlGroup, HTMLSelect} from '@blueprintjs/core';
-import BodySelector from '../../body-selector';
-import SchemaDesigner from '../../../designers/schema';
-import {MarkdownEditor as Markdown} from '../../Editor';
-import {Provider} from 'react-redux';
-import {schemaStore} from '../../../redux/store';
+import BodySelector from 'components/body-selector';
+import SchemaDesigner from 'components/Designer/Schema';
+import {MarkdownEditor as Markdown} from 'components/Editor';
+import {defaultSchema} from '../../../model';
 
-class RequestBody extends React.Component {
-  render() {
-    const bodyOptions = ['application/json', 'application/xml'];
-    const initSchema = {
-      title: 'abc',
-      type: 'object',
-      properties: {
-        a: {type: 'string'},
-      },
-      required: ['a'],
-      examples: {},
-    };
+const RequestBody = ({requestBody, onChange}) => {
+  const [selectedContentType, setSelectedContentType] = useState();
+  const [selectedSchema, setSelectedSchema] = useState({});
 
-    return (
-      <div>
-        <BodySelector contentTypes={bodyOptions} />
-        <div className="flex-1">
-          <Markdown
-            className="mt-6 -mx-1 relative hover:bg-darken-2 rounded-lg"
-            placeholder="abcdef"
-          />
-        </div>
-        <div className="mt-6">
-          <Provider store={schemaStore}>
-            <SchemaDesigner dark initschema={initSchema} />
-          </Provider>
-        </div>
+  useEffect(() => {
+    const newSchema = requestBody.content[selectedContentType]?.schema;
+    setSelectedSchema(newSchema);
+  }, [selectedContentType]);
+
+  return (
+    <div>
+      <BodySelector
+        contentTypes={requestBody ? Object.keys(requestBody.content) : []}
+        onAdd={(e) => {
+          setSelectedContentType(e.toLowerCase());
+          onChange({
+            ...requestBody,
+            content: {
+              ...requestBody.content,
+              [e]: {schema: defaultSchema.object},
+            },
+          });
+        }}
+        onSelect={(e) => {
+          const schema = requestBody.content[e.toLowerCase()]['schema'];
+          setSelectedContentType(e.toLowerCase());
+        }}
+        onUpdate={(e) => {
+          const {content, ...restOfRequestBody} = requestBody;
+          const {[selectedContentType]: originalSchema, ...rest} = content;
+          onChange({
+            ...restOfRequestBody,
+            content: {...rest, [e]: originalSchema},
+          });
+        }}
+        onDelete={(e) => {
+          const {content, ...restOfRequestBody} = requestBody;
+          const {[selectedContentType]: originalSchema, ...rest} = content;
+          onChange({
+            ...restOfRequestBody,
+            content: rest,
+          });
+        }}
+      />
+      <div className="flex-1">
+        <Markdown
+          className="mt-6 -mx-1 relative hover:bg-darken-2 rounded-lg"
+          placeholder="abcdef"
+        />
       </div>
-    );
-  }
-}
+      <div className="mt-6">
+        <SchemaDesigner
+          dark
+          initschema={selectedSchema}
+          namespace="requestBody"
+          onChange={(e) => {
+            setSelectedSchema(e);
+            onChange({
+              ...requestBody,
+              content: {
+                ...requestBody.content,
+                [selectedContentType]: {schema: e},
+              },
+            });
+          }}
+        />
+      </div>
+    </div>
+  );
+};
+
+RequestBody.propTypes = {
+  requestBody: PropTypes.object,
+};
 
 export default RequestBody;

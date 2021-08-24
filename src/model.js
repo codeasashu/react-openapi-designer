@@ -4,12 +4,44 @@ export const defaultSchema = {
   number: {type: 'number'},
   integer: {type: 'integer'},
   array: {type: 'array', items: {type: 'string'}},
-  object: {type: 'object', properties: {}, required: [], examples: {}},
+  object: {
+    title: '',
+    type: 'object',
+    properties: {},
+    required: [],
+    examples: {},
+  },
 };
 
 export const defaultOperation = {
   summary: '',
+  requestBody: {
+    description: 'Patch user properties to update.',
+    content: {
+      'application/json': {
+        schema: {
+          type: 'object',
+          properties: {
+            a: {type: 'string'},
+          },
+        },
+      },
+    },
+  },
   responses: {
+    200: {
+      description: 'Example response',
+      content: {
+        'application/json': {
+          schema: {
+            type: 'object',
+            properties: {
+              a: {type: 'string'},
+            },
+          },
+        },
+      },
+    },
     default: {
       description: '',
     },
@@ -31,9 +63,41 @@ export const exampleDoc = {
     },
   },
   components: {
-    schemas: {},
-    responses: {},
-    parameters: {},
+    schemas: {
+      Users: {
+        description: '',
+        type: 'object',
+        properties: {
+          a: {type: 'string'},
+        },
+      },
+    },
+    responses: {
+      testresp: {
+        description: 'Example response',
+        content: {
+          'application/json': {
+            schema: {
+              type: 'object',
+              properties: {
+                a: {type: 'string'},
+              },
+            },
+          },
+        },
+      },
+    },
+    parameters: {
+      test: {
+        name: 'test12',
+        in: 'query',
+        required: false,
+        schema: {
+          type: 'string',
+        },
+        description: 'test',
+      },
+    },
     examples: {},
     requestBodies: {},
     headers: {},
