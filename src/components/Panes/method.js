@@ -1,9 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Switch, ButtonGroup, Button, Intent} from '@blueprintjs/core';
+import {Switch, Button, Intent} from '@blueprintjs/core';
 import {TitleEditor as Title, MarkdownEditor as Markdown} from '../Editor';
 import RequestBody from '../Designer/RequestBody';
 import Responses from '../Designer/Responses';
+import ParameterGroup from '../Designer/ParameterGroup';
 
 const AddOperation = ({method, onAdd}) => {
   return (
@@ -61,12 +62,10 @@ const Operation = ({operation, onChange}) => {
             />
           </div>
           <div className="my-8 -mx-1 border-t dark:border-darken-4" />
-          <ButtonGroup>
-            <Button text="Security" icon="plus" />
-            <Button text="Header" icon="plus" />
-            <Button text="Query Param" icon="plus" />
-            <Button text="Cookie" icon="plus" />
-          </ButtonGroup>
+          <ParameterGroup
+            parameters={operation.parameters || []}
+            onChange={(parameters) => onChange({parameters})}
+          />
           <div className="my-8 -mx-1 border-t dark:border-darken-4" />
           <RequestBody
             requestBody={operation.requestBody || null}
