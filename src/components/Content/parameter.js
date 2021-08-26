@@ -5,7 +5,7 @@ import Parameter from '../../designers/parameter';
 //import SchemaDesigner from '../Designer/Schema';
 //import {TitleEditor, MarkdownEditor} from '../Editor';
 
-const ParameterContent = ({name, parameter, onChange}) => {
+const ParameterContent = ({name, parameter, onChange, onDelete}) => {
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
@@ -21,9 +21,7 @@ const ParameterContent = ({name, parameter, onChange}) => {
             onChange={(e) => {
               onChange({name, schema: {...parameter, ...e}});
             }}
-            onDelete={() => {
-              console.log('parameter delete', parameter);
-            }}
+            onDelete={onDelete}
           />
         </div>
       </div>
@@ -35,6 +33,7 @@ ParameterContent.propTypes = {
   name: PropTypes.string,
   parameter: PropTypes.object,
   onChange: PropTypes.func,
+  onDelete: PropTypes.func,
 };
 
 export default ParameterContent;

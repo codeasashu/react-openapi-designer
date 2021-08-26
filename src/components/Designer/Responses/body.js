@@ -1,6 +1,5 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {cloneDeep} from 'lodash';
 import Headers from './headers';
 import BodySelector from '../../body-selector';
 import MarkupEditor from '../../Editor/markdown';
@@ -9,31 +8,17 @@ import {defaultSchema, ContentTypes} from '../../../utils';
 
 const ResponseBody = ({response, onChange}) => {
   const [selectedMediaType, setSelectedMediaType] = useState(ContentTypes.json);
-  //const [schema, setSchema] = useState(null);
+  const [schema, setSchema] = useState({});
 
-  const hasMediaType =
-    !!selectedMediaType &&
-    Object.keys(response.content).indexOf(selectedMediaType) >= 0;
+  useEffect(() => {
+    const newSchema = response.content[selectedMediaType]?.schema;
+    setSchema(newSchema);
+  }, [selectedMediaType]);
 
-  const schema = hasMediaType
-    ? response.content[selectedMediaType]?.schema
-    : null;
-  //useEffect(() => {
-  //const hasMediaType =
-  //!!selectedMediaType &&
-  //Object.keys(response.content).indexOf(selectedMediaType) >= 0;
-
-  //const _schema = hasMediaType
-  //? response.content[selectedMediaType]?.schema
-  //: null;
-  ////setSchema(_schema);
-  //}, [selectedMediaType, response.content]);
-
-  const handleMediaType = (action, mediaType, oldMediaType) => {
+  const handleMediaType = (action, mediaType) => {
     if (action === 'select') {
       setSelectedMediaType(mediaType);
     } else if (action === 'add') {
-      //setSchema(defaultSchema.object);
       setSelectedMediaType(mediaType);
       onChange({
         ...response,
@@ -43,24 +28,26 @@ const ResponseBody = ({response, onChange}) => {
         },
       });
     } else if (action === 'update') {
-      setSelectedMediaType(mediaType);
-      let clonedResponse = cloneDeep(response);
-      clonedResponse.content[mediaType] =
-        clonedResponse.content[oldMediaType]?.schema;
-      delete clonedResponse.content[oldMediaType];
-      onChange({...response, ...clonedResponse});
+      const {content, ...restOfResponse} = response;
+      const {[selectedMediaType]: originalSchema, ...rest} = content;
+      onChange({
+        ...restOfResponse,
+        content: {...rest, [mediaType]: originalSchema},
+      });
     } else if (action === 'delete') {
       // @TODO check if response has any contenttype left. If not,
       // trigger the deleteResponse event from here
-      setSelectedMediaType(oldMediaType);
-      let clonedResponse = cloneDeep(response);
-      delete clonedResponse.content[mediaType];
-      onChange({...response, ...clonedResponse});
+      const {content, ...restOfResponse} = response;
+      //eslint-disable-next-line no-unused-vars
+      const {[selectedMediaType]: originalSchema, ...rest} = content;
+      onChange({
+        ...restOfResponse,
+        content: rest,
+      });
     }
   };
 
   const handleSchemaChange = (schema) => {
-    //setSchema(schema);
     const newResponse = {
       ...response,
       content: {...response.content, [selectedMediaType]: {schema}},

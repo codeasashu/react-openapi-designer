@@ -1,7 +1,6 @@
 // @flow
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-//import {Switch, ButtonGroup, Button, ControlGroup, HTMLSelect} from '@blueprintjs/core';
 import BodySelector from 'components/body-selector';
 import SchemaDesigner from 'components/Designer/Schema';
 import {MarkdownEditor as Markdown} from 'components/Editor';
@@ -31,7 +30,6 @@ const RequestBody = ({requestBody, onChange}) => {
           });
         }}
         onSelect={(e) => {
-          const schema = requestBody.content[e.toLowerCase()]['schema'];
           setSelectedContentType(e.toLowerCase());
         }}
         onUpdate={(e) => {
@@ -42,8 +40,9 @@ const RequestBody = ({requestBody, onChange}) => {
             content: {...rest, [e]: originalSchema},
           });
         }}
-        onDelete={(e) => {
+        onDelete={() => {
           const {content, ...restOfRequestBody} = requestBody;
+          //eslint-disable-next-line no-unused-vars
           const {[selectedContentType]: originalSchema, ...rest} = content;
           onChange({
             ...restOfRequestBody,
@@ -80,6 +79,7 @@ const RequestBody = ({requestBody, onChange}) => {
 
 RequestBody.propTypes = {
   requestBody: PropTypes.object,
+  onChange: PropTypes.func,
 };
 
 export default RequestBody;
