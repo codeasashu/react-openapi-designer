@@ -16,6 +16,7 @@ const schemaStoreObject = {
     schema: schemaSlice('schema').reducer,
     response: schemaSlice('response').reducer,
     requestBody: schemaSlice('requestBody').reducer,
+    model: schemaSlice('model').reducer,
     dropdown: dropdownReducer,
   },
 };

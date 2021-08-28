@@ -1,65 +1,68 @@
 // @flow
-import React from 'react';
+import React, {useEffect, useRef, useState} from 'react';
 import PropTypes from 'prop-types';
-import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import {union, head} from 'lodash';
 import {Button, ControlGroup, MenuItem} from '@blueprintjs/core';
 import {Suggest} from '@blueprintjs/select';
 import {ContentTypes, highlightText} from '../utils';
 
-@autoBindMethodsForReact()
-class BodySelector extends React.PureComponent {
-  constructor(props) {
-    super(props);
-    this._inputRef = null;
-    const contentTypeHistory = props.contentTypes;
-    const selectedContentType = head(contentTypeHistory) || ContentTypes.json;
-    this.state = {
-      selectedContentType,
-      validContentTypes: Object.values(ContentTypes),
-      contentTypeHistory: union(contentTypeHistory, [selectedContentType]),
-      addingContentType: false,
-    };
-  }
+const areContentTypesEqual = (contentTypeA, contentTypeB) =>
+  contentTypeA.toLowerCase() === contentTypeB.toLowerCase();
 
-  componentDidMount() {
-    if (typeof this.props.onSelect === 'function')
-      this.props.onSelect(this.state.selectedContentType);
-  }
+const SelectedContentTypes = ({selected, contentTypes, onChange}) => {
+  return contentTypes.length > 0 ? (
+    <div className="bp3-select flex-shrink">
+      <select value={selected} onChange={onChange}>
+        <option label="any" value="">
+          any
+        </option>
+        {contentTypes.map((k, i) => (
+          <option value={k} key={i}>
+            {k}
+          </option>
+        ))}
+      </select>
+    </div>
+  ) : null;
+};
 
-  renderCreateContentTypeOption(
-    query: string,
-    active: boolean,
-    handleClick: React.MouseEventHandler<HTMLElement>,
-  ) {
-    return (
-      <MenuItem
-        icon="add"
-        text={`Create "${query}"`}
-        active={active}
-        onClick={handleClick}
-        shouldDismissPopover={false}
-      />
-    );
-  }
+SelectedContentTypes.propTypes = {
+  selected: PropTypes.string,
+  contentTypes: PropTypes.array,
+  onChange: PropTypes.func,
+};
 
-  renderContentType(contentType, {handleClick, modifiers, query}) {
-    if (!modifiers.matchesPredicate) {
-      return null;
-    }
+const BodySelector = (props) => {
+  const inputRef = useRef();
 
-    return (
-      <MenuItem
-        active={modifiers.active}
-        disabled={modifiers.disabled}
-        key={contentType}
-        onClick={handleClick}
-        text={highlightText(contentType, query)}
-      />
-    );
-  }
+  const getDefaultContentType = (contentTypes) => {
+    return head(contentTypes) || ContentTypes.json;
+  };
 
-  filterContentType(query, contentType, _index, exactMatch) {
+  const [selectedContentType, setSelectedContentType] = useState(
+    getDefaultContentType(props.contentTypes),
+  );
+  const [contentTypeHistory, setContentTypeHistory] = useState(
+    union(props.contentTypes, [selectedContentType]),
+  );
+  const [validContentTypes, setValidContentTypes] = useState(
+    Object.values(ContentTypes),
+  );
+  const [addingContentType, setAddingContentType] = useState(false);
+
+  useEffect(() => {
+    console.log('props contentType changed', props.contentTypes, props.via);
+    setContentTypeHistory(props.contentTypes);
+    setSelectedContentType(getDefaultContentType(props.contentTypes));
+    setAddingContentType(false);
+  }, [props.contentTypes]);
+
+  //componentDidMount() {
+  //if (typeof this.props.onSelect === 'function')
+  //this.props.onSelect(this.state.selectedContentType);
+  //}
+
+  const filterContentType = (query, contentType, _index, exactMatch) => {
     const normalizedTitle = contentType.toLowerCase();
     const normalizedQuery = query.toLowerCase();
 
@@ -68,145 +71,133 @@ class BodySelector extends React.PureComponent {
     } else {
       return contentType.indexOf(normalizedQuery) >= 0;
     }
-  }
+  };
 
-  areContentTypesEqual(contentTypeA, contentTypeB) {
-    // Compare only the text (ignoring case) just for simplicity.
-    return contentTypeA.toLowerCase() === contentTypeB.toLowerCase();
-  }
-
-  onSelectContentType(contentType) {
-    let {
-      contentTypeHistory,
-      validContentTypes,
-      addingContentType,
-      selectedContentType,
-    } = this.state;
-
-    const oldSelectedContentType = selectedContentType;
-
+  const addToValidContentType = (contentType) => {
     if (validContentTypes.indexOf(contentType) < 0) {
       validContentTypes.push(contentType);
     }
+    setValidContentTypes(validContentTypes);
+  };
 
+  const addToContentTypeHistory = (contentType) => {
     const idx =
       addingContentType === true
         ? contentTypeHistory.indexOf(contentType)
         : contentTypeHistory.indexOf(selectedContentType);
     if (idx < 0) {
-      // Add the contentType in response history
-      contentTypeHistory.push(contentType);
+      setContentTypeHistory([...contentTypeHistory, contentType]);
     } else {
-      contentTypeHistory.splice(idx, 1, contentType);
+      let copyOfContentTypeHistory = contentTypeHistory.slice(0);
+      copyOfContentTypeHistory.splice(idx, 1, contentType);
+      setContentTypeHistory(copyOfContentTypeHistory);
     }
-    this.setState({
-      validContentTypes,
-      contentTypeHistory,
-      selectedContentType: contentType,
-      addingContentType: false,
-    });
-    if (addingContentType === true) this.props.onAdd(contentType);
-    else this.props.onUpdate(contentType, oldSelectedContentType);
-  }
+  };
 
-  onChangeContentType(e) {
-    this.setState({selectedContentType: e.target.value});
-    this.props.onSelect(e.target.value);
-  }
+  const onSelectContentType = (contentType) => {
+    const oldSelectedContentType = selectedContentType;
+    const isAdding = addingContentType;
 
-  onDeleteContentType() {
-    let {selectedContentType, contentTypeHistory} = this.state;
+    addToValidContentType(contentType);
+    addToContentTypeHistory(contentType);
+    setSelectedContentType(contentType);
+    setAddingContentType(false);
+
+    if (isAdding === true) {
+      props.onAdd(contentType);
+    } else {
+      props.onUpdate(contentType, oldSelectedContentType);
+    }
+  };
+
+  const removeContentTypeFromHistory = (contentType) => {
+    let copyOfContentTypeHistory = contentTypeHistory.slice(0);
+    const idx = contentTypeHistory.indexOf(contentType);
+    const deletedElem =
+      idx > 0 ? copyOfContentTypeHistory.splice(idx, 1) : null;
+    return deletedElem.indexOf(contentType) >= 0
+      ? copyOfContentTypeHistory
+      : null;
+  };
+
+  const onDeleteContentType = () => {
     const toDeleteContentType = selectedContentType;
-    const idx = contentTypeHistory.indexOf(selectedContentType);
-    contentTypeHistory.splice(idx, 1);
-
-    if (contentTypeHistory.length === 0) {
-      selectedContentType = '';
+    const newHistory = removeContentTypeFromHistory(toDeleteContentType);
+    console.log(newHistory, toDeleteContentType);
+    if (newHistory !== null && newHistory.length) {
+      setContentTypeHistory(newHistory);
+      setSelectedContentType(contentTypeHistory[0]);
+      props.onDelete(toDeleteContentType, selectedContentType);
+    } else if (typeof props.onEmptyContentType === 'function') {
       // Alert the parent component when there are no contentTypes left
       // in the response
-      if (typeof this.props.onEmptyContentType === 'function')
-        this.props.onEmptyContentType();
-    } else {
-      selectedContentType = contentTypeHistory[0];
+      props.onEmptyContentType();
     }
-    this.setState({
-      contentTypeHistory,
-      selectedContentType,
-    });
-    this.props.onDelete(toDeleteContentType, selectedContentType);
-  }
+  };
 
-  onAddContentType() {
-    if (this._inputRef) {
-      this._inputRef.focus();
-    }
-    this.setState({addingContentType: true});
-  }
-
-  handleInputRef(ref) {
-    this._inputRef = ref;
-  }
-
-  getDropdownItems() {
-    const {
-      selectedContentType,
-      validContentTypes,
-      contentTypeHistory,
-      addingContentType,
-    } = this.state;
-
+  const getDropdownItems = () => {
     let items = validContentTypes.filter(
       (ct) => contentTypeHistory.indexOf(ct) < 0,
     );
     return addingContentType === true ? items : [...items, selectedContentType];
-  }
+  };
 
-  renderSelectedContentTypes() {
-    const {selectedContentType, contentTypeHistory} = this.state;
-    return (
-      <div className="bp3-select flex-shrink">
-        <select value={selectedContentType} onChange={this.onChangeContentType}>
-          <option label="any" value="">
-            any
-          </option>
-          {contentTypeHistory.map((k, i) => (
-            <option value={k} key={i}>
-              {k}
-            </option>
-          ))}
-        </select>
-      </div>
-    );
-  }
-
-  render() {
-    const {selectedContentType} = this.state;
-    return (
-      <div className="flex items-center">
-        <ControlGroup className="flex-1">
-          <Button icon="plus" text="Add Body" onClick={this.onAddContentType} />
-          {this.state.contentTypeHistory.length > 0 &&
-            this.renderSelectedContentTypes()}
-        </ControlGroup>
-        <ControlGroup>
-          <Suggest
-            items={this.getDropdownItems()}
-            createNewItemFromQuery={(ct) => ct}
-            createNewItemRenderer={this.renderCreateContentTypeOption}
-            itemRenderer={this.renderContentType}
-            itemPredicate={this.filterContentType}
-            inputValueRenderer={(ct) => ct}
-            itemsEqual={this.areContentTypesEqual}
-            onItemSelect={this.onSelectContentType}
-            selectedItem={selectedContentType}
-            inputProps={{inputRef: this.handleInputRef}}
-          />
-          <Button icon="trash" onClick={this.onDeleteContentType} />
-        </ControlGroup>
-      </div>
-    );
-  }
-}
+  return (
+    <div className="flex items-center">
+      <ControlGroup className="flex-1">
+        <Button
+          icon="plus"
+          text="Add Body"
+          onClick={() => {
+            inputRef.current.focus();
+            setAddingContentType(true);
+          }}
+        />
+        <SelectedContentTypes
+          selected={selectedContentType}
+          contentTypes={contentTypeHistory}
+          onChange={(e) => {
+            setSelectedContentType(e.target.value);
+            props.onSelect(e.target.value);
+          }}
+        />
+      </ControlGroup>
+      <ControlGroup>
+        <Suggest
+          items={getDropdownItems()}
+          createNewItemFromQuery={(ct) => ct}
+          createNewItemRenderer={({query, active, handleClick}) => (
+            <MenuItem
+              icon="add"
+              text={`Create "${query}"`}
+              active={active}
+              onClick={handleClick}
+              shouldDismissPopover={false}
+            />
+          )}
+          itemRenderer={(contentType, {handleClick, modifiers, query}) => {
+            return modifiers.matchesPredicate ? (
+              <MenuItem
+                active={modifiers.active}
+                disabled={modifiers.disabled}
+                key={contentType}
+                onClick={handleClick}
+                text={highlightText(contentType, query)}
+              />
+            ) : null;
+          }}
+          itemPredicate={filterContentType}
+          inputValueRenderer={(ct) => ct}
+          itemsEqual={areContentTypesEqual}
+          onItemSelect={onSelectContentType}
+          selectedItem={selectedContentType}
+          inputProps={{inputRef}}
+        />
+        <Button icon="trash" onClick={onDeleteContentType} />
+      </ControlGroup>
+    </div>
+  );
+};
 
 BodySelector.propTypes = {
   contentTypes: PropTypes.arrayOf(PropTypes.string),

@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {invert} from 'lodash';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
@@ -23,10 +23,19 @@ const tabIndexes = {
   delete: 3,
 };
 
-const PathContent = ({path, pathItem, method: apiMethod, onChange}) => {
+const PathContent = ({
+  path,
+  pathItem,
+  method: apiMethod,
+  onChange,
+  ...props
+}) => {
   let history = useHistory();
-  let location = useLocation();
   let query = useQuery();
+
+  useEffect(() => {
+    console.log('path is changed', path);
+  }, [path]);
 
   const selectDefaultMethod = (method = null) => {
     method = method && method.toLowerCase();
@@ -94,9 +103,10 @@ const PathContent = ({path, pathItem, method: apiMethod, onChange}) => {
         <div className="px-10 pb-2 max-w-6xl">
           <div className="mt-6">
             <UrlEditor
+              errors={props.errors?.url}
               value={path}
-              onChange={(e) => {
-                console.log('url editor', e);
+              onChange={(newPath) => {
+                onChange({path: newPath, pathItem, oldPath: path});
               }}
             />
           </div>
@@ -175,6 +185,7 @@ PathContent.propTypes = {
   path: PropTypes.string,
   method: PropTypes.string,
   pathItem: PropTypes.object,
+  errors: PropTypes.any,
   onChange: PropTypes.func,
 };
 

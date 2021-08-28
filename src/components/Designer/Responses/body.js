@@ -1,25 +1,50 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import Headers from './headers';
-import BodySelector from '../../body-selector';
+import BodySelector from 'components/Pickers/ContentType';
 import MarkupEditor from '../../Editor/markdown';
 import SchemaDesigner from '../Schema';
-import {defaultSchema, ContentTypes} from '../../../utils';
+import {defaultSchema, sortContentTypes, ContentTypes} from '../../../utils';
+
+const getDefaultContentType = (contentTypes) => {
+  const sortedContentTypes = sortContentTypes(contentTypes, [
+    ContentTypes.json,
+    ContentTypes.html,
+    ContentTypes.text,
+  ]);
+  return sortedContentTypes.length ? sortedContentTypes[0] : null;
+};
 
 const ResponseBody = ({response, onChange}) => {
-  const [selectedMediaType, setSelectedMediaType] = useState(ContentTypes.json);
-  const [schema, setSchema] = useState({});
+  const [selectedMediaType, setSelectedMediaType] = useState(
+    getDefaultContentType(Object.keys(response.content)),
+  );
+  //const selectedSchema = response.content[selectedMediaType].schema;
+  //const [schema, setSchema] = useState(selectedSchema);
 
   useEffect(() => {
-    const newSchema = response.content[selectedMediaType]?.schema;
-    setSchema(newSchema);
-  }, [selectedMediaType]);
+    if (Object.keys(response.content).indexOf(selectedMediaType) < 0) {
+      setSelectedMediaType(ContentTypes.json);
+    }
+  }, [response]);
+
+  //useEffect(() => {
+  //console.log('Response has changed2', selectedMediaType, response.content);
+  ////const newSchema = response.content[selectedMediaType].schema;
+  //setSelectedMediaType(ContentTypes.json);
+  ////setSchema(newSchema);
+  //}, [props.code]);
+
+  //useEffect(() => {
+  //console.log('Response has changed', selectedMediaType, response.content);
+  //const newSchema = response.content[selectedMediaType].schema;
+  //setSchema(newSchema);
+  //}, [selectedMediaType]);
 
   const handleMediaType = (action, mediaType) => {
     if (action === 'select') {
       setSelectedMediaType(mediaType);
     } else if (action === 'add') {
-      setSelectedMediaType(mediaType);
       onChange({
         ...response,
         content: {
@@ -27,6 +52,7 @@ const ResponseBody = ({response, onChange}) => {
           [mediaType]: {schema: defaultSchema.object},
         },
       });
+      setSelectedMediaType(mediaType);
     } else if (action === 'update') {
       const {content, ...restOfResponse} = response;
       const {[selectedMediaType]: originalSchema, ...rest} = content;
@@ -69,6 +95,8 @@ const ResponseBody = ({response, onChange}) => {
       />
       <div className="mt-8">
         <BodySelector
+          via="response"
+          selected={selectedMediaType}
           contentTypes={Object.keys(response.content)}
           onSelect={(c) => handleMediaType('select', c)}
           onAdd={(c) => handleMediaType('add', c)}
@@ -80,7 +108,7 @@ const ResponseBody = ({response, onChange}) => {
           <SchemaDesigner
             dark
             namespace="response"
-            initschema={schema}
+            initschema={response.content[selectedMediaType]?.schema}
             onChange={handleSchemaChange}
           />
         </div>

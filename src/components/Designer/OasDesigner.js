@@ -1,4 +1,5 @@
-import React from 'react';
+//@flow
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
@@ -18,6 +19,12 @@ const getDarkModeClasses = (dark) =>
 function OasDesignerBare({dark, openapi, ...props}) {
   // const openapi = new OASBuilder(sampleDoc);
   let history = useHistory();
+  const [errors, setErrors] = useState({
+    path: [],
+    schema: [],
+    parameter: [],
+    response: [],
+  });
 
   function handleClick({menu, itemPath = {}}) {
     const queryParams = new URLSearchParams({menu, ...itemPath});
@@ -37,9 +44,16 @@ function OasDesignerBare({dark, openapi, ...props}) {
             <Gutter layout="horizontal" />
             <Content
               openapi={openapi}
-              onPathChange={({path, pathItem}) =>
-                props.handlePathChange({path, pathItem})
-              }
+              errors={errors}
+              onPathChange={({path, pathItem, ...rest}) => {
+                try {
+                  props.handlePathChange({path, pathItem, ...rest});
+                  handleClick({menu: 'path', itemPath: {path, method: 'get'}});
+                } catch (errors) {
+                  console.log('error', errors);
+                  setErrors({...errors, path: errors});
+                }
+              }}
               onSchemaChange={({name, schema}) =>
                 props.handleSchemaChange({name, schema})
               }

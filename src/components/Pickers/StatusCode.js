@@ -1,7 +1,7 @@
-import React from 'react';
+import React, {useState, useEffect, useRef} from 'react';
 import PropTypes from 'prop-types';
 import {Button, ControlGroup, MenuItem} from '@blueprintjs/core';
-import {Select} from '@blueprintjs/select';
+import {Suggest} from '@blueprintjs/select';
 import {StatusCodes, highlightText} from '../../utils';
 
 const renderCreateContentTypeOption = (
@@ -9,7 +9,7 @@ const renderCreateContentTypeOption = (
   active: boolean,
   handleClick: React.MouseEventHandler<HTMLElement>,
 ) => {
-  return (
+  return query.length <= 3 ? (
     <MenuItem
       icon="add"
       text={`Create "${query}"`}
@@ -17,7 +17,7 @@ const renderCreateContentTypeOption = (
       onClick={handleClick}
       shouldDismissPopover={false}
     />
-  );
+  ) : null;
 };
 
 const renderStatusCode = (code, {handleClick, modifiers, query}) => {
@@ -49,15 +49,25 @@ const filterStatusCode = (query, code, _index, exactMatch) => {
   }
 };
 
-const areContentTypesEqual = (contentTypeA, contentTypeB) => {
-  // Compare only the text (ignoring case) just for simplicity.
-  return contentTypeA === contentTypeB;
-};
+const StatusCode = ({addCode, selectedItem, onOpen, onSelect, onDelete}) => {
+  const inputRef = useRef();
+  const [selectedCode, setSelectedCode] = useState(selectedItem);
 
-const StatusCode = ({onSelect, onDelete}) => {
+  const handleSelect = (code) => {
+    setSelectedCode(code);
+    onSelect(code);
+  };
+
+  useEffect(() => {
+    if (addCode === true) {
+      inputRef.current.focus();
+      onOpen();
+    }
+  }, [addCode]);
+
   return (
     <ControlGroup>
-      <Select
+      <Suggest
         items={StatusCodes}
         createNewItemFromQuery={(ct) => ct}
         createNewItemRenderer={renderCreateContentTypeOption}
@@ -65,18 +75,21 @@ const StatusCode = ({onSelect, onDelete}) => {
         itemPredicate={filterStatusCode}
         inputValueRenderer={(ct) => ct}
         itemsEqual={(a, b) => a === b}
-        onItemSelect={onSelect}
-        selectedItem={200}>
-        <Button rightIcon="double-caret-vertical" text="200" />
-      </Select>
-      <Button icon="trash" onClick={onDelete} />
+        onItemSelect={handleSelect}
+        selectedItem={selectedCode}
+        inputProps={{inputRef}}
+      />
+      <Button icon="trash" onClick={() => onDelete(selectedCode)} />
     </ControlGroup>
   );
 };
 
 StatusCode.propTypes = {
+  selectedItem: PropTypes.any,
+  addCode: PropTypes.bool,
   onSelect: PropTypes.func,
   onDelete: PropTypes.func,
+  onOpen: PropTypes.func,
 };
 
 export default StatusCode;

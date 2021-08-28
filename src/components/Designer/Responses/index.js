@@ -1,8 +1,10 @@
 // @flow
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import PropTypes from 'prop-types';
 import StatusCode from './statusCode';
 import ResponseBody from './body';
+import {defaultSchema} from '../../../model';
+import {ContentTypes} from '../../../utils';
 
 const Response = ({dark, responses, onChange, ...props}) => {
   const codes = Object.keys(responses)
@@ -10,12 +12,41 @@ const Response = ({dark, responses, onChange, ...props}) => {
     .filter((e) => !isNaN(e))
     .sort();
   const [selectedCode, setSelectedCode] = useState(codes[0]);
+  const [selectedResponse, setSelectedResponse] = useState(
+    responses[selectedCode],
+  );
+
+  const addDefaultResponse = (code) => {
+    return {
+      ...responses,
+      [code]: {
+        content: {[ContentTypes.json]: {schema: defaultSchema.object}},
+      },
+    };
+  };
+
+  useEffect(() => {
+    console.log('codeechange', selectedCode);
+    setSelectedResponse(responses[selectedCode]);
+  }, [selectedCode]);
+
   return (
     <div className={`flex flex-col ${dark && 'bp3-dark'}`}>
-      <StatusCode statuses={codes} onSelect={(code) => setSelectedCode(code)} />
+      <StatusCode
+        statuses={codes}
+        onSelect={(code) => setSelectedCode(code)}
+        onAdd={(code) => {
+          onChange(addDefaultResponse(code));
+          setSelectedCode(code);
+        }}
+        onDelete={() => {}}
+      />
       <ResponseBody
-        response={responses[selectedCode]}
-        onChange={(response) => onChange({[selectedCode]: response})}
+        response={selectedResponse}
+        onChange={(response) => {
+          setSelectedResponse(response);
+          onChange({[selectedCode]: response});
+        }}
         {...props}
       />
     </div>

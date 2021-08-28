@@ -34,6 +34,7 @@ const ModelContent = ({name, schema, onChange}) => {
             <SchemaDesigner
               dark
               initschema={schema}
+              namespace="model"
               onChange={(e) => onChange({name, schema: e})}
             />
           </div>

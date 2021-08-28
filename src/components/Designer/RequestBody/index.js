@@ -1,13 +1,25 @@
 // @flow
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import BodySelector from 'components/body-selector';
+import BodySelector from 'components/Pickers/ContentType';
 import SchemaDesigner from 'components/Designer/Schema';
 import {MarkdownEditor as Markdown} from 'components/Editor';
 import {defaultSchema} from '../../../model';
+import {sortContentTypes, ContentTypes} from '../../../utils';
+
+const getDefaultContentType = (contentTypes) => {
+  const sortedContentTypes = sortContentTypes(contentTypes, [
+    ContentTypes.json,
+    ContentTypes.form,
+    ContentTypes.multipart,
+  ]);
+  return sortedContentTypes.length ? sortedContentTypes[0] : null;
+};
 
 const RequestBody = ({requestBody, onChange}) => {
-  const [selectedContentType, setSelectedContentType] = useState();
+  const [selectedContentType, setSelectedContentType] = useState(
+    getDefaultContentType(Object.keys(requestBody.content)),
+  );
   const [selectedSchema, setSelectedSchema] = useState({});
 
   useEffect(() => {
@@ -18,6 +30,7 @@ const RequestBody = ({requestBody, onChange}) => {
   return (
     <div>
       <BodySelector
+        selected={selectedContentType}
         contentTypes={requestBody ? Object.keys(requestBody.content) : []}
         onAdd={(e) => {
           setSelectedContentType(e.toLowerCase());

@@ -20,6 +20,7 @@ function useQuery() {
 
 function getContentItem(
   openapi,
+  errors,
   {onPathChange, onSchemaChange, onParameterChange, onResponseChange},
 ) {
   let query = useQuery();
@@ -43,6 +44,7 @@ function getContentItem(
           path={path}
           method={query.get('method')}
           pathItem={pathItem}
+          errors={errors.path}
           onChange={onPathChange}
         />
       );
@@ -52,6 +54,7 @@ function getContentItem(
         <ModelContent
           name={query.get('model')}
           schema={modelSchema}
+          errors={errors.schema}
           onChange={onSchemaChange}
         />
       );
@@ -61,6 +64,7 @@ function getContentItem(
         <Parameter
           name={query.get('parameter')}
           parameter={parameterSchema}
+          errors={errors.parameter}
           onChange={onParameterChange}
         />
       );
@@ -70,6 +74,7 @@ function getContentItem(
         <Response
           name={query.get('response')}
           response={responseSchema}
+          errors={errors.response}
           onChange={onResponseChange}
         />
       );
@@ -80,6 +85,7 @@ function getContentItem(
 
 export default function Content({
   openapi,
+  errors,
   onPathChange,
   onSchemaChange,
   onParameterChange,
@@ -95,7 +101,7 @@ export default function Content({
       <div className="bp3-dark relative flex flex-1 flex-col bg-canvas">
         <Options onToggleView={toggleView} />
         {currentView === 'form' &&
-          getContentItem(openapi, {
+          getContentItem(openapi, errors, {
             onPathChange,
             onSchemaChange,
             onParameterChange,
@@ -114,6 +120,7 @@ export default function Content({
 
 Content.propTypes = {
   openapi: PropTypes.object,
+  errors: PropTypes.object,
   onPathChange: PropTypes.func,
   onSchemaChange: PropTypes.func,
   onParameterChange: PropTypes.func,

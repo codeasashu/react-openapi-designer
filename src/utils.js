@@ -87,3 +87,17 @@ export const generateHeaderName = (headers: Object) => {
   const longestIndex = getLongestIndex(Object.keys(headers), /header-([\d]+)/g);
   return `header-${longestIndex + 1}`;
 };
+
+export const sortContentTypes = (contentTypes: Array, order = []) => {
+  return contentTypes.sort((a, b) => {
+    const firstIndex = order.indexOf(a);
+    const secondIndex = order.indexOf(b);
+    if (firstIndex < 0) {
+      return 1;
+    }
+    if (secondIndex < 0) {
+      return -1;
+    }
+    return firstIndex - secondIndex;
+  });
+};

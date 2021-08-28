@@ -26,58 +26,6 @@ Title.propTypes = {
   text: PropTypes.string,
 };
 
-const models = {
-  Users: {
-    title: 'Users',
-    type: 'object',
-    description: '',
-    properties: {
-      id: {
-        type: 'string',
-      },
-    },
-  },
-  Pets: {
-    title: 'Pets',
-    type: 'object',
-    description: '',
-    properties: {
-      id: {
-        type: 'string',
-      },
-    },
-  },
-};
-
-const responses = {
-  test: {
-    description: '',
-    content: {
-      'application/json': {
-        schema: {
-          title: 'Users',
-          type: 'object',
-          description: '',
-          properties: {
-            id: {
-              type: 'string',
-            },
-          },
-        },
-      },
-    },
-  },
-};
-
-//const paths = {
-//'/users': {
-//tags: ['get', 'post'],
-//},
-//'/pet': {
-//tags: ['post'],
-//},
-//};
-
 const Sidebar = ({openapi, onClick}) => {
   return (
     <StyledSidebar
