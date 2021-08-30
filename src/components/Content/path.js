@@ -77,7 +77,7 @@ const PathContent = ({
   const method = selectDefaultMethod(apiMethod);
   const operationObj = pathItem[method];
   const [selectedTab, setSelectedTab] = useState(
-    tabIndexes[apiMethod.toLowerCase()],
+    tabIndexes[method.toLowerCase()],
   );
 
   return (
