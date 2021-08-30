@@ -4,6 +4,7 @@ import {useLocation} from 'react-router-dom';
 import {OpenApiBuilder} from 'openapi3-ts';
 import styled from 'styled-components';
 import Options from './options';
+import Info from './info';
 import PathContent from './path';
 import ModelContent from './model';
 import Parameter from './parameter';
@@ -21,7 +22,15 @@ function useQuery() {
 function getContentItem(
   openapi,
   errors,
-  {onPathChange, onSchemaChange, onParameterChange, onResponseChange},
+  {
+    onPathChange,
+    onSchemaChange,
+    onParameterChange,
+    onResponseChange,
+    onInfoChange,
+    onSecuritySchemeChange,
+    onServerChange,
+  },
 ) {
   let query = useQuery();
   let contentItem = null;
@@ -38,6 +47,19 @@ function getContentItem(
     openapi.components.responses[query.get('response')];
 
   switch (query.get('menu')) {
+    case 'info':
+      contentItem = (
+        <Info
+          info={openapi.info}
+          servers={openapi.servers || []}
+          globalSecurity={openapi.security || []}
+          securitySchemes={openapi.components?.securitySchemes}
+          onChange={onInfoChange}
+          onSecuritySchemeChange={onSecuritySchemeChange}
+          onServerChange={onServerChange}
+        />
+      );
+      break;
     case 'path':
       contentItem = (
         <PathContent
@@ -90,6 +112,9 @@ export default function Content({
   onSchemaChange,
   onParameterChange,
   onResponseChange,
+  onInfoChange,
+  onSecuritySchemeChange,
+  onServerChange,
 }) {
   const [currentView, setCurrentView] = useState('form');
 
@@ -106,6 +131,9 @@ export default function Content({
             onSchemaChange,
             onParameterChange,
             onResponseChange,
+            onInfoChange,
+            onSecuritySchemeChange,
+            onServerChange,
           })}
         {currentView === 'code' && (
           <MarkdownEditor
@@ -125,4 +153,7 @@ Content.propTypes = {
   onSchemaChange: PropTypes.func,
   onParameterChange: PropTypes.func,
   onResponseChange: PropTypes.func,
+  onInfoChange: PropTypes.func,
+  onServerChange: PropTypes.func,
+  onSecuritySchemeChange: PropTypes.func,
 };

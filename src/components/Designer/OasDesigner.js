@@ -45,6 +45,14 @@ function OasDesignerBare({dark, openapi, ...props}) {
             <Content
               openapi={openapi}
               errors={errors}
+              onInfoChange={(info) => {
+                props.handleInfo(info);
+              }}
+              onServerChange={(servers) => props.handleServers(servers)}
+              onSecuritySchemeChange={({name, scheme, ...rest}) => {
+                console.log('securityScheme changed', name, scheme, rest);
+                props.handleSecuritySchemes({name, scheme, ...rest});
+              }}
               onPathChange={({path, pathItem, ...rest}) => {
                 try {
                   props.handlePathChange({path, pathItem, ...rest});
@@ -74,10 +82,13 @@ function OasDesignerBare({dark, openapi, ...props}) {
 OasDesignerBare.propTypes = {
   dark: PropTypes.bool,
   openapi: PropTypes.object,
+  handleInfo: PropTypes.func,
   handlePathChange: PropTypes.func,
   handleSchemaChange: PropTypes.func,
   handleParameterChange: PropTypes.func,
   handleResponseChange: PropTypes.func,
+  handleServers: PropTypes.func,
+  handleSecuritySchemes: PropTypes.func,
 };
 
 const OasDesigner = (props) => {

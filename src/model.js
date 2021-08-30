@@ -13,6 +13,22 @@ export const defaultSchema = {
   },
 };
 
+export const defaultSecuritySchemes = {
+  http: {
+    type: 'http',
+    scheme: 'basic',
+  },
+  apiKey: {
+    type: 'apiKey',
+    in: 'query',
+    name: 'Api Key',
+  },
+  openIdConnect: {
+    type: 'openIdConnect',
+    openIdConnectUrl: '',
+  },
+};
+
 export const defaultOperation = {
   summary: '',
   requestBody: {
@@ -52,7 +68,19 @@ export const exampleDoc = {
   openapi: '3.0.0',
   info: {
     title: 'app1',
-    version: 'version2',
+    version: '1.0',
+    summary: 'App API summary',
+    description: 'App API Description',
+    contact: {
+      name: 'Ashutosh',
+      url: 'abc url',
+      email: 'ashu@fdj.com',
+    },
+    termsOfService: 'abc',
+    license: {
+      name: 'Asshu license',
+      identifier: '0BSD',
+    },
   },
   paths: {
     '/users/id': {
@@ -101,10 +129,35 @@ export const exampleDoc = {
     examples: {},
     requestBodies: {},
     headers: {},
-    securitySchemes: {},
+    securitySchemes: {
+      'API Key - 1': {
+        name: 'API Key test',
+        type: 'apiKey',
+        in: 'header',
+        description: 'kljkl',
+      },
+      'API Key - 2': {
+        type: 'http',
+        scheme: 'basic',
+        description: 'basic scheme',
+      },
+      'API Key - 3': {
+        type: 'openIdConnect',
+        openIdConnectUrl: 'oidurl',
+        description: 'oid desc',
+      },
+    },
     links: {},
     callbacks: {},
   },
   tags: [],
-  servers: [],
+  servers: [
+    {
+      description: 'ppap',
+    },
+    {
+      url: 'abc s1',
+      description: 'ppap2',
+    },
+  ],
 };

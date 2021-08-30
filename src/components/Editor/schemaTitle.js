@@ -21,7 +21,7 @@ const SchemaTitle = (props) => {
 
   useEffect(() => {
     setWidth(calculateWidth(hiddenDiv));
-  });
+  }, [inputValue]);
 
   return (
     <span style={{maxWidth}}>

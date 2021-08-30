@@ -3,10 +3,8 @@ import OrderedDict from '../../ordered-dict';
 import {cloneDeep} from 'lodash';
 import {OpenApiBuilder} from 'openapi3-ts';
 import {exampleDoc} from '../../model';
-// import {original, current} from 'immer';
 
 const hasPathInPathItems = (path, pathItems) => {
-  //const otherPaths = omit(pathItems), rest.oldPath)
   return (
     Object.keys(pathItems)
       .map((p) => p.toLowerCase())
@@ -18,6 +16,42 @@ export const openapi = createSlice({
   name: 'openapi',
   initialState: OpenApiBuilder.create(exampleDoc).rootDoc,
   reducers: {
+    handleInfo: (state, action) => {
+      const info = action.payload;
+      return OpenApiBuilder.create(cloneDeep(state)).addInfo(info).rootDoc;
+    },
+    handleServers: (state, action) => {
+      const servers = action.payload;
+      return {...state, servers};
+    },
+    handleSecuritySchemes: (state, action) => {
+      const {name, scheme, ...rest} = action.payload;
+      if (rest.oldName && name === rest.oldName) {
+        return state;
+      }
+      if (rest.oldName || rest.deleteOnly === true) {
+        let newDoc = new OrderedDict(
+          cloneDeep(state.components.securitySchemes),
+        );
+
+        if (rest.deleteOnly === false) {
+          const keyIndex = newDoc.findIndex(rest.oldName);
+          newDoc.insert(keyIndex, name, scheme);
+          newDoc.remove(rest.oldName);
+        } else if (rest.deleteOnly === true) {
+          newDoc.remove(name);
+        }
+
+        return {
+          ...state,
+          components: {...state.components, securitySchemes: newDoc.toDict()},
+        };
+      }
+      return OpenApiBuilder.create(cloneDeep(state)).addSecurityScheme(
+        name,
+        scheme,
+      ).rootDoc;
+    },
     handlePathChange: (state, action) => {
       const {path, pathItem, ...rest} = action.payload;
       if (rest.oldPath && path === rest.oldPath) {
@@ -29,8 +63,6 @@ export const openapi = createSlice({
         }
 
         let newDoc = new OrderedDict(cloneDeep(state.paths));
-        // Path update required
-        //delete newState.paths[rest.oldPath];
         const keyIndex = newDoc.findIndex(rest.oldPath);
         newDoc.insert(keyIndex, path, pathItem);
         newDoc.remove(rest.oldPath);
