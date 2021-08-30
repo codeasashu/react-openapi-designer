@@ -195,7 +195,9 @@ const RootSchema = ({schema, dark, initialschema, ...props}) => {
 };
 
 RootSchema.propTypes = {
+  namespace: PropTypes.string,
   initschema: PropTypes.object,
+  initialschema: PropTypes.object,
   schema: PropTypes.object,
   open: PropTypes.object,
   dark: PropTypes.bool,

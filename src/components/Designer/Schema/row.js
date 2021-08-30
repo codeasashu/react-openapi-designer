@@ -7,8 +7,8 @@ import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import {Button, Icon, Intent, TextArea} from '@blueprintjs/core';
 import {Popover2, Tooltip2} from '@blueprintjs/popover2';
 import LocaleProvider from '../../../utils/locale';
-import {SchemaDropdown, AdvancedProperties} from '../../Pickers';
-import SchemaTitleEditor from '../../Editor/schemaTitle';
+import {SchemaDropdown, AdvancedProperties} from 'components/Pickers';
+import SchemaTitleEditor from 'components/Editor/schemaTitle';
 
 const SchemaItemEntity = ({type, text}) => {
   const textStyles =
@@ -109,15 +109,8 @@ class Row extends React.PureComponent {
   }
 
   render() {
-    const {
-      show,
-      schema,
-      sidebar,
-      required,
-      fieldName,
-      fieldPrefix,
-      children,
-    } = this.props;
+    const {show, schema, sidebar, required, fieldName, fieldPrefix, children} =
+      this.props;
 
     const prefix = fieldPrefix || [];
     const name = fieldName || null;

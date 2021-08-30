@@ -50,7 +50,6 @@ function OasDesignerBare({dark, openapi, ...props}) {
               }}
               onServerChange={(servers) => props.handleServers(servers)}
               onSecuritySchemeChange={({name, scheme, ...rest}) => {
-                console.log('securityScheme changed', name, scheme, rest);
                 props.handleSecuritySchemes({name, scheme, ...rest});
               }}
               onPathChange={({path, pathItem, ...rest}) => {

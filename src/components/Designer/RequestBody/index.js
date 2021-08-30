@@ -20,12 +20,26 @@ const RequestBody = ({requestBody, onChange}) => {
   const [selectedContentType, setSelectedContentType] = useState(
     getDefaultContentType(Object.keys(requestBody.content)),
   );
-  const [selectedSchema, setSelectedSchema] = useState({});
+  const [selectedSchema, setSelectedSchema] = useState(
+    requestBody.content[selectedContentType]?.schema,
+  );
 
   useEffect(() => {
     const newSchema = requestBody.content[selectedContentType]?.schema;
     setSelectedSchema(newSchema);
   }, [selectedContentType]);
+
+  const handleSchemaChange = (schema) => {
+    setSelectedSchema(schema);
+    const newSchema = {
+      ...requestBody,
+      content: {
+        ...requestBody.content,
+        [selectedContentType]: {schema},
+      },
+    };
+    onChange(newSchema);
+  };
 
   return (
     <div>
@@ -74,16 +88,7 @@ const RequestBody = ({requestBody, onChange}) => {
           dark
           initschema={selectedSchema}
           namespace="requestBody"
-          onChange={(e) => {
-            setSelectedSchema(e);
-            onChange({
-              ...requestBody,
-              content: {
-                ...requestBody.content,
-                [selectedContentType]: {schema: e},
-              },
-            });
-          }}
+          onChange={handleSchemaChange}
         />
       </div>
     </div>
