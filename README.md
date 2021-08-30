@@ -50,3 +50,7 @@ To start local development, clone this repo and run `npm run dev`.
 If you wish to use this repo in some other project, while quickly making changes,
 you should try using `npm run watch`, which starts this project in watch mode and is
 a **lot** faster.
+
+## TODO
+
+- Add https://github.com/suren-atoyan/monaco-react editor in schema
