@@ -101,3 +101,15 @@ export const sortContentTypes = (contentTypes: Array, order = []) => {
     return firstIndex - secondIndex;
   });
 };
+
+export const escapeUri = (path) => path.replaceAll(/\//g, '~1');
+export const unescapeUri = (path) => path.replaceAll(/~1/g, '/');
+
+export const getJsonPointerFromUrl = (pointer: string) => {
+  // When there is no pointer, we show info as default module
+  const jsonPointer = pointer || '#/info';
+  return jsonPointer
+    .replace('#', '')
+    .split('/')
+    .filter((n) => !!n);
+};

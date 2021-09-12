@@ -1,10 +1,30 @@
 //@flow
 import React from 'react';
 import PropTypes from 'prop-types';
+import {get} from 'lodash';
+import {useSelector, useDispatch} from 'react-redux';
+import {handleModelChange} from 'store/modules/openapi';
 import SchemaDesigner from '../Designer/Schema';
 import {TitleEditor, MarkdownEditor} from '../Editor';
 
-const ModelContent = ({name, schema, onChange}) => {
+const ModelContent = ({relativeJsonPath}) => {
+  const name = relativeJsonPath.slice(-1).pop();
+  const dispatch = useDispatch();
+
+  const changeModel = React.useCallback(
+    (path, value) => dispatch(handleModelChange({path, value})),
+    [dispatch],
+  );
+
+  const title = useSelector(
+    ({openapi}) =>
+      get(openapi, relativeJsonPath.concat(['title']), name) || name,
+  );
+  const description = useSelector(({openapi}) =>
+    get(openapi, relativeJsonPath.concat(['description'])),
+  );
+  const schema = useSelector(({openapi}) => get(openapi, relativeJsonPath));
+
   return schema ? (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
@@ -12,9 +32,9 @@ const ModelContent = ({name, schema, onChange}) => {
           <div className="flex pl-2 justify-between">
             <TitleEditor
               xl
-              value={schema['title'] || name}
+              value={title}
               onChange={(e) =>
-                onChange({name, schema: {...schema, title: e.target.value}})
+                changeModel(relativeJsonPath.concat(['title']), e.target.value)
               }
             />
           </div>
@@ -23,9 +43,9 @@ const ModelContent = ({name, schema, onChange}) => {
               <MarkdownEditor
                 className="CodeEditor mb-8 relative hover:bg-darken-2 rounded-lg"
                 placeholder="Description...."
-                value={schema['description']}
+                value={description}
                 onChange={(e) =>
-                  onChange({name, schema: {...schema, description: e}})
+                  changeModel(relativeJsonPath.concat(['description']), e)
                 }
               />
             </div>
@@ -35,7 +55,7 @@ const ModelContent = ({name, schema, onChange}) => {
               dark
               initschema={schema}
               namespace="model"
-              onChange={(e) => onChange({name, schema: e})}
+              onChange={(e) => changeModel(relativeJsonPath, e)}
             />
           </div>
         </div>
@@ -47,9 +67,7 @@ const ModelContent = ({name, schema, onChange}) => {
 };
 
 ModelContent.propTypes = {
-  name: PropTypes.string,
-  schema: PropTypes.object,
-  onChange: PropTypes.func,
+  relativeJsonPath: PropTypes.array,
 };
 
 export default ModelContent;

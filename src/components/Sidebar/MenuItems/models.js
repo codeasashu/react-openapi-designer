@@ -11,7 +11,7 @@ const Models = ({models, onClick}) => {
           icon="cube"
           inner
           label={model}
-          onClick={() => onClick({itemPath: {model}})}
+          onClick={() => onClick({itemPath: `components/schemas/${model}`})}
           key={i}
         />
       ))}

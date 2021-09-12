@@ -11,7 +11,9 @@ const Responses = (props) => {
           icon="exchange"
           inner
           label={props.responses[response].title || response}
-          onClick={() => props.onClick({itemPath: {response}})}
+          onClick={() =>
+            props.onClick({itemPath: `components/responses/${response}`})
+          }
           key={i}
         />
       ))}

@@ -1,8 +1,10 @@
 import {createSlice} from '@reduxjs/toolkit';
-import OrderedDict from '../../ordered-dict';
-import {cloneDeep} from 'lodash';
+import {get, set, unset, cloneDeep} from 'lodash';
 import {OpenApiBuilder} from 'openapi3-ts';
-import {exampleDoc} from '../../model';
+import OrderedDict from '../../ordered-dict';
+import {exampleDoc, defaultOperation} from '../../model';
+import {generateOperationId} from '../../utils/schema';
+import {unescapeUri} from '../../utils';
 
 const hasPathInPathItems = (path, pathItems) => {
   return (
@@ -18,7 +20,8 @@ export const openapi = createSlice({
   reducers: {
     handleInfo: (state, action) => {
       const info = action.payload;
-      return OpenApiBuilder.create(cloneDeep(state)).addInfo(info).rootDoc;
+      return {...state, info: {...state.info, ...info}};
+      //return OpenApiBuilder.create(cloneDeep(state)).addInfo(info).rootDoc;
     },
     handleServers: (state, action) => {
       const servers = action.payload;
@@ -72,15 +75,63 @@ export const openapi = createSlice({
       return OpenApiBuilder.create(cloneDeep(state)).addPath(path, pathItem)
         .rootDoc;
     },
+    handlePathNameChange: (state, action) => {
+      const {newPath, oldPath} = action.payload;
+      if (hasPathInPathItems(newPath, state.paths)) {
+        throw {url: [`Path ${newPath} exists in doc`]};
+      }
+      const clonedPaths = cloneDeep(state.paths);
+      const pathItem = get(clonedPaths, oldPath);
+      let newDoc = new OrderedDict(clonedPaths);
+      const keyIndex = newDoc.findIndex(oldPath);
+      newDoc.insert(keyIndex, newPath, pathItem);
+      newDoc.remove(oldPath);
+
+      return {...state, paths: newDoc.toDict()};
+    },
+    handleAddOperation: (state, action) => {
+      const {path, method: methodName} = action.payload;
+      const method = methodName.toLowerCase();
+      const operationId = generateOperationId(path, method);
+      set(state.paths, [path, method], {
+        ...defaultOperation,
+        operationId,
+      });
+    },
     handleSchemaChange: (state, action) => {
       const {name, schema} = action.payload;
       return OpenApiBuilder.create(cloneDeep(state)).addSchema(name, schema)
         .rootDoc;
     },
+    handleModelChange: (state, action) => {
+      const {path, value} = action.payload;
+      return set(state, path, value);
+    },
+    handleModelDelete: (state, action) => {
+      let {path} = action.payload;
+      if (path.length && path[0] === 'paths') {
+        path = path.slice(0, 2);
+        path = path.map((i) => unescapeUri(i));
+      }
+      unset(state, path);
+      return state;
+    },
     handleParameterChange: (state, action) => {
-      const {name, schema} = action.payload;
-      return OpenApiBuilder.create(cloneDeep(state)).addParameter(name, schema)
-        .rootDoc;
+      const {name, schema, ...rest} = action.payload;
+      if (rest.deleteOnly === true) {
+        let newDoc = new OrderedDict(cloneDeep(state.components.parameters));
+        newDoc.remove(name);
+
+        return {
+          ...state,
+          components: {...state.components, parameters: newDoc.toDict()},
+        };
+      }
+      return (
+        schema &&
+        OpenApiBuilder.create(cloneDeep(state)).addParameter(name, schema)
+          .rootDoc
+      );
     },
     handleResponseChange: (state, action) => {
       const {name, response} = action.payload;
@@ -90,5 +141,16 @@ export const openapi = createSlice({
     addUrl: (state, action) => ({...state, name: action.payload}),
   },
 });
+
+export const {
+  handleInfo,
+  handleServers,
+  handleSecuritySchemes,
+  handleSchemaChange,
+  handleModelChange,
+  handleModelDelete,
+  handlePathNameChange,
+  handleAddOperation,
+} = openapi.actions;
 
 export default openapi.reducer;

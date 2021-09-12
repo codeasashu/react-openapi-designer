@@ -1,10 +1,27 @@
 //@flow
 import React from 'react';
 import PropTypes from 'prop-types';
+import {get} from 'lodash';
+import {useSelector, useDispatch} from 'react-redux';
+import {handleModelChange} from 'store/modules/openapi';
 import {TitleEditor} from '../Editor';
 import ResponseBody from '../Designer/Responses/body';
 
-const ResponseContent = ({name, response, onChange}) => {
+const ResponseContent = ({relativeJsonPath}) => {
+  const name = relativeJsonPath.slice(-1).pop();
+  const dispatch = useDispatch();
+
+  const changeModel = React.useCallback(
+    (path, value) => dispatch(handleModelChange({path, value})),
+    [dispatch],
+  );
+
+  const title = useSelector(
+    ({openapi}) =>
+      get(openapi, relativeJsonPath.concat(['title']), name) || name,
+  );
+  const response = useSelector(({openapi}) => get(openapi, relativeJsonPath));
+
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
@@ -13,16 +30,18 @@ const ResponseContent = ({name, response, onChange}) => {
             <TitleEditor
               disabled
               xl
-              value={response['title'] || name}
+              value={title}
               onChange={(e) =>
-                onChange({name, response: {...response, title: e.target.value}})
+                changeModel(relativeJsonPath.concat(['title']), e.target.value)
               }
             />
           </div>
           <div className="flex-1">
             <ResponseBody
               response={response}
-              onChange={(e) => onChange({name, response: {...response, ...e}})}
+              onChange={(e) => {
+                changeModel(relativeJsonPath, {title, ...e});
+              }}
             />
           </div>
         </div>
@@ -32,9 +51,7 @@ const ResponseContent = ({name, response, onChange}) => {
 };
 
 ResponseContent.propTypes = {
-  name: PropTypes.string,
-  response: PropTypes.object,
-  onChange: PropTypes.func,
+  relativeJsonPath: PropTypes.array,
 };
 
 export default ResponseContent;

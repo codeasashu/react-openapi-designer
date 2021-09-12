@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Tag} from '@blueprintjs/core';
+import {escapeUri} from '../../../utils';
 import MenuItem from './base';
 
 const PathItem = (props) => {
@@ -11,7 +12,9 @@ const PathItem = (props) => {
         style={{paddingLeft: '22px'}}>
         <span
           className="truncate text-left direction-rtl unicode-bidi"
-          onClick={() => props.onClick({itemPath: {path: props.label}})}>
+          onClick={() =>
+            props.onClick({itemPath: `paths/${escapeUri(props.label)}`})
+          }>
           {props.label}
         </span>
         {props.tags && (
@@ -20,9 +23,13 @@ const PathItem = (props) => {
               <Tag
                 key={tag}
                 className="mr-2 mt-1"
-                onClick={() =>
-                  props.onClick({itemPath: {path: props.label, method: tag}})
-                }>
+                onClick={() => {
+                  props.onClick({
+                    itemPath: `paths/${escapeUri(
+                      props.label,
+                    )}/${tag.toLowerCase()}`,
+                  });
+                }}>
                 {tag}
               </Tag>
             ))}

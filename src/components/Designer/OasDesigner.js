@@ -1,5 +1,5 @@
 //@flow
-import React, {useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {connect} from 'react-redux';
@@ -16,24 +16,17 @@ const getDarkModeClasses = (dark) =>
     'bp3-dark': !!dark,
   });
 
-function OasDesignerBare({dark, openapi, ...props}) {
-  // const openapi = new OASBuilder(sampleDoc);
+function OasDesignerBare({dark, openapi}) {
   let history = useHistory();
-  const [errors, setErrors] = useState({
-    path: [],
-    schema: [],
-    parameter: [],
-    response: [],
-  });
 
-  function handleClick({menu, itemPath = {}}) {
-    const queryParams = new URLSearchParams({menu, ...itemPath});
+  function handleClick({menu, itemPath: path = {}}) {
+    const queryParams = new URLSearchParams({menu, path});
     history.push(`/designer?${queryParams}`);
   }
 
   return (
     <div className={getDarkModeClasses(dark)}>
-      <div className={'bg-white dark:bg-gray-700 OasContainer h-full w-full'}>
+      <div className={'bg-white dark:bg-gray-700 OasContainer h-screen w-full'}>
         <div className={'Studio h-full flex flex-1 flex-col'}>
           <div className={'flex flex-1'}>
             <Sidebar
@@ -42,35 +35,7 @@ function OasDesignerBare({dark, openapi, ...props}) {
               className={'flex flex-col bg-white dark:bg-gray-900 border-r'}
             />
             <Gutter layout="horizontal" />
-            <Content
-              openapi={openapi}
-              errors={errors}
-              onInfoChange={(info) => {
-                props.handleInfo(info);
-              }}
-              onServerChange={(servers) => props.handleServers(servers)}
-              onSecuritySchemeChange={({name, scheme, ...rest}) => {
-                props.handleSecuritySchemes({name, scheme, ...rest});
-              }}
-              onPathChange={({path, pathItem, ...rest}) => {
-                try {
-                  props.handlePathChange({path, pathItem, ...rest});
-                  handleClick({menu: 'path', itemPath: {path, method: 'get'}});
-                } catch (errors) {
-                  console.log('error', errors);
-                  setErrors({...errors, path: errors});
-                }
-              }}
-              onSchemaChange={({name, schema}) =>
-                props.handleSchemaChange({name, schema})
-              }
-              onParameterChange={({name, schema}) =>
-                props.handleParameterChange({name, schema})
-              }
-              onResponseChange={({name, response}) =>
-                props.handleResponseChange({name, response})
-              }
-            />
+            <Content openapi={openapi} />
           </div>
         </div>
       </div>
@@ -81,13 +46,6 @@ function OasDesignerBare({dark, openapi, ...props}) {
 OasDesignerBare.propTypes = {
   dark: PropTypes.bool,
   openapi: PropTypes.object,
-  handleInfo: PropTypes.func,
-  handlePathChange: PropTypes.func,
-  handleSchemaChange: PropTypes.func,
-  handleParameterChange: PropTypes.func,
-  handleResponseChange: PropTypes.func,
-  handleServers: PropTypes.func,
-  handleSecuritySchemes: PropTypes.func,
 };
 
 const OasDesigner = (props) => {

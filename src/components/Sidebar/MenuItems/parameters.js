@@ -12,7 +12,9 @@ const Parameters = (props) => {
           inner
           label={parameter}
           key={i}
-          onClick={() => props.onClick({itemPath: {parameter}})}
+          onClick={() =>
+            props.onClick({itemPath: `components/parameters/${parameter}`})
+          }
         />
       ))}
     </>

@@ -1,12 +1,17 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
+import {useSelector, useDispatch} from 'react-redux';
+import {
+  handleModelChange,
+  handlePathNameChange,
+  handleAddOperation,
+} from 'store/modules/openapi';
 import PropTypes from 'prop-types';
-import {invert} from 'lodash';
+import {invert, get} from 'lodash';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import {useHistory, useLocation} from 'react-router-dom';
 import {TitleEditor, UrlEditor} from '../Editor';
 import {MethodPane} from '../Panes';
-import {defaultOperation} from '../../model';
-import {generateOperationId} from '../../utils/schema';
+import {escapeUri} from '../../utils';
 
 const methodTabClasses =
   'bp3-simple-tab-panel rounded-none flex-1 border-l-0 \
@@ -23,38 +28,40 @@ const tabIndexes = {
   delete: 3,
 };
 
-const PathContent = ({
-  path,
-  pathItem,
-  method: apiMethod,
-  onChange,
-  ...props
-}) => {
+const unescapeUri = (path) => path.replaceAll(/~1/g, '/');
+
+const PathContent = ({path, relativeJsonPath, ...props}) => {
+  let relativePath = relativeJsonPath.map((i) => unescapeUri(i));
+  const dispatch = useDispatch();
   let history = useHistory();
+
+  const onChange = React.useCallback(
+    (path, value) => dispatch(handleModelChange({path, value})),
+    [dispatch],
+  );
+
   let query = useQuery();
+  const pathItem = useSelector(({openapi}) =>
+    get(openapi, relativePath.slice(0, 2)),
+  );
 
-  useEffect(() => {
-    console.log('path is changed', path);
-  }, [path]);
-
-  const selectDefaultMethod = (method = null) => {
-    method = method && method.toLowerCase();
+  const selectDefaultMethod = () => {
     const methods = Object.keys(pathItem).map((m) => m.toLowerCase());
-    if (method && methods.indexOf(method) > -1) return method;
+    if (methods.length === 0) return null;
     if (methods.indexOf('get') > -1) return 'get';
     if (methods.indexOf('post') > -1) return 'post';
     if (methods.indexOf('put') > -1) return 'put';
     if (methods.indexOf('delete') > -1) return 'delete';
-    return null;
+    return methods[0].toLowerCase();
   };
 
-  const addOperation = (methodName) => {
-    const operationId = generateOperationId(path, methodName);
-    const _pathItem = {
-      ...pathItem,
-      [methodName.toLowerCase()]: {...defaultOperation, operationId},
-    };
-    onChange({path, pathItem: _pathItem});
+  const addOperation = (method) => {
+    dispatch(handleAddOperation({path: relativePath[1], method}));
+    query.set(
+      'path',
+      `paths/${escapeUri(relativePath[1])}/${method.toLowerCase()}`,
+    );
+    history.push(`/designer?${query}`);
   };
 
   const updateOperation = (methodName, operation) => {
@@ -62,22 +69,57 @@ const PathContent = ({
       path,
       pathItem: {
         ...pathItem,
-        [methodName.toLowerCase()]: {...operationObj, ...operation},
+        [methodName.toLowerCase()]: {...operation, ...operation},
       },
     });
   };
 
   const onTabClick = (selectedIndex) => {
-    const methodName = invert(tabIndexes)[selectedIndex];
     setSelectedTab(selectedIndex);
-    query.set('method', methodName);
-    history.push(`/designer?${query}`);
+    const methodName = invert(tabIndexes)[selectedIndex];
+    if (Object.keys(pathItem).indexOf(methodName.toLowerCase()) >= 0) {
+      query.set(
+        'path',
+        `paths/${escapeUri(relativePath[1])}/${methodName.toLowerCase()}`,
+      );
+      history.push(`/designer?${query}`);
+    }
   };
 
-  const method = selectDefaultMethod(apiMethod);
-  const operationObj = pathItem[method];
+  const extractMethodFromUri = (validMethods, relativePath) => {
+    if (relativePath.length < 3) return null;
+    const method = relativePath[2];
+    const isValidMethod = validMethods.indexOf(method.toLowerCase()) >= 0;
+    return isValidMethod ? method.toLowerCase() : null;
+  };
+
+  let method = extractMethodFromUri(Object.keys(tabIndexes), relativePath);
+  if (method === null) {
+    method = selectDefaultMethod();
+    const copyOfRelativePath = relativePath.slice(0, 2);
+    copyOfRelativePath.push(method);
+    relativePath = copyOfRelativePath;
+  }
+
+  const operation = useSelector(({openapi}) => {
+    return get(openapi, relativePath);
+  });
+
   const [selectedTab, setSelectedTab] = useState(
     tabIndexes[method.toLowerCase()],
+  );
+
+  const onPathChange = React.useCallback(
+    (newPath, oldPath) => {
+      dispatch(handlePathNameChange({newPath, oldPath}));
+      const methodName = invert(tabIndexes)[selectedTab];
+      query.set(
+        'path',
+        `#/paths/${escapeUri(newPath)}/${methodName.toLowerCase()}`,
+      );
+      history.replace(`/designer?${query}`);
+    },
+    [dispatch],
   );
 
   return (
@@ -86,17 +128,11 @@ const PathContent = ({
         <div className="flex px-10 mt-10 max-w-6xl justify-between">
           <TitleEditor
             xl
-            value={operationObj['summary']}
+            value={operation['summary']}
             placeholder="Operation Name"
             onChange={(e) => {
               const summary = e.target.value;
-              onChange({
-                path,
-                pathItem: {
-                  ...pathItem,
-                  [method.toLowerCase()]: {...operationObj, summary},
-                },
-              });
+              onChange(relativePath.concat(['summary']), summary);
             }}
           />
         </div>
@@ -104,9 +140,9 @@ const PathContent = ({
           <div className="mt-6">
             <UrlEditor
               errors={props.errors?.url}
-              value={path}
+              value={relativePath[1]}
               onChange={(newPath) => {
-                onChange({path: newPath, pathItem, oldPath: path});
+                onPathChange(newPath, relativePath[1]);
               }}
             />
           </div>
@@ -184,7 +220,7 @@ const PathContent = ({
 PathContent.propTypes = {
   path: PropTypes.string,
   method: PropTypes.string,
-  pathItem: PropTypes.object,
+  relativeJsonPath: PropTypes.array,
   errors: PropTypes.any,
   onChange: PropTypes.func,
 };

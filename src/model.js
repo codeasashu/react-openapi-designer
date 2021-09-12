@@ -161,3 +161,36 @@ export const exampleDoc = {
     },
   ],
 };
+
+export const ModuleNames = {
+  info: 'info',
+  paths: 'paths',
+  models: 'schemas',
+  parameters: 'parameters',
+  responses: 'responses',
+  components: 'components',
+};
+
+export const getModuleFromJsonPointer = (items: []) => {
+  if (!items || items.length <= 0) {
+    return ModuleNames.info;
+  }
+  if (items[0] === ModuleNames.paths) {
+    return ModuleNames.paths;
+  }
+  if (items[0] === ModuleNames.components) {
+    if (items[1] === ModuleNames.models) {
+      return ModuleNames.models;
+    }
+    if (items[1] === ModuleNames.parameters) {
+      return ModuleNames.parameters;
+    }
+    if (items[1] === ModuleNames.responses) {
+      return ModuleNames.responses;
+    }
+    if (items[1] === ModuleNames.securitySchemes) {
+      return ModuleNames.securitySchemes;
+    }
+  }
+  return ModuleNames.info;
+};
