@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {useLocation, useHistory} from 'react-router-dom';
 import {OpenApiBuilder} from 'openapi3-ts';
@@ -26,7 +26,10 @@ function useQuery() {
 
 const SubContent = () => {
   const {path} = useQuery();
-  const pointer = getJsonPointerFromUrl(path);
+  const [pointer, setPointer] = useState(getJsonPointerFromUrl(path));
+  useEffect(() => {
+    setPointer(getJsonPointerFromUrl(path));
+  }, [path]);
   const moduleName = getModuleFromJsonPointer(pointer);
   return (
     <>

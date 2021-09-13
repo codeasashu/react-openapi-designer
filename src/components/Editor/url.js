@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import {
   ControlGroup,
@@ -31,6 +31,10 @@ ErrorElement.propTypes = {
 const Url = (props) => {
   const [value, setValue] = useState(props.value);
 
+  useEffect(() => {
+    setValue(props.value);
+  }, [props.value]);
+
   return (
     <ControlGroup className="flex">
       <Button text="http://localhost" />
@@ -41,7 +45,7 @@ const Url = (props) => {
         onBlur={() => props.onChange(value)}
         rightElement={<ErrorElement errors={props.errors} />}
       />
-      <Button text="path params" />
+      <Button text="path params" onClick={props.togglePathParams} />
     </ControlGroup>
   );
 };
@@ -51,6 +55,7 @@ Url.propTypes = {
   placeholder: PropTypes.any,
   errors: PropTypes.arrayOf(PropTypes.string),
   onChange: PropTypes.func,
+  togglePathParams: PropTypes.func,
 };
 
 export default Url;

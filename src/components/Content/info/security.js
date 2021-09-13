@@ -1,7 +1,6 @@
 //@flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import {cloneDeep} from 'lodash';
 import {
   Button,
   ControlGroup,
@@ -44,20 +43,14 @@ const ApiKey = ({scheme, name, onChange}) => {
         title="name"
         placeholder="name"
         value={scheme?.name}
-        onChange={(e) => {
-          console.log('name', e.target.value);
-          onChange({...scheme, name: e.target.value});
-        }}
+        onChange={(e) => onChange({...scheme, name: e.target.value})}
         className="pr-0"
       />
       <div className="bp3-html-select">
         <select
           placeholder="in"
           value={scheme.in}
-          onChange={(e) => {
-            console.log('in', e.target.value);
-            onChange({...scheme, in: e.target.value});
-          }}>
+          onChange={(e) => onChange({...scheme, in: e.target.value})}>
           <option value="query">query</option>
           <option value="header">header</option>
           <option value="cookie">cookie</option>

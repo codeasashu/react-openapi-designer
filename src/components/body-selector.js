@@ -51,7 +51,6 @@ const BodySelector = (props) => {
   const [addingContentType, setAddingContentType] = useState(false);
 
   useEffect(() => {
-    console.log('props contentType changed', props.contentTypes, props.via);
     setContentTypeHistory(props.contentTypes);
     setSelectedContentType(getDefaultContentType(props.contentTypes));
     setAddingContentType(false);
@@ -123,7 +122,6 @@ const BodySelector = (props) => {
   const onDeleteContentType = () => {
     const toDeleteContentType = selectedContentType;
     const newHistory = removeContentTypeFromHistory(toDeleteContentType);
-    console.log(newHistory, toDeleteContentType);
     if (newHistory !== null && newHistory.length) {
       setContentTypeHistory(newHistory);
       setSelectedContentType(contentTypeHistory[0]);

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Tag} from '@blueprintjs/core';
-import {escapeUri} from '../../../utils';
+import {escapeUri, isValidPathMethod} from '../../../utils';
 import MenuItem from './base';
 
 const PathItem = (props) => {
@@ -48,19 +48,23 @@ PathItem.propTypes = {
   onClick: PropTypes.func,
 };
 
-const Paths = (props) => {
+const Paths = ({paths, onClick}) => {
   return (
     <>
       <MenuItem icon="folder-open" label="Paths" />
-      {props.paths &&
-        Object.keys(props.paths).map((path, i) => (
-          <PathItem
-            key={i}
-            label={path}
-            tags={Object.keys(props.paths[path]).map((m) => m.toLowerCase())}
-            onClick={props.onClick}
-          />
-        ))}
+      {paths &&
+        Object.keys(paths).map((path, i) => {
+          return (
+            <PathItem
+              key={i}
+              label={path}
+              tags={Object.keys(paths[path])
+                .filter(isValidPathMethod)
+                .map((m) => m.toLowerCase())}
+              onClick={onClick}
+            />
+          );
+        })}
     </>
   );
 };

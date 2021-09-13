@@ -83,7 +83,8 @@ export const exampleDoc = {
     },
   },
   paths: {
-    '/users/id': {
+    '/users/id/{abc}': {
+      parameters: [{in: 'path', schema: {type: 'string'}, name: 'abc'}],
       get: {...defaultOperation, summary: 'abcd', operationId: 'get-users-id'},
     },
     '/users/abc': {

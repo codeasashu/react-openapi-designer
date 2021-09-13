@@ -26,7 +26,6 @@ const Response = ({dark, responses, onChange, ...props}) => {
   };
 
   useEffect(() => {
-    console.log('codeechange', selectedCode);
     setSelectedResponse(responses[selectedCode]);
   }, [selectedCode]);
 

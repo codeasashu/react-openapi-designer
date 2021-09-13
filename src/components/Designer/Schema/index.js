@@ -15,7 +15,7 @@ function useTraceUpdate(props) {
       return ps;
     }, {});
     if (Object.keys(changedProps).length > 0) {
-      console.log('Changed props SchemaDesigner:', changedProps);
+      console.debug('Changed props SchemaDesigner:', changedProps);
     }
     prev.current = props;
   });

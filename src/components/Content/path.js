@@ -4,6 +4,7 @@ import {
   handleModelChange,
   handlePathNameChange,
   handleAddOperation,
+  changePathParameter,
 } from 'store/modules/openapi';
 import PropTypes from 'prop-types';
 import {invert, get} from 'lodash';
@@ -11,7 +12,13 @@ import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
 import {useHistory, useLocation} from 'react-router-dom';
 import {TitleEditor, UrlEditor} from '../Editor';
 import {MethodPane} from '../Panes';
-import {escapeUri} from '../../utils';
+import PathParams from '../Designer/ParameterGroup/path';
+import {
+  extractMethodFromUri,
+  escapeUri,
+  getPathParameters,
+  validPathMethods,
+} from '../../utils';
 
 const methodTabClasses =
   'bp3-simple-tab-panel rounded-none flex-1 border-l-0 \
@@ -22,10 +29,20 @@ function useQuery() {
 }
 
 const tabIndexes = {
-  get: 0,
-  post: 1,
-  put: 2,
-  delete: 3,
+  [validPathMethods.get]: 0,
+  [validPathMethods.post]: 1,
+  [validPathMethods.put]: 2,
+  [validPathMethods.delete]: 3,
+};
+
+const selectDefaultMethod = (pathItem) => {
+  const methods = Object.keys(pathItem).map((m) => m.toLowerCase());
+  if (methods.length === 0) return null;
+  if (methods.indexOf('get') > -1) return 'get';
+  if (methods.indexOf('post') > -1) return 'post';
+  if (methods.indexOf('put') > -1) return 'put';
+  if (methods.indexOf('delete') > -1) return 'delete';
+  return methods[0].toLowerCase();
 };
 
 const unescapeUri = (path) => path.replaceAll(/~1/g, '/');
@@ -34,26 +51,28 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
   let relativePath = relativeJsonPath.map((i) => unescapeUri(i));
   const dispatch = useDispatch();
   let history = useHistory();
+  let query = useQuery();
+
+  const [isPathParamsVisible, setPathParamsVisibility] = useState(false);
+
+  const pathItem = useSelector(({openapi}) =>
+    get(openapi, relativePath.slice(0, 2), {}),
+  );
+  const method =
+    extractMethodFromUri(relativePath) || selectDefaultMethod(pathItem);
+
+  const operation = useSelector(({openapi}) => {
+    return get(openapi, relativePath, {});
+  });
+
+  const [selectedTab, setSelectedTab] = useState(
+    tabIndexes[method.toLowerCase()],
+  );
 
   const onChange = React.useCallback(
     (path, value) => dispatch(handleModelChange({path, value})),
     [dispatch],
   );
-
-  let query = useQuery();
-  const pathItem = useSelector(({openapi}) =>
-    get(openapi, relativePath.slice(0, 2)),
-  );
-
-  const selectDefaultMethod = () => {
-    const methods = Object.keys(pathItem).map((m) => m.toLowerCase());
-    if (methods.length === 0) return null;
-    if (methods.indexOf('get') > -1) return 'get';
-    if (methods.indexOf('post') > -1) return 'post';
-    if (methods.indexOf('put') > -1) return 'put';
-    if (methods.indexOf('delete') > -1) return 'delete';
-    return methods[0].toLowerCase();
-  };
 
   const addOperation = (method) => {
     dispatch(handleAddOperation({path: relativePath[1], method}));
@@ -64,12 +83,12 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
     history.push(`/designer?${query}`);
   };
 
-  const updateOperation = (methodName, operation) => {
+  const updateOperation = (method, operation) => {
     onChange({
       path,
       pathItem: {
         ...pathItem,
-        [methodName.toLowerCase()]: {...operation, ...operation},
+        [method.toLowerCase()]: {...operation, ...operation},
       },
     });
   };
@@ -86,29 +105,6 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
     }
   };
 
-  const extractMethodFromUri = (validMethods, relativePath) => {
-    if (relativePath.length < 3) return null;
-    const method = relativePath[2];
-    const isValidMethod = validMethods.indexOf(method.toLowerCase()) >= 0;
-    return isValidMethod ? method.toLowerCase() : null;
-  };
-
-  let method = extractMethodFromUri(Object.keys(tabIndexes), relativePath);
-  if (method === null) {
-    method = selectDefaultMethod();
-    const copyOfRelativePath = relativePath.slice(0, 2);
-    copyOfRelativePath.push(method);
-    relativePath = copyOfRelativePath;
-  }
-
-  const operation = useSelector(({openapi}) => {
-    return get(openapi, relativePath);
-  });
-
-  const [selectedTab, setSelectedTab] = useState(
-    tabIndexes[method.toLowerCase()],
-  );
-
   const onPathChange = React.useCallback(
     (newPath, oldPath) => {
       dispatch(handlePathNameChange({newPath, oldPath}));
@@ -122,13 +118,31 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
     [dispatch],
   );
 
+  const onPathParamChange = React.useCallback(
+    (param, index) => {
+      dispatch(changePathParameter({path: relativePath[1], param, index}))
+        .unwrap()
+        .then((newPath) => {
+          if (newPath) {
+            const methodName = invert(tabIndexes)[selectedTab];
+            query.set(
+              'path',
+              `paths/${escapeUri(newPath)}/${methodName.toLowerCase()}`,
+            );
+            history.push(`/designer?${query}`);
+          }
+        });
+    },
+    [dispatch, relativePath],
+  );
+
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
         <div className="flex px-10 mt-10 max-w-6xl justify-between">
           <TitleEditor
             xl
-            value={operation['summary']}
+            value={operation?.summary || ''}
             placeholder="Operation Name"
             onChange={(e) => {
               const summary = e.target.value;
@@ -144,9 +158,20 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
               onChange={(newPath) => {
                 onPathChange(newPath, relativePath[1]);
               }}
+              togglePathParams={() =>
+                setPathParamsVisibility(!isPathParamsVisible)
+              }
             />
           </div>
         </div>
+        {isPathParamsVisible && (
+          <div className="px-10 pb-2 max-w-6xl">
+            <PathParams
+              parameters={getPathParameters(pathItem) || []}
+              onChange={(newParam, index) => onPathParamChange(newParam, index)}
+            />
+          </div>
+        )}
         <Tabs
           className="flex flex-col flex-1"
           selectedTabClassName="selected-tab"

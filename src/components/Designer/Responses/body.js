@@ -29,14 +29,12 @@ const ResponseBody = ({response, onChange}) => {
   }, [response]);
 
   //useEffect(() => {
-  //console.log('Response has changed2', selectedMediaType, response.content);
   ////const newSchema = response.content[selectedMediaType].schema;
   //setSelectedMediaType(ContentTypes.json);
   ////setSchema(newSchema);
   //}, [props.code]);
 
   //useEffect(() => {
-  //console.log('Response has changed', selectedMediaType, response.content);
   //const newSchema = response.content[selectedMediaType].schema;
   //setSchema(newSchema);
   //}, [selectedMediaType]);
