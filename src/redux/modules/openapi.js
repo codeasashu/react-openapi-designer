@@ -40,7 +40,7 @@ const movePathNode = (paths, newPath, oldPath) => {
   const clonedPaths = cloneDeep(paths);
   const pathItem = get(clonedPaths, oldPath);
 
-  const parameters = get(clonedPaths, [oldPath, 'parameters']);
+  const parameters = get(clonedPaths, [oldPath, 'parameters'], []);
   const newParameters = modifyParametersFromPath(parameters, newPath);
   set(clonedPaths, [oldPath, 'parameters'], newParameters);
   let newDoc = new OrderedDict(clonedPaths);
