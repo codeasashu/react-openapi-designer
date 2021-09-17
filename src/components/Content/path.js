@@ -18,6 +18,7 @@ import {
   escapeUri,
   getPathParameters,
   validPathMethods,
+  isValidPathMethod,
 } from '../../utils';
 
 const methodTabClasses =
@@ -58,19 +59,28 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
   const pathItem = useSelector(({openapi}) =>
     get(openapi, relativePath.slice(0, 2), {}),
   );
+
   const method =
     extractMethodFromUri(relativePath) || selectDefaultMethod(pathItem);
 
   const operation = useSelector(({openapi}) => {
+    if (
+      relativePath.length > 0 &&
+      isValidPathMethod(relativePath[relativePath.length - 1]) == false
+    ) {
+      return get(openapi, relativePath.concat([method]), {});
+    }
     return get(openapi, relativePath, {});
   });
 
   const [selectedTab, setSelectedTab] = useState(
-    tabIndexes[method.toLowerCase()],
+    tabIndexes[method ? method.toLowerCase() : 0],
   );
 
   const onChange = React.useCallback(
-    (path, value) => dispatch(handleModelChange({path, value})),
+    (path, value) => {
+      dispatch(handleModelChange({path, value}));
+    },
     [dispatch],
   );
 
@@ -83,14 +93,30 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
     history.push(`/designer?${query}`);
   };
 
-  const updateOperation = (method, operation) => {
-    onChange({
-      path,
-      pathItem: {
-        ...pathItem,
-        [method.toLowerCase()]: {...operation, ...operation},
-      },
+  const hasMethod = (jsonPath, method) => {
+    return (
+      jsonPath.length && method && jsonPath.at(-1) === method.toLowerCase()
+    );
+  };
+
+  const updateOperation = (forMethod, newOperation) => {
+    let jsonPath = relativePath.slice(0);
+    if (forMethod == null) {
+      forMethod = method;
+    }
+    if (forMethod && hasMethod(jsonPath, forMethod) == false) {
+      jsonPath = jsonPath.concat([forMethod.toLowerCase()]);
+    }
+    onChange(jsonPath, {
+      ...operation,
+      ...newOperation,
     });
+    /*
+    {
+      path,
+      ...pathItem,
+      [method.toLowerCase()]: {...operation, ...myOperation},
+    });*/
   };
 
   const onTabClick = (selectedIndex) => {
@@ -146,7 +172,7 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
             placeholder="Operation Name"
             onChange={(e) => {
               const summary = e.target.value;
-              onChange(relativePath.concat(['summary']), summary);
+              updateOperation(method, {...operation, summary});
             }}
           />
         </div>
@@ -181,25 +207,25 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
           <TabList className="mt-6 px-10 flex bp3-simple-tab-list">
             <Tab
               className={`bp3-simple-tab uppercase ${
-                method.toLowerCase() === 'get' && 'text-green-400'
+                method === 'get' && 'text-green-400'
               }`}>
               get
             </Tab>
             <Tab
               className={`bp3-simple-tab uppercase ${
-                method.toLowerCase() === 'post' && 'text-blue-600'
+                method === 'post' && 'text-blue-600'
               }`}>
               post
             </Tab>
             <Tab
               className={`bp3-simple-tab uppercase ${
-                method.toLowerCase() === 'put' && 'text-yellow-600'
+                method === 'put' && 'text-yellow-600'
               }`}>
               put
             </Tab>
             <Tab
               className={`bp3-simple-tab uppercase ${
-                method.toLowerCase() === 'delete' && 'text-red-400'
+                method === 'delete' && 'text-red-400'
               }`}>
               delete
             </Tab>

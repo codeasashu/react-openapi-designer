@@ -68,7 +68,7 @@ const Operation = ({operation, onChange}) => {
           />
           <div className="my-8 -mx-1 border-t dark:border-darken-4" />
           <RequestBody
-            requestBody={operation.requestBody || null}
+            requestBody={operation.requestBody || {}}
             onChange={(requestBody) => onChange({requestBody})}
           />
           <div className="my-8 -mx-1 border-t dark:border-darken-4" />

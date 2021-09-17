@@ -11,9 +11,11 @@ const Response = ({dark, responses, onChange, ...props}) => {
     .map((e) => parseInt(e))
     .filter((e) => !isNaN(e))
     .sort();
-  const [selectedCode, setSelectedCode] = useState(codes[0]);
+  const [selectedCode, setSelectedCode] = useState(
+    codes.length ? codes[0] : null,
+  );
   const [selectedResponse, setSelectedResponse] = useState(
-    responses[selectedCode],
+    selectedCode ? responses[selectedCode] : null,
   );
 
   const addDefaultResponse = (code) => {
@@ -32,7 +34,7 @@ const Response = ({dark, responses, onChange, ...props}) => {
   return (
     <div className={`flex flex-col ${dark && 'bp3-dark'}`}>
       <StatusCode
-        statuses={codes}
+        statuses={codes || []}
         onSelect={(code) => setSelectedCode(code)}
         onAdd={(code) => {
           onChange(addDefaultResponse(code));
@@ -40,14 +42,16 @@ const Response = ({dark, responses, onChange, ...props}) => {
         }}
         onDelete={() => {}}
       />
-      <ResponseBody
-        response={selectedResponse}
-        onChange={(response) => {
-          setSelectedResponse(response);
-          onChange({[selectedCode]: response});
-        }}
-        {...props}
-      />
+      {selectedResponse && (
+        <ResponseBody
+          response={selectedResponse}
+          onChange={(response) => {
+            setSelectedResponse(response);
+            onChange({[selectedCode]: response});
+          }}
+          {...props}
+        />
+      )}
     </div>
   );
 };

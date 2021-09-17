@@ -17,7 +17,9 @@ const getDefaultContentType = (contentTypes) => {
 
 const ResponseBody = ({response, onChange}) => {
   const [selectedMediaType, setSelectedMediaType] = useState(
-    getDefaultContentType(Object.keys(response.content)),
+    getDefaultContentType(
+      response?.content ? Object.keys(response.content) : [],
+    ),
   );
   //const selectedSchema = response.content[selectedMediaType].schema;
   //const [schema, setSchema] = useState(selectedSchema);
@@ -81,16 +83,20 @@ const ResponseBody = ({response, onChange}) => {
 
   return (
     <>
-      <div className="flex-1">
-        <MarkupEditor
-          value={response.description}
-          onChange={(e) => onChange({...response, description: e})}
+      {response.description !== undefined && (
+        <div className="flex-1">
+          <MarkupEditor
+            value={response.description}
+            onChange={(e) => onChange({...response, description: e})}
+          />
+        </div>
+      )}
+      {response.headers !== undefined && (
+        <Headers
+          parameters={response.headers}
+          onChange={(e) => onChange({...response, headers: e})}
         />
-      </div>
-      <Headers
-        parameters={response.headers}
-        onChange={(e) => onChange({...response, headers: e})}
-      />
+      )}
       <div className="mt-8">
         <BodySelector
           via="response"
@@ -102,14 +108,16 @@ const ResponseBody = ({response, onChange}) => {
           onUpdate={(_new, _old) => handleMediaType('update', _new, _old)}
         />
 
-        <div className="mt-8">
-          <SchemaDesigner
-            dark
-            namespace="response"
-            initschema={response.content[selectedMediaType]?.schema}
-            onChange={handleSchemaChange}
-          />
-        </div>
+        {response.content && selectedMediaType && (
+          <div className="mt-8">
+            <SchemaDesigner
+              dark
+              namespace="response"
+              initschema={response.content[selectedMediaType]?.schema}
+              onChange={handleSchemaChange}
+            />
+          </div>
+        )}
       </div>
     </>
   );

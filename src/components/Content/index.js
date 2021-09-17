@@ -19,9 +19,8 @@ const StyledContent = styled.div`
 
 function useQuery() {
   const query = new URLSearchParams(useLocation().search);
-  const location = query.get('location');
   const path = query.get('path');
-  return {location, path};
+  return {path};
 }
 
 const SubContent = () => {
@@ -61,6 +60,7 @@ export default function Content({openapi}) {
     <StyledContent className={'flex flex-col flex-1'}>
       <div className="bp3-dark relative flex flex-1 flex-col bg-canvas">
         <Options
+          view={currentView}
           onToggleView={toggleView}
           onDelete={() => history.replace('/')}
         />

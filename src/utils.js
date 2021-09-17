@@ -222,3 +222,42 @@ export const getPathParameters = (pathItem) => {
   const parameters = compact(get(pathItem, 'parameters', []));
   return parameters.filter((p) => p['in'] && p['in'] === 'path');
 };
+
+const replaceInPath = (e, t, n) => {
+  const r = e.toString();
+  let o = '';
+  let i = r;
+  let a = 0;
+  let s = i.indexOf(t);
+
+  for (; s > -1; ) {
+    o += r.substring(a, a + s) + n;
+    i = i.substring(s + t.length, i.length);
+    a += s + t.length;
+    s = i.indexOf(t);
+  }
+
+  if (i.length > 0) {
+    o += r.substring(r.length - i.length, r.length);
+  }
+
+  return o;
+};
+
+const decodeUriFragment = (path) =>
+  replaceInPath(replaceInPath(path, '~1', '/'), '~0', '~');
+
+export const generateOperationId = (path, method) => {
+  // eslint-disable-next-line no-useless-escape
+  const pathRegex = /[^A-Za-z0-9-._~:?#\[\]@!$&'()*+,;=]+/g;
+
+  const replacer = (e, t, n) => {
+    if (n.length === e.length + t) {
+      return '';
+    } else {
+      return '-';
+    }
+  };
+  const newPath = decodeUriFragment(path);
+  return `${method.toLowerCase()}${newPath.replace(pathRegex, replacer)}`;
+};

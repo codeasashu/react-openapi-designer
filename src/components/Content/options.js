@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {useDispatch} from 'react-redux';
 import {handleModelDelete} from 'store/modules/openapi';
 import {useLocation} from 'react-router-dom';
-import {Button, ButtonGroup} from '@blueprintjs/core';
+import {Button, ButtonGroup, Icon} from '@blueprintjs/core';
 import {getJsonPointerFromUrl} from '../../utils';
 import {getModuleFromJsonPointer, ModuleNames} from '../../model';
 
@@ -32,7 +32,7 @@ const Options = (props) => {
         <div className="flex items-center">
           <Button
             small
-            icon="trash"
+            icon={<Icon size={14} icon="trash" />}
             text="delete"
             onClick={() => {
               dispatch(handleModelDelete({path: pointer}));
@@ -44,8 +44,20 @@ const Options = (props) => {
       <div className="flex-1" />
       <div>
         <ButtonGroup>
-          <Button small text="Form" onClick={props.onToggleView} />
-          <Button small text="Code" onClick={props.onToggleView} />
+          <Button
+            active={props.view === 'form'}
+            small
+            icon={<Icon size={14} icon="form" />}
+            text="Form"
+            onClick={props.onToggleView}
+          />
+          <Button
+            active={props.view === 'code'}
+            small
+            icon={<Icon size={14} icon="code" />}
+            text="Code"
+            onClick={props.onToggleView}
+          />
         </ButtonGroup>
       </div>
       <div className="ml-3">
@@ -56,6 +68,7 @@ const Options = (props) => {
 };
 
 Options.propTypes = {
+  view: PropTypes.string,
   onToggleView: PropTypes.func,
   onDelete: PropTypes.func,
 };

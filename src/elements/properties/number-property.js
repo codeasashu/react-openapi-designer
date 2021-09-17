@@ -57,7 +57,7 @@ class NumberProperty extends PureComponent {
             {isSubtype ? 'subtype' : ''} Number properties
           </div>
           <Keywords.Minimum
-            value={data.minimum}
+            value={data.minimum || ''}
             exclusiveMinimum={data.exclusiveMinimum}
             onChange={(e) => this.changeOtherValue(e, 'minimum')}
             onToggle={(e) =>
@@ -65,7 +65,7 @@ class NumberProperty extends PureComponent {
             }
           />
           <Keywords.Maximum
-            value={data.maximum}
+            value={data.maximum || ''}
             exclusiveMaximum={data.exclusiveMaximum}
             onChange={(e) => this.changeOtherValue(e, 'maximum')}
             onToggle={(e) =>

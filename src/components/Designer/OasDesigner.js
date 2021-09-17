@@ -19,8 +19,8 @@ const getDarkModeClasses = (dark) =>
 function OasDesignerBare({dark, openapi}) {
   let history = useHistory();
 
-  function handleClick({menu, itemPath: path = {}}) {
-    const queryParams = new URLSearchParams({menu, path});
+  function handleClick({path = null}) {
+    const queryParams = path ? new URLSearchParams({path}) : '';
     history.push(`/designer?${queryParams}`);
   }
 

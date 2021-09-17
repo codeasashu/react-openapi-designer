@@ -26,6 +26,12 @@
     border-top-left-radius: 0;
 }
 
+:root {
+    --canvas-h: 218;
+    --canvas-s: 32%;
+    --canvas-l: 8%;
+    --color-canvas: hsla(var(--canvas-h), var(--canvas-s), var(--canvas-l), 1);
+}
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -33,6 +39,10 @@
 *, :after, :before {
     border: 0 solid #8694ad80;
     box-sizing: border-box;
+}
+
+.sl-bg-canvas-pure {
+    background-color: var(--color-canvas-pure);
 }
 
 .bg-canvas {
@@ -106,3 +116,17 @@
     letter-spacing: normal;
     text-transform: none;
 }
+
+.bp3-dark .dark\:bg-success {
+    background-color: #48bb78;
+}
+.bp3-dark .dark\:bg-info {
+    background-color: #008eff;
+}
+.bp3-dark .dark\:bg-warning {
+    background-color: #ed8936;
+}
+.bp3-dark .dark\:bg-danger {
+    background-color: #f56565;
+}
+

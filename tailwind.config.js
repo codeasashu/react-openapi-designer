@@ -3,7 +3,15 @@ module.exports = {
   darkMode: 'media', // or 'media' or 'class'
   //darkMode: 'class', // or 'media' or 'class'
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        canvas: {
+          light: 'var(--color-canvas)',
+          dark: 'var(--color-canvas)',
+          DEFAULT: 'var(--color-canvas)',
+        },
+      },
+    },
   },
   variants: {
     extend: {},

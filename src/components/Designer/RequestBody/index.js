@@ -1,32 +1,39 @@
 // @flow
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
+import {ControlGroup, Button} from '@blueprintjs/core';
 import BodySelector from 'components/Pickers/ContentType';
 import SchemaDesigner from 'components/Designer/Schema';
 import {MarkdownEditor as Markdown} from 'components/Editor';
 import {defaultSchema} from '../../../model';
 import {sortContentTypes, ContentTypes} from '../../../utils';
 
-const getDefaultContentType = (contentTypes) => {
-  const sortedContentTypes = sortContentTypes(contentTypes, [
-    ContentTypes.json,
-    ContentTypes.form,
-    ContentTypes.multipart,
-  ]);
-  return sortedContentTypes.length ? sortedContentTypes[0] : null;
-};
-
 const RequestBody = ({requestBody, onChange}) => {
+  const getDefaultContentType = () => {
+    if (!requestBody || !requestBody.content) {
+      return undefined;
+    }
+    const sortedContentTypes = sortContentTypes(
+      Object.keys(requestBody.content),
+      [ContentTypes.json, ContentTypes.form, ContentTypes.multipart],
+    );
+    return sortedContentTypes.length ? sortedContentTypes[0] : null;
+  };
+
   const [selectedContentType, setSelectedContentType] = useState(
-    getDefaultContentType(Object.keys(requestBody.content)),
+    getDefaultContentType(),
   );
   const [selectedSchema, setSelectedSchema] = useState(
-    requestBody.content[selectedContentType]?.schema,
+    requestBody.content
+      ? requestBody.content[selectedContentType]?.schema
+      : null,
   );
 
   useEffect(() => {
-    const newSchema = requestBody.content[selectedContentType]?.schema;
-    setSelectedSchema(newSchema);
+    if (requestBody && requestBody.content) {
+      const newSchema = requestBody.content[selectedContentType]?.schema;
+      setSelectedSchema(newSchema);
+    }
   }, [selectedContentType]);
 
   const handleSchemaChange = (schema) => {
@@ -41,11 +48,30 @@ const RequestBody = ({requestBody, onChange}) => {
     onChange(newSchema);
   };
 
-  return (
+  return requestBody.content === undefined ? (
+    <div className="flex items-center">
+      <ControlGroup className="flex-1">
+        <Button
+          icon="plus"
+          text="Add Body"
+          onClick={() => {
+            onChange({
+              content: {
+                'application/json': {schema: defaultSchema.object},
+              },
+            });
+            setSelectedContentType('application/json');
+          }}
+        />
+      </ControlGroup>
+    </div>
+  ) : (
     <div>
       <BodySelector
         selected={selectedContentType}
-        contentTypes={requestBody ? Object.keys(requestBody.content) : []}
+        contentTypes={
+          requestBody?.content ? Object.keys(requestBody.content) : []
+        }
         onAdd={(e) => {
           setSelectedContentType(e.toLowerCase());
           onChange({
@@ -56,9 +82,7 @@ const RequestBody = ({requestBody, onChange}) => {
             },
           });
         }}
-        onSelect={(e) => {
-          setSelectedContentType(e.toLowerCase());
-        }}
+        onSelect={setSelectedContentType}
         onUpdate={(e) => {
           const {content, ...restOfRequestBody} = requestBody;
           const {[selectedContentType]: originalSchema, ...rest} = content;
@@ -77,20 +101,24 @@ const RequestBody = ({requestBody, onChange}) => {
           });
         }}
       />
-      <div className="flex-1">
-        <Markdown
-          className="mt-6 -mx-1 relative hover:bg-darken-2 rounded-lg"
-          placeholder="abcdef"
-        />
-      </div>
-      <div className="mt-6">
-        <SchemaDesigner
-          dark
-          initschema={selectedSchema}
-          namespace="requestBody"
-          onChange={handleSchemaChange}
-        />
-      </div>
+      {requestBody.content && (
+        <div className="flex-1">
+          <Markdown
+            className="mt-6 -mx-1 relative hover:bg-darken-2 rounded-lg"
+            placeholder="abcdef"
+          />
+        </div>
+      )}
+      {selectedSchema && (
+        <div className="mt-6">
+          <SchemaDesigner
+            dark
+            initschema={selectedSchema}
+            namespace="requestBody"
+            onChange={handleSchemaChange}
+          />
+        </div>
+      )}
     </div>
   );
 };

@@ -2,7 +2,7 @@ import {createSlice, createAsyncThunk} from '@reduxjs/toolkit';
 import {get, set, unset, cloneDeep, compact} from 'lodash';
 import {OpenApiBuilder} from 'openapi3-ts';
 import OrderedDict from '../../ordered-dict';
-import {exampleDoc, defaultOperation} from '../../model';
+import {exampleDoc, defaultOperation, defaultSchema} from '../../model';
 import {generateOperationId} from '../../utils/schema';
 import {
   unescapeUri,
@@ -143,7 +143,8 @@ export const openapi = createSlice({
     },
     handleModelChange: (state, action) => {
       const {path, value} = action.payload;
-      return set(state, path, value);
+      console.log('model change', path, value);
+      set(state, path, value);
     },
     handleModelDelete: (state, action) => {
       let {path} = action.payload;
@@ -177,6 +178,34 @@ export const openapi = createSlice({
         .rootDoc;
     },
     addUrl: (state, action) => ({...state, name: action.payload}),
+    addComponent: (state, action) => {
+      const {parentName, name, ...rest} = action.payload;
+      const description = '';
+      const schema = defaultSchema.object;
+      let targetObject = schema;
+      if (parentName === 'responses') {
+        targetObject = {
+          description: '',
+          content: {'application/json': {schema}},
+        };
+      }
+      if (parentName === 'parameters') {
+        const _in = rest?.parameter || 'query';
+        targetObject = {
+          in: _in,
+          name,
+          description,
+          schema: defaultSchema.string,
+        };
+      }
+      set(state, ['components', parentName, name], targetObject);
+    },
+    addPath: (state, action) => {
+      const {path} = action.payload;
+      const operationId = generateOperationId(path, 'get');
+      const pathItem = {get: {operationId, responses: {}}};
+      set(state, ['paths', path], pathItem);
+    },
   },
   extraReducers: {
     [changePathParameter.fulfilled]: (state) => {
@@ -195,6 +224,8 @@ export const {
   handlePathNameChange,
   handleAddOperation,
   handlePathParamChange,
+  addComponent,
+  addPath,
 } = openapi.actions;
 
 export default openapi.reducer;
