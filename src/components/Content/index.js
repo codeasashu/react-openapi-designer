@@ -11,7 +11,7 @@ import PathContent from './path';
 import ModelContent from './model';
 import Parameter from './parameter';
 import Response from './response';
-import MarkdownEditor from '../Editor/markdown';
+import YamlEditor from '../Editor/yaml';
 
 const StyledContent = styled.div`
   width: calc(80% - 2px);
@@ -66,7 +66,7 @@ export default function Content({openapi}) {
         />
         {currentView === 'form' && <SubContent />}
         {currentView === 'code' && (
-          <MarkdownEditor
+          <YamlEditor
             value={OpenApiBuilder.create(openapi).getSpecAsYaml()}
             onChange={() => {}}
           />

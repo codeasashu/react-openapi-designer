@@ -30,6 +30,11 @@ function OasDesignerBare({dark, openapi}) {
         <div className={'Studio h-full flex flex-1 flex-col'}>
           <div className={'flex flex-1'}>
             <Sidebar
+              style={{
+                width: 'calc(18% - 2px)',
+                maxWidth: '375px',
+                minWidth: '290px',
+              }}
               openapi={openapi}
               onClick={handleClick}
               className={'flex flex-col bg-white dark:bg-gray-900 border-r'}

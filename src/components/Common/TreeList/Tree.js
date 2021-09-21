@@ -4,38 +4,7 @@ import {ContextMenu, Menu, MenuDivider, MenuItem} from '@blueprintjs/core';
 import SortableTree from '../../../react-sortable-tree/src/react-sortable-tree';
 import TreeRow from './TreeRow';
 import TreeRowContent from './TreeRowContent';
-
-const icons = {
-  overview: {
-    default: 'star',
-    color: 'var(--icon-color)',
-  },
-  paths: {
-    color: '#eba439',
-    default: 'folder-close',
-    expanded: 'folder-open',
-  },
-  model: {
-    default: 'cube',
-    color: '#ef932b',
-  },
-  response: {
-    color: '#0f79c5',
-    default: 'exchange',
-  },
-  parameter: {
-    default: 'paragraph',
-    color: '#1a4f75',
-  },
-  example: {
-    default: 'credit-card',
-    color: '#e53e3e',
-  },
-  requestBody: {
-    color: '#6e44b1',
-    default: 'dot',
-  },
-};
+import {icons} from '../../../model';
 
 const getItems = (items) =>
   items.map((item, index) => {
@@ -60,7 +29,7 @@ SidebarContextMenu.propTypes = {
   items: PropTypes.array,
 };
 
-const Tree = ({treeData, onChange, onClick, generateContextMenu}) => {
+const Tree = ({treeData, onChange, onClick, generateContextMenu, ...props}) => {
   const generateNodeProps = ({node}) => {
     const handleContextMenu = (e) => {
       if (!generateContextMenu) {
@@ -89,7 +58,7 @@ const Tree = ({treeData, onChange, onClick, generateContextMenu}) => {
   };
 
   return (
-    <div style={{height: '100%', width: 289}}>
+    <div className={props.className} style={{height: '100%', width: 289}}>
       <SortableTree
         treeData={treeData}
         onChange={(treeData) => onChange({treeData})}
@@ -110,6 +79,7 @@ const Tree = ({treeData, onChange, onClick, generateContextMenu}) => {
 };
 
 Tree.propTypes = {
+  className: PropTypes.any,
   treeData: PropTypes.any,
   onChange: PropTypes.func,
   onClick: PropTypes.func,

@@ -7,6 +7,8 @@ import OasDesigner from './components/Designer';
 import SchemaDesigner from './designers/schema';
 import ResponseDesigner from './designers/response';
 import ParameterDesigner from './designers/parameter';
+import {StoresContext} from './components/Tree/context';
+import Stores from './Stores';
 import './overrides.scss';
 import './app.css';
 
@@ -51,7 +53,9 @@ const Response = (props: SchemaPropType) => {
 const OpenapiSpecDesigner = (props) => {
   return (
     <Provider store={openapiStore}>
-      <OasDesigner {...props} />
+      <StoresContext.Provider value={new Stores()}>
+        <OasDesigner {...props} />
+      </StoresContext.Provider>
     </Provider>
   );
 };

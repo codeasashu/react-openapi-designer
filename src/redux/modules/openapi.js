@@ -39,7 +39,6 @@ const movePathNode = (paths, newPath, oldPath) => {
   }
   const clonedPaths = cloneDeep(paths);
   const pathItem = get(clonedPaths, oldPath);
-
   const parameters = get(clonedPaths, [oldPath, 'parameters'], []);
   const newParameters = modifyParametersFromPath(parameters, newPath);
   set(clonedPaths, [oldPath, 'parameters'], newParameters);
@@ -47,7 +46,16 @@ const movePathNode = (paths, newPath, oldPath) => {
   const keyIndex = newDoc.findIndex(oldPath);
   newDoc.insert(keyIndex, newPath, pathItem);
   newDoc.remove(oldPath);
+  return newDoc.toDict();
+};
 
+const moveComponent = (components, name, oldName) => {
+  const clonedComponents = cloneDeep(components);
+  const component = get(clonedComponents, oldName);
+  let newDoc = new OrderedDict(clonedComponents);
+  const keyIndex = newDoc.findIndex(oldName);
+  newDoc.insert(keyIndex, name, component);
+  newDoc.remove(oldName);
   return newDoc.toDict();
 };
 
@@ -143,14 +151,16 @@ export const openapi = createSlice({
     },
     handleModelChange: (state, action) => {
       const {path, value} = action.payload;
-      console.log('model change', path, value);
       set(state, path, value);
     },
     handleModelDelete: (state, action) => {
       let {path} = action.payload;
       if (path.length && path[0] === 'paths') {
-        path = path.slice(0, 2);
-        path = path.map((i) => unescapeUri(i));
+        const originalElements = path.slice(0, 2);
+        const remainingElements = path.slice(2);
+        path = originalElements
+          .map((i) => unescapeUri(i))
+          .concat(remainingElements);
       }
       unset(state, path);
       return state;
@@ -200,6 +210,21 @@ export const openapi = createSlice({
       }
       set(state, ['components', parentName, name], targetObject);
     },
+    renameComponent: (state, action) => {
+      const {parentName, name, oldName} = action.payload;
+      const components = get(state, ['components', parentName], null);
+      if (components == null) {
+        return state;
+      }
+      const mergedComponents = moveComponent(components, name, oldName);
+      return {
+        ...state,
+        components: {
+          ...state.components,
+          [parentName]: mergedComponents,
+        },
+      };
+    },
     addPath: (state, action) => {
       const {path} = action.payload;
       const operationId = generateOperationId(path, 'get');
@@ -226,6 +251,7 @@ export const {
   handlePathParamChange,
   addComponent,
   addPath,
+  renameComponent,
 } = openapi.actions;
 
 export default openapi.reducer;

@@ -39,7 +39,7 @@ const methodColors = {
 const RowIcon = ({icons, node, expanded}) => {
   const iconProp = node.type !== undefined ? icons[node.type] : undefined;
   const getIcon = (icon, expanded) => {
-    if (icon === null) {
+    if (icon == null) {
       return icon;
     } else {
       if (expanded && icon.expanded !== undefined) {
@@ -75,7 +75,7 @@ const EditorRow = ({node, placeholder = ''}) => {
   const [error, setError] = React.useState(null);
 
   const onBlur = React.useCallback(() => {
-    console.log('cancel Edit');
+    node.actions.undo && node.actions.undo(node);
   }, []);
 
   const onKeyDown = React.useCallback(

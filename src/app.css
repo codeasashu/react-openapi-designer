@@ -31,6 +31,10 @@
     --canvas-s: 32%;
     --canvas-l: 8%;
     --color-canvas: hsla(var(--canvas-h), var(--canvas-s), var(--canvas-l), 1);
+    --color-canvas-pure: hsla(218, 32%, 5%, 1);
+    --editor-bg: var(--color-canvas) !important;
+    --sidebar-bg: var(--color-canvas-pure) !important;
+    --gutter-bg: var(--color-canvas) !important;
 }
 @tailwind base;
 @tailwind components;
@@ -41,8 +45,15 @@
     box-sizing: border-box;
 }
 
-.sl-bg-canvas-pure {
-    background-color: var(--color-canvas-pure);
+.sidebar-bg {
+    background-color: var(--sidebar-bg);
+}
+.content-bg{
+    background-color: var(--editor-bg);
+}
+
+.monaco-editor .margin, .monaco-editor .monaco-editor-background, .monaco-editor .inputarea.ime-input {
+    background-color: var(--color-canvas)!important;
 }
 
 .bg-canvas {

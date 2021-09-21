@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
   mode: 'development',
@@ -68,6 +69,9 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+    }),
+    new MonacoWebpackPlugin({
+      languages: ['json', 'yaml'],
     }),
   ],
 };

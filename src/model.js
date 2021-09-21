@@ -1,3 +1,51 @@
+export const icons = {
+  overview: {
+    default: 'star',
+    color: 'var(--icon-color)',
+  },
+  paths: {
+    color: '#eba439',
+    default: 'folder-close',
+    expanded: 'folder-open',
+  },
+  model: {
+    default: 'cube',
+    color: '#ef932b',
+  },
+  response: {
+    color: '#0f79c5',
+    default: 'exchange',
+  },
+  parameter: {
+    default: 'paragraph',
+    color: '#1a4f75',
+  },
+  example: {
+    default: 'credit-card',
+    color: '#e53e3e',
+  },
+  requestBody: {
+    color: '#6e44b1',
+    default: 'dot',
+  },
+};
+
+export const treeTypes = {
+  Overview: 'overview',
+  Path: 'path',
+  Paths: 'paths',
+  Model: 'model',
+  Models: 'models',
+  Response: 'response',
+  Responses: 'responses',
+  RequestBody: 'requestBody',
+  RequestBodies: 'requestBodies',
+  Parameter: 'parameter',
+  Parameters: 'parameters',
+  Examples: 'examples',
+  Example: 'example',
+};
+
 export const defaultSchema = {
   string: {type: 'string'},
   boolean: {type: 'boolean'},
