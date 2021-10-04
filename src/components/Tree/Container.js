@@ -18,6 +18,7 @@ const TreeContainer = observer((props) => {
     style,
     striped,
     innerPadding,
+    generateContextMenu,
     maxRows,
     interactive = true,
     initialScrollOffset,
@@ -61,7 +62,7 @@ const TreeContainer = observer((props) => {
     rowHeight,
     innerPadding: _innerPadding,
     tree,
-    generateContextMenu: store.generateContextMenu,
+    generateContextMenu,
     striped,
     draggable: draggable !== false,
   };
@@ -89,7 +90,8 @@ const TreeContainer = observer((props) => {
         return _innerPadding * 2;
       }
 
-      const node = tree.itemAt(_innerPadding ? nodeIndex - 1 : nodeIndex);
+      const itemIndex = _innerPadding ? nodeIndex - 1 : nodeIndex;
+      const node = tree.itemAt(itemIndex);
 
       if (typeof rowHeight == 'function' && node !== undefined) {
         return rowHeight(node);

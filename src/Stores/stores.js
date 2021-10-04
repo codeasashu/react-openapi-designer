@@ -1,5 +1,6 @@
 import GraphStore from './graphStore';
 import UiStore from './uiStore';
+import OasStore from './oasStore';
 import DesignTreeStore from './designTreeStore';
 import EventEmitter from '../EventEmitter';
 
@@ -8,6 +9,7 @@ class Stores {
     this.eventEmitter = new EventEmitter();
     this.graphStore = new GraphStore(this);
     this.uiStore = new UiStore(this);
+    this.oasStore = new OasStore(this);
     this.designTreeStore = new DesignTreeStore(this);
 
     this.registerEventListeners();

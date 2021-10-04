@@ -1,3 +1,4 @@
+import {isObjectLike} from 'lodash';
 import {decodeUriFragment} from '../utils';
 
 export const isParentNode = (e) =>
@@ -45,6 +46,9 @@ export const nodeOperations = {
   PatchSourceNodeProp: 'patch_source_node_props',
   RemoveNode: 'remove_node',
   MoveNode: 'move_node',
+  Add: 'add_child_node',
+  Move: 'move_child_node',
+  Remove: 'remove_child_node',
 };
 
 export const NodeCategories = {
@@ -69,6 +73,22 @@ export const eventTypes = {
   // Graph events
   GraphNodeAdd: 'graph.node_add',
   DidAddSourceMapNode: 'graph.source_map_node_add',
+  DidPatchSourceNodeProp: 'graph.patch_sourcemap_node',
+  DidChangeSourceNode: 'graph.did_changed_source_node',
+  DidPatchSourceNodePropComplete: 'graph.did_patch_source_complete',
+  DidRemoveNode: 'graph.did_remove_node',
+  ComputeSourceMap: 'graph.compute_source_map',
+
+  // sidebar events
+  CreatePath: 'action.create_path',
+  CreateModel: 'action.create_model',
+  CreateExample: 'action.create_example',
+  CreateParameter: 'action.create_parameter',
+  CreateResponse: 'action.create_response',
+  CreateRequestBody: 'action.create_request_body',
+  RenameNode: 'action.rename_node',
+  DeleteNode: 'action.delete_node',
+  DeleteHttpMethod: 'action.delete_http_method',
 };
 
 export const taskTypes = {
@@ -325,3 +345,10 @@ export const isParameterNode = (node) => {
     node.type === NodeTypes.Parameter
   );
 };
+
+export const isOperationLike = (node) =>
+  NodeCategories.SourceMap === node.category &&
+  NodeTypes.Operation === node.type &&
+  isObjectLike(node.data.parsed);
+
+export const isHyphenOnly = (e) => !e.match(/^(?:0|[1-9]\d*)$/) && e === '-';

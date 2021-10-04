@@ -68,13 +68,15 @@ class Graph {
         },
       });
 
-      if (_node.category === NodeCategories.SourceMap) {
+      const newNode = this.dom.nodes[nodeid];
+
+      if (newNode.category === NodeCategories.SourceMap) {
         this.notifier.emit(eventTypes.DidAddSourceMapNode, {
-          node: _node,
+          node: newNode,
         });
       }
 
-      return this.dom.nodes[nodeid];
+      return newNode;
     };
 
     this.indexNode = (node, trace) => this.addNode(node, trace, true);

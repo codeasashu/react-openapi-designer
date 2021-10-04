@@ -1,6 +1,12 @@
 /* eslint-disable no-prototype-builtins */
-import {escapeRegExp} from 'lodash';
-import {NodeCategories, NodeTypes} from '../../utils/tree';
+import {escapeRegExp, difference} from 'lodash';
+import {
+  NodeCategories,
+  NodeTypes,
+  nodeOperations,
+  eventTypes,
+} from '../../utils/tree';
+import {encodeUriFragment} from '../../utils';
 //import {exampleDoc} from '../../model';
 
 const operations = [
@@ -201,61 +207,195 @@ const getNodeMap = (operations, parsedData, nodeKey) => {
   };
 };
 
-const getChildNodes = (node, isSourceMap) => {
-  const childNodes = {};
-  for (const childNode of node.children) {
-    if (isSourceMap(childNode)) {
-      childNodes[childNode.uri] = childNode;
-    }
+function encodePath(e) {
+  return '/' + e.map(encodeUriFragment).join('/');
+}
 
-    if (childNode.children && childNode.children.length) {
-      Object.assign(childNodes, getChildNodes(childNode, isSourceMap));
+const removeNodeFromUriMap = (
+  operation, // e
+  {
+    node, // t
+    currentUriMap, //n
+    removeNode, // r
+  },
+) => {
+  const nodePath = node.uri + encodePath(operation.path); //i
+
+  if (!currentUriMap.hasOwnProperty(nodePath)) {
+    return currentUriMap;
+  }
+
+  const currentNode = currentUriMap[nodePath]; //o
+
+  if (
+    currentNode === undefined ||
+    NodeCategories.SourceMap !== currentNode.category ||
+    currentNode.id === undefined
+  ) {
+    return currentUriMap;
+  }
+
+  removeNode(currentNode.id);
+
+  for (const _node in currentUriMap) {
+    if (nodePath === _node.substring(0, nodePath.length)) {
+      delete currentUriMap[_node];
     }
   }
 
-  return childNodes;
+  return currentUriMap;
 };
 
-export const initGraph = (node, graph) => {
-  let childNodes = getChildNodes(node); // u
+function moveNode(patch, {node, currentUriMap, moveNode}) {
+  const fromNodePath = node.uri + encodePath(patch.from); // i
+  const toNodePath = node.uri + encodePath(patch.path); //o
 
-  const nodePropsUriMap = getNodeMap(
-    operations,
-    node.data.parsed,
-    node.uri,
-  ).uriMap; // c
+  if (!currentUriMap.hasOwnProperty(fromNodePath)) {
+    return currentUriMap;
+  }
+
+  const fromNode = currentUriMap[fromNodePath]; //a
+
+  if (
+    fromNode === undefined ||
+    NodeCategories.SourceMap !== fromNode.category ||
+    fromNode.id === undefined
+  ) {
+    return currentUriMap;
+  }
+
+  const toNode = currentUriMap[node.uri + encodePath(patch.path.slice(0, -1))];
+
+  if (
+    !(
+      toNode === undefined ||
+      NodeCategories.SourceMap !== toNode.category ||
+      toNode.id === undefined
+    )
+  ) {
+    moveNode(
+      fromNode.id,
+      toNode.id,
+      toNodePath.substring(toNodePath.lastIndexOf('/') + 1),
+    );
+    delete currentUriMap[fromNodePath];
+    currentUriMap[fromNode.uri] = fromNode;
+  }
+
+  return currentUriMap;
+}
+
+export const recomputeGraphNodes = (node, graph, operation) => {
+  if (NodeCategories.Source !== node.category || !node.data.parsed) {
+    return;
+  }
+
+  let currentUriMap = (function getChildNodes(node, isSourceMapNode) {
+    // u
+    const existingChildren = {};
+
+    for (const child of node.children) {
+      if (isSourceMapNode && isSourceMapNode(child)) {
+        existingChildren[child.uri] = child;
+      }
+
+      if (child.children && child.children.length) {
+        Object.assign(existingChildren, getChildNodes(child, isSourceMapNode));
+      }
+    }
+
+    return existingChildren;
+  })(node, (_node) => NodeCategories.SourceMap === _node.category);
+
+  if (
+    operation &&
+    eventTypes.ComputeSourceMap === operation.op &&
+    operation.patch
+  ) {
+    let notModified = true;
+
+    for (const patch of operation.patch) {
+      // n
+      if (patch.op === nodeOperations.Move) {
+        currentUriMap = moveNode(patch, {
+          node,
+          currentUriMap,
+          moveNode: graph.moveNode,
+        });
+        //u = ur(n, {
+        //node: t,
+        //currentUriMap: u,
+        //moveNode: o,
+        //})
+      } else {
+        if (patch.op === nodeOperations.Remove) {
+          currentUriMap = removeNodeFromUriMap(patch, {
+            node,
+            currentUriMap,
+            removeNode: graph.removeNode,
+          });
+        } else {
+          notModified = false;
+        }
+      }
+    }
+
+    if (notModified) {
+      return;
+    }
+  }
+
+  const allUriMap = getNodeMap(operations, node.data.parsed, node.uri).uriMap;
 
   const nodeUriMap = {};
-  const uriMaps = {};
-  for (const uri in nodePropsUriMap) {
-    if (!nodePropsUriMap.hasOwnProperty(uri)) {
+  const existinguUriMaps = {};
+  for (const uri in allUriMap) {
+    if (!allUriMap.hasOwnProperty(uri)) {
       continue;
     }
 
-    if (childNodes[uri]) {
-      const node = graph.getNodeByUri(uri);
+    if (currentUriMap[uri]) {
+      const _node = graph.getNodeByUri(uri);
 
-      if (!node) {
+      if (!_node) {
         continue;
       }
 
-      uriMaps[uri] = node;
+      existinguUriMaps[uri] = _node;
       continue;
     }
 
-    const nodeProps = nodePropsUriMap[uri];
+    const _node = allUriMap[uri];
     // Removing current node uri from whole path will give parent node path
-    const parentUri = uri.replace(
-      new RegExp(`/${escapeRegExp(nodeProps.path)}$`),
+    const cleanedUri = uri.replace(
+      new RegExp(`/${escapeRegExp(_node.path)}$`),
       '',
     );
-    const parentNode = childNodes[parentUri] || nodeUriMap[parentUri] || node; // o
+    const parentNode =
+      currentUriMap[cleanedUri] || nodeUriMap[cleanedUri] || node;
 
-    const newNode = Object.assign(Object.assign({}, nodeProps), {
+    const newNode = Object.assign(Object.assign({}, _node), {
       parentId: parentNode.id,
     });
 
     const currentNode = graph.addNode(newNode);
     nodeUriMap[currentNode.uri] = currentNode;
+  }
+
+  const currentNodesUris = Object.keys(currentUriMap); // h
+  const allNodesUris = Object.keys(allUriMap); //f
+  const newNodeUris = difference(currentNodesUris, allNodesUris); //p
+  const processed = {};
+
+  for (const nodeUri of newNodeUris) {
+    const _node = currentUriMap[nodeUri];
+
+    if (_node && _node.id) {
+      if (!(_node.parentId && processed[_node.parentId])) {
+        graph.removeNode(_node.id);
+      }
+
+      processed[_node.id] = true;
+    }
   }
 };

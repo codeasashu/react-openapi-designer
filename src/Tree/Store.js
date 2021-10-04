@@ -78,37 +78,37 @@ class Store {
     this.rename = async (node, validator) => {
       console.log('rename', node, validator);
       this.setEditedNode(node.id);
+
       ////const disposableCollection = new o.DisposableCollection();
 
-      //try {
-      //return await new Promise((success, failed) => {
-      //disposableCollection.pushAll([
-      //this.events.on(
-      //eventTypes.BeforeEditComplete,
-      //async (currentNode, parentNode) => {
-      //try {
-      //if (validator !== undefined) {
-      //await validator(currentNode, parentNode);
-      //}
+      try {
+        return await new Promise((success, failed) => {
+          this.events.on(
+            eventTypes.BeforeEditComplete,
+            async (currentNode, parentNode) => {
+              try {
+                if (validator !== undefined) {
+                  await validator(currentNode, parentNode);
+                }
 
-      //this.events.emit(
-      //eventTypes.AfterEditComplete,
-      //currentNode,
-      //parentNode,
-      //);
-      //} catch (errors) {
-      //this.events.emit(eventTypes.ValidationError, errors);
-      //}
-      //},
-      //),
-      //this.events.on(eventTypes.AfterEditComplete, success),
-      //this.events.on(eventTypes.EditCancel, failed),
-      //]);
-      //});
-      //} finally {
-      //disposableCollection.dispose();
-      //this.setEditedNode(null);
-      //}
+                this.events.emit(
+                  eventTypes.AfterEditComplete,
+                  currentNode,
+                  parentNode,
+                );
+              } catch (errors) {
+                this.events.emit(eventTypes.ValidationError, errors);
+              }
+            },
+          );
+
+          this.events.on(eventTypes.AfterEditComplete, success);
+          this.events.on(eventTypes.EditCancel, failed);
+        });
+      } finally {
+        //disposableCollection.dispose();
+        this.setEditedNode(null);
+      }
     };
 
     this.tree = tree;
@@ -164,7 +164,6 @@ class Store {
     const {expanded} = this.state; // n
 
     if (expand === undefined || expanded[node.id] !== expand) {
-      console.log('change expand', expanded, node.id);
       this.someprop = node.id;
       this.state.setExpandedKeyVal(
         node.id,
@@ -179,7 +178,6 @@ class Store {
       } else {
         this.tree.wrap(node);
       }
-      console.log('tree', this.tree);
     }
 
     if (!this.isNodeExpanded(node)) {
@@ -273,6 +271,7 @@ class Store {
 
       return node;
     } catch (error) {
+      console.error('[TreeStore error]', error);
       throw (this.tree.removeNode(node), error);
     }
   }

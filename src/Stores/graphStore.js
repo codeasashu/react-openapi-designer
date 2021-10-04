@@ -1,9 +1,14 @@
 import {join} from 'lodash';
 import Graph from './graph';
-import {initGraph} from './graph/addNode';
+import {recomputeGraphNodes} from './graph/addNode';
 import {exampleDoc} from '../model';
 
-import {NodeCategories, eventTypes, taskTypes} from '../utils/tree';
+import {
+  NodeCategories,
+  eventTypes,
+  taskTypes,
+  nodeOperations,
+} from '../utils/tree';
 
 class GraphStore {
   rootNode = undefined;
@@ -39,6 +44,64 @@ class GraphStore {
     this.getNodeByFilename = (e) => this.getNodeByUri(this.cwd + '/' + e);
     this.getFilename = (e) => e.uri.replace(this.cwd + '/', '');
     this.getNodeById = (e) => this.graph.getNodeById(e);
+
+    this.renameNode = async (nodeId, name) => {
+      //e,t
+      const node = this.getNodeById(nodeId); // n
+
+      //if (NodeCategories.Source === node.category) {
+      //await this.queueTask({
+      //op: be.a.MoveSourceNode,
+      //nodeId: e,
+      //newPath: t,
+      //});
+      //} else {
+      if (NodeCategories.SourceMap !== node.category) {
+        throw new Error('Node musst be sourceMap Node');
+      }
+
+      if (node.relativeJsonPath.length === 0) {
+        throw new Error('relativeJsonPath cannot be empty');
+      }
+
+      this.graph.patchSourceNodeProp(node.parentSourceNode.id, 'data.parsed', [
+        {
+          op: nodeOperations.Move,
+          from: node.relativeJsonPath,
+          path: [
+            ...node.relativeJsonPath.slice(0, node.relativeJsonPath.length - 1),
+            name,
+          ],
+        },
+      ]);
+    };
+
+    this.removeNode = async (nodeId) => {
+      //e
+      const node = this.getNodeById(nodeId); //t
+
+      //if (NodeCategories.Source === node.category) {
+      //return this.queueTask({
+      //op: be.a.DeleteSourceNode,
+      //nodeId: node.id,
+      //});
+      //}
+
+      if (NodeCategories.SourceMap === node.category) {
+        const sourceNode = node.parentSourceNode; // n
+
+        if (!sourceNode) {
+          return;
+        }
+
+        return this.graph.patchSourceNodeProp(sourceNode.id, 'data.parsed', [
+          {
+            op: nodeOperations.Remove,
+            path: node.relativeJsonPath,
+          },
+        ]);
+      }
+    };
   }
 
   activate() {
@@ -53,7 +116,6 @@ class GraphStore {
     );
 
     if (this.rootNode) {
-      console.log('emitting event');
       this.eventEmitter.emit(eventTypes.GraphNodeAdd, {
         task: taskTypes.ReadSourceNode,
         node: this.rootNode,
@@ -62,6 +124,41 @@ class GraphStore {
   }
 
   registerEventListeners() {
+    //this.eventEmitter.on(eventTypes.DidAddSourceMapNode, ({node}) => {
+    //if (isOperationLike(node)) {
+    ////@TODO - Transformations should be added
+    //const transformNode = {
+    //method: node.path,
+    //};
+
+    //const virtualNode = {
+    //category: NodeCategories.Virtual,
+    //path: node.path + '-virtual',
+    //type: NodeTypes.Operation,
+    //data: transformNode,
+    //parentId: node.id,
+    //};
+    //this.graph.addNode(virtualNode);
+    //}
+    //});
+
+    this.eventEmitter.on(eventTypes.DidPatchSourceNodeProp, (operation) => {
+      let task = {};
+      const nodeId = operation.id;
+      const node = this.graph.getNodeById(nodeId);
+      if (operation.prop === 'data.parsed') {
+        task = {
+          op: eventTypes.ComputeSourceMap,
+          nodeId,
+          patch: operation.value,
+        };
+      }
+
+      console.log('operationProp', node, task);
+      recomputeGraphNodes(node, this.graph, task);
+      this.eventEmitter.emit(eventTypes.DidPatchSourceNodePropComplete);
+    });
+
     this.eventEmitter.on(eventTypes.GraphNodeAdd, ({task, node}) => {
       if (task === taskTypes.ReadSourceNode && node.parent == null) {
         this.graph.setSourceNodeProp(
@@ -71,7 +168,7 @@ class GraphStore {
         );
         this.graph.setSourceNodeProp(node.id, 'data.parsed', exampleDoc);
 
-        initGraph(node, this.graph);
+        recomputeGraphNodes(node, this.graph);
       }
     });
   }

@@ -502,15 +502,15 @@ class Tree {
       throw new Error('Cannot remove root node');
     }
 
-    const {parentNode} = node;
+    const {parent} = node;
 
-    const parentcount = parentNode[countSymbol];
-    parentNode.children.splice(parentNode.children.indexOf(node), 1);
+    const parentcount = parent[countSymbol];
+    parent.children.splice(parent.children.indexOf(node), 1);
 
     if (parentcount !== undefined) {
       this.clearCache();
-      this.invalidateNode(parentNode);
-      this.count += parentNode[countSymbol] - parentcount;
+      this.invalidateNode(parent);
+      this.count += parent[countSymbol] - parentcount;
     }
   }
 

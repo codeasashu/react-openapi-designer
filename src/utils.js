@@ -247,6 +247,9 @@ const replaceInPath = (e, t, n) => {
 export const decodeUriFragment = (path) =>
   replaceInPath(replaceInPath(path, '~1', '/'), '~0', '~');
 
+export const encodeUriFragment = (path) =>
+  replaceInPath(replaceInPath(path, '~', '~0'), '/', '~1');
+
 export const generateOperationId = (path, method) => {
   // eslint-disable-next-line no-useless-escape
   const pathRegex = /[^A-Za-z0-9-._~:?#\[\]@!$&'()*+,;=]+/g;
@@ -260,4 +263,33 @@ export const generateOperationId = (path, method) => {
   };
   const newPath = decodeUriFragment(path);
   return `${method.toLowerCase()}${newPath.replace(pathRegex, replacer)}`;
+};
+
+export const pathToPointer = (path) => {
+  return encodeUriFragmentIdentifier(path);
+};
+
+const encodeUriFragmentIdentifier = (path) => {
+  if (path && typeof path !== 'object') {
+    throw new TypeError('Invalid type: path must be an array of segments.');
+  }
+
+  if (path.length === 0) {
+    return '#';
+  }
+
+  return `#/${path.map(encodeUriFragment).join('/')}`;
+};
+
+export const getPathParametersFromUri = (uri) => {
+  const matcher = /{(.+?)}/g;
+  let matches = matcher.exec(uri);
+  const params = [];
+
+  for (; matches !== null; ) {
+    params.push(matches[1]);
+    matches = matcher.exec(uri);
+  }
+
+  return params;
 };

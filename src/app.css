@@ -2,6 +2,50 @@
 @import "@blueprintjs/popover2/lib/css/blueprint-popover2";
 @import "@blueprintjs/icons/lib/css/blueprint-icons";
 
+.DesignTreeListItem {
+  cursor: pointer;
+}
+
+.DesignTreeListItem:hover {
+  background-color: rgba(0,0,0,0.06)
+}
+
+.DesignTreeListItem .bp3-context-menu{
+  display: inline;
+}
+
+.DesignTreeListItem .bp3-tag {
+  min-height: 16px;
+    padding: 0 4px;
+    font-size: 11px;
+  }
+
+.TreeListItem__input {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    padding-right: 5px;
+}
+.DesignTreeListItem__input {
+    appearance: none;
+    border: none;
+    background: 0 0;
+    box-shadow: none;
+    outline: none;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100%;
+    padding-right: 5px;
+}
+.unicode-bidi {
+    unicode-bidi: bidi-override;
+}
+.direction-rtl {
+    direction: rtl;
+}
 .bp3-simple-tab-list {
     margin: 0;
     padding: 0;

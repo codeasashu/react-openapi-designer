@@ -1,9 +1,20 @@
-import {get, set, isEqual} from 'lodash';
+import {get, set, isEqual, isObject, pull, remove} from 'lodash';
+import produce from 'immer';
 import SourceMapNode from './sourceNode';
 import VirtualNode from './virtualNode';
 import GraphNode from './graphNode';
-import {nodeOperations, NodeCategories, eventTypes} from '../../utils/tree';
+import {
+  nodeOperations,
+  NodeCategories,
+  isHyphenOnly,
+  eventTypes,
+} from '../../utils/tree';
+import {decodeUriFragment} from '../../utils';
 //function handleOperation(e, t, n) { t = emitGroup
+
+//function pn(e) {
+//return '/' + e.map(encodeUriFragment).join('/');
+//}
 
 function getNodeWithException(dom, nodeid) {
   const node = dom.nodes[nodeid];
@@ -38,7 +49,7 @@ function handleOperation(dom, patch, notifier) {
 
     switch (operation.op) {
       case nodeOperations.AddNode:
-        return (function (dom, operation, notifier) {
+        return (function (dom, operation) {
           const {node} = operation;
 
           const parentNode = node.parentId
@@ -55,7 +66,6 @@ function handleOperation(dom, patch, notifier) {
                 );
               }
 
-              console.log('applyPatch', operation);
               nodeInstance = new GraphNode(node, parentNode);
               break;
             case NodeCategories.SourceMap:
@@ -94,23 +104,86 @@ function handleOperation(dom, patch, notifier) {
             dom.nodesByType[nodeInstance.type] || [];
           dom.nodesByType[nodeInstance.type].push(nodeInstance);
           return operation;
+        })(dom, operation);
+      case nodeOperations.MoveNode:
+        return (function (dom, operation, notifier) {
+          const node = getNodeWithException(dom, operation.id); // r
+
+          const {uri} = node;
+
+          if (operation.newParentId === null) {
+            node.parent = undefined;
+          } else if (
+            operation.newParentId &&
+            node.parentId !== operation.newParentId
+          ) {
+            const parent = getNodeWithException(dom, operation.newParentId);
+
+            if (!parent) {
+              throw new ReferenceError(
+                `Parent with "${operation.newParentId}" id not found. Move cannot be completed`,
+              );
+            }
+
+            node.parent = parent;
+          }
+
+          if (operation.newPath && node.path !== operation.newPath) {
+            node.path = operation.newPath;
+          }
+
+          notifier.emit(
+            eventTypes.DidMoveNode,
+            Object.assign(Object.assign({}, operation), {
+              oldUri: uri,
+            }),
+          );
+
+          return operation;
+        })(dom, operation, notifier);
+      case nodeOperations.RemoveNode:
+        return (function (dom, operation, notifier) {
+          // e,t,n
+          //const r = In(dom, operation.id)
+          const node = getNodeWithException(dom, operation.id); // r
+          if (node.parent) {
+            pull(node.parent.children, node);
+          }
+
+          (function recursiveRemove(dom, _node) {
+            // t,n
+            for (const child of _node.children) {
+              recursiveRemove(dom, child);
+            }
+
+            delete dom.nodes[_node.id];
+            delete dom.nodesByUri[_node.uri];
+            remove(dom.nodesByType[_node.type], (e) => _node.id === e.id);
+          })(dom, node);
+
+          notifier.emit(
+            eventTypes.DidRemoveNode,
+            Object.assign(Object.assign({}, operation)),
+          );
+          return operation;
         })(dom, operation, notifier);
       case nodeOperations.SetSourceNodeProp:
         return setNodeProp(dom, operation);
       case nodeOperations.PatchSourceNodeProp:
         return (function (dom, operation) {
-          // e,t
-          const node = getNodeWithException(dom, operation.id); // r
-
-          if (NodeCategories.Source !== node.category) {
+          const sourceNode = getNodeWithException(dom, operation.id); // r
+          if (NodeCategories.Source !== sourceNode.category) {
             throw new Error(
               'Setting the raw property is only allowed on source nodes.',
             );
           }
-
-          const nodeProp = get(node, operation.prop);
-          const patchedNodeProp = patchSourceNodeProp(nodeProp, operation.prop);
-          set(node, operation.prop, patchedNodeProp);
+          const parsedSpec = get(sourceNode, operation.prop);
+          const patchedNodeProp = patchSourceNodeProp(
+            parsedSpec,
+            operation.value,
+          );
+          set(sourceNode, operation.prop, patchedNodeProp);
+          notifier.emit(eventTypes.DidPatchSourceNodeProp, operation);
           return operation;
         })(dom, operation);
       default:
@@ -119,26 +192,27 @@ function handleOperation(dom, patch, notifier) {
   };
 }
 
-function patchNodeProp(nodeProp, value) {
+function patchNodeProp(spec, operation) {
   // e, t
-  if (nodeOperations.Text === value.op) {
-    const nodeProp = String(nodeProp || '');
-    return `${nodeProp.slice(0, value.offset)}${value.value}${nodeProp.slice(
-      value.offset + value.length,
+  if (nodeOperations.Text === operation.op) {
+    const spec = String(spec || '');
+    return `${spec.slice(0, operation.offset)}${operation.value}${spec.slice(
+      operation.offset + operation.length,
     )}`;
   }
 
   if (
-    value.path.length === 0 &&
-    (nodeOperations.Add === value.op || nodeOperations.Replace === value.op)
+    operation.path.length === 0 &&
+    (nodeOperations.Add === operation.op ||
+      nodeOperations.Replace === operation.op)
   ) {
-    return value.value;
+    return operation.value;
   }
 
-  if (nodeOperations.Move === value.op) {
-    const n = value.from.slice(0, -1);
+  if (nodeOperations.Move === operation.op) {
+    const n = operation.from.slice(0, -1);
 
-    if (isEqual(n, value.path.slice(0, -1))) {
+    if (isEqual(n, operation.path.slice(0, -1))) {
       return {};
       //return hn(e || {}, (e) =>
       //t.path.length > 1
@@ -160,17 +234,66 @@ function patchNodeProp(nodeProp, value) {
       //);
     }
   }
+
+  if (
+    nodeOperations.Add === operation.op ||
+    nodeOperations.Replace === operation.op
+  ) {
+    return produce(spec || {}, (draftSpec) => {
+      !(function (draftSpec, operation) {
+        const {path, value, op} = operation;
+        if (!isObject(draftSpec)) {
+          return draftSpec;
+        }
+
+        const totalItems = path.length; //i
+        const lastIndex = totalItems - 1; // o
+        let counter = -1; //a
+        let initialSpec = draftSpec; // s
+
+        for (; initialSpec != null && totalItems > ++counter; ) {
+          let decodedPath = decodeUriFragment(String(path[counter])); //e
+          let initialValue = value; //i
+
+          if (lastIndex !== counter) {
+            const schema = initialSpec[decodedPath]; // n
+            initialValue = isObject(schema)
+              ? schema
+              : isHyphenOnly(String(path[counter + 1]))
+              ? []
+              : {};
+          }
+
+          if (decodedPath === '-' && Array.isArray(initialSpec)) {
+            decodedPath = String(initialSpec.length);
+          }
+
+          if (
+            nodeOperations.Add === op &&
+            !Number.isNaN(Number(decodedPath)) &&
+            Array.isArray(initialSpec) &&
+            lastIndex === counter
+          ) {
+            initialSpec.splice(Number(decodedPath), 0, initialValue);
+          } else {
+            initialSpec[decodedPath] = initialValue;
+          }
+
+          initialSpec = initialSpec[decodedPath];
+        }
+      })(draftSpec, operation);
+    });
+  } else {
+    return spec;
+  }
 }
 
-const patchSourceNodeProp = (nodeProp, operation) => {
-  let values = operation.value;
-  let _nodeProp = nodeProp;
+const patchSourceNodeProp = (spec, values) => {
+  let _spec = spec;
   for (const value of values) {
-    // e of t
-    _nodeProp = patchNodeProp(nodeProp, value);
+    _spec = patchNodeProp(spec, value);
   }
-
-  return _nodeProp;
+  return _spec;
 };
 
 export {handleOperation};

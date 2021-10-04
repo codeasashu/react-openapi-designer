@@ -25,7 +25,7 @@ const NodeEditor = ({node, placeholder}) => {
           onBlur();
       }
     },
-    [node, onBlur],
+    [node, store, onInput],
   );
 
   const onFocus = React.useCallback((e) => {

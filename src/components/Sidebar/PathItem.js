@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {observer} from 'mobx-react';
 import {StoresContext} from '../Tree/context';
-import {EditableText} from '@blueprintjs/core';
+import EditableText from './EditableText';
 
 const methodColors = {
   get: 'success',
@@ -50,13 +50,10 @@ const PathItem = observer(({isEdited, node}) => {
 
     const activeNode = isActiveNode || !!activeId;
 
-    console.log('metadata', node.metadata.operations.items);
-
     methodsTags = (
       <div className="uppercase mt-1 mb-1 truncate">
         {node.metadata.operations.items.map(({method, id}) => {
-          console.log('pe', method, id);
-          return (
+          return method ? (
             <span
               key={id}
               className={classnames(
@@ -73,7 +70,7 @@ const PathItem = observer(({isEdited, node}) => {
               )}>
               {method}
             </span>
-          );
+          ) : null;
         })}
       </div>
     );

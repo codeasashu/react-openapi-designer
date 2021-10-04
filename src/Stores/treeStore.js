@@ -163,7 +163,6 @@ class Store {
     const {expanded} = this.state; // n
 
     if (expand === undefined || expanded[node.id] !== expand) {
-      console.log('change expand', expanded, node.id);
       this.someprop = node.id;
       this.state.setExpandedKeyVal(
         node.id,

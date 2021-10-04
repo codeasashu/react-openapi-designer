@@ -17,7 +17,7 @@ class UiStore {
         if (nodeUri === undefined) {
           this.chosenSymbolNodeUri = undefined;
           this.activeSourceNode = undefined;
-          delete this._preferences.activeSourceNodeUri;
+          //delete this._preferences.activeSourceNodeUri;
         } else {
           this.chosenSymbolNodeUri =
             this._preferences['activeSymbolNodeUri.' + nodeUri];
@@ -157,7 +157,6 @@ class UiStore {
     this.stores.graphStore.eventEmitter.on(
       eventTypes.GraphNodeAdd,
       ({node}) => {
-        console.log('node Added ui', node);
         this.handleAddNode({node});
       },
     );

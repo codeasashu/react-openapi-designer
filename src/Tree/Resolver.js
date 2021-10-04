@@ -1,4 +1,5 @@
 import {get} from 'lodash';
+import {toJS} from 'mobx';
 import {
   generateUUID,
   NodeTypes,
@@ -72,7 +73,6 @@ const mapSchema = (node, parent, metadata) => {
     });
   }
 
-  console.log('got invalid node', node);
   throw new Error('Invalid node provided');
 };
 
@@ -317,7 +317,7 @@ function _resolveResponses(treeNode) {
   const node = this.stores.graphStore.getNodeById(treeNode.id);
   if (node && NodeCategories.SourceMap === node.category) {
     return node.children
-      .filter(isParameterNode)
+      .filter(isResponseNode)
       .map((child) => getChildNode(child, node));
   } else {
     return [];
@@ -357,10 +357,9 @@ function _resolvePathNode(treeNode) {
       return getChildNode(pathitem, node, {
         operations: new OperationNode(
           sortOperations(pathitem.children, 'path').map((_node) => {
-            console.log('path ops', _node);
             return {
               id: _node.id,
-              method: _node.method,
+              method: _node.path,
             };
           }),
         ),
@@ -386,7 +385,6 @@ function _resolveAllNodes(node) {
     activeSourceNode.children.find(
       (node) => NodeTypes.Components === node.type,
     ) || activeSourceNode; //u
-  console.log('components', components.children);
   const paths = activeSourceNode.children.find(isPathsNode); //c
   const models =
     components == null
@@ -409,7 +407,6 @@ function _resolveAllNodes(node) {
       ? undefined
       : components.children.find((e) => e.type === NodeTypes.RequestBodies); // p
 
-  console.log('models', requestBodies, responses, parameters, examples);
   return [
     {
       id: info ? info.id : generateUUID(),

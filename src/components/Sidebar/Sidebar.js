@@ -11,14 +11,6 @@ const Sidebar = observer((props) => {
   const stores = React.useContext(StoresContext);
   const handleScroll = () => {};
 
-  const rowHeight = (e) =>
-    'path' === e.type &&
-    e.metadata !== undefined &&
-    'operations' in e.metadata &&
-    e.metadata.operations.items.length > 0
-      ? 50
-      : 30;
-
   const rowRenderer = React.useCallback(
     (node, rowOptions) => {
       if (node.type === NodeTypes.Path) {
@@ -48,7 +40,8 @@ const Sidebar = observer((props) => {
       store={stores.designTreeStore.treeStore}
       stores={stores}
       draggable={false}
-      rowHeight={rowHeight}
+      rowHeight={stores.designTreeStore.rowHeight}
+      generateContextMenu={stores.designTreeStore.generateContextMenu}
       rowRenderer={rowRenderer}
       itemClassName="DesignTreeListItem"
       className="SidebarTreeList"

@@ -1,10 +1,19 @@
-import {makeObservable, action, observable, reaction, computed} from 'mobx';
+import {
+  makeObservable,
+  runInAction,
+  action,
+  observable,
+  reaction,
+  computed,
+} from 'mobx';
 import {
   eventTypes,
   raiseErrorIfNotParentNode,
   NodeTypes,
   isOperationNode,
   isParentNode,
+  generateUUID,
+  nodeOperations,
 } from '../utils/tree';
 import ComputedTree from '../Tree/ComputedTree';
 import Tree from '../Tree/Tree';
@@ -14,6 +23,10 @@ import TreeStore from '../Tree/Store';
 import TreeState from '../Tree/State';
 import ApiTreeStore from './apiTreeStore';
 import {icons} from '../model';
+import Node from '../Tree/Node';
+import PathNode from './nodes/pathNode';
+import ModelNode from './nodes/modelNode';
+import ParentNode from '../Tree/ParentNode';
 
 class DesignTreeStore extends ApiTreeStore {
   activeTreeNode;
@@ -38,43 +51,39 @@ class DesignTreeStore extends ApiTreeStore {
         menuItems.push({
           text: 'New Path',
           onClick: () => {
-            console.log('add new path');
-            this.treeStore.events.emit(eventTypes.CreatePath, node.id);
+            this.treeStore.events.emit(eventTypes.CreatePath, node);
           },
         });
       } else if (node.type === 'models') {
         menuItems.push({
           text: 'New Model',
           onClick: () => {
-            this.treeStore.events.emit(eventTypes.CreateModel, node.id);
+            this.treeStore.events.emit(eventTypes.CreateModel, node);
           },
         });
       } else if (node.type === 'responses') {
         menuItems.push({
           text: 'New Response',
           onClick: () => {
-            console.log('add new response');
-            this.treeStore.events.emit(eventTypes.CreateResponse, node.id);
+            this.treeStore.events.emit(eventTypes.CreateResponse, node);
           },
         });
       } else if (node.type === 'examples') {
         menuItems.push({
           text: 'New Example',
           onClick: () => {
-            console.log('add new example');
-            this.treeStore.events.emit(eventTypes.CreateExample, node.id);
+            this.treeStore.events.emit(eventTypes.CreateExample, node);
           },
         });
       } else if (node.type === 'parameters') {
         ['query', 'path', 'header', 'cookie'].forEach((param) => {
-          const paramName = param[0].toUpperCase() + param.slice(1);
+          const parameterType = param[0].toUpperCase() + param.slice(1);
           menuItems.push({
-            text: `New ${paramName} parameter`,
+            text: `New ${parameterType} parameter`,
             onClick: () => {
-              console.log(`add new ${param} parameter`);
               this.treeStore.events.emit(eventTypes.CreateParameter, {
-                nodeid: node.id,
-                parameter: paramName,
+                node,
+                parameterType,
               });
             },
           });
@@ -83,8 +92,7 @@ class DesignTreeStore extends ApiTreeStore {
         menuItems.push({
           text: 'New Request Body',
           onClick: () => {
-            console.log('add new requestBody');
-            this.treeStore.events.emit(eventTypes.CreateRequestBody, node.id);
+            this.treeStore.events.emit(eventTypes.CreateRequestBody, node);
           },
         });
       }
@@ -110,7 +118,7 @@ class DesignTreeStore extends ApiTreeStore {
             text: 'Rename',
 
             onClick: () => {
-              this.treeStore.events.emit(eventTypes.RenameNode, node.id);
+              this.treeStore.events.emit(eventTypes.RenameNode, node);
             },
           },
           {
@@ -131,10 +139,23 @@ class DesignTreeStore extends ApiTreeStore {
             text: '' + item.method.toUpperCase(),
             onClick: () => {
               console.log('deleting operation for', item, node);
-              this.treeStore.events.emit(eventTypes.DeleteHttpMethod, {
-                nodeid: node.id,
-                method: item.id,
-              });
+
+              const _node = this.stores.graphStore.getNodeById(item.id);
+              this.stores.graphStore.graph.patchSourceNodeProp(
+                _node.parentSourceNode.id,
+                'data.parsed',
+                [
+                  {
+                    op: nodeOperations.Remove,
+                    path: _node.relativeJsonPath,
+                  },
+                ],
+              );
+              this.invalidateTree();
+              //this.treeStore.events.emit(eventTypes.DeleteHttpMethod, {
+              //nodeid: node.id,
+              //method: item.id,
+              //});
             },
           })),
         });
@@ -143,16 +164,16 @@ class DesignTreeStore extends ApiTreeStore {
       return menuItems;
     };
 
-    this.rowHeight = (e) =>
-      'path' === e.type &&
-      e.metadata !== undefined &&
-      'operations' in e.metadata &&
-      e.metadata.operations.items.length > 0
+    this.rowHeight = (e) => {
+      return NodeTypes.Path === e.type &&
+        e.metadata !== undefined &&
+        'operations' in e.metadata &&
+        e.metadata.operations.items.length > 0
         ? 50
         : 30;
+    };
 
     this.handleNodeClick = (e, node) => {
-      console.log('clicked node', node, e);
       switch (node.type) {
         case NodeTypes.Models:
         case NodeTypes.Paths:
@@ -160,7 +181,6 @@ class DesignTreeStore extends ApiTreeStore {
         case NodeTypes.Parameters:
         case NodeTypes.RequestBodies:
         case NodeTypes.Examples:
-          console.log('clicked nod2', node);
           raiseErrorIfNotParentNode(node);
           this.treeStore.toggleExpand(node);
           break;
@@ -181,6 +201,32 @@ class DesignTreeStore extends ApiTreeStore {
           break;
         default:
           this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
+      }
+    };
+
+    this.createNewNode = async (node, parent, validator) => {
+      try {
+        let newNode = Object.assign(
+          {
+            id: generateUUID(),
+            name: '',
+            parent,
+          },
+          node,
+        );
+
+        this.newNodeId = newNode.id;
+        const _newNode = await this.treeStore.create(
+          isParentNode(newNode) ? new ParentNode(newNode) : new Node(newNode),
+          parent,
+          validator,
+        );
+
+        this.tree.removeNode(_newNode);
+
+        return _newNode;
+      } finally {
+        this.newNodeId = undefined;
       }
     };
 
@@ -260,12 +306,187 @@ class DesignTreeStore extends ApiTreeStore {
   }
 
   registerEventListeners() {
+    this.registerGraphEventListeners();
+    this.registerTreeEventListeners();
+  }
+
+  async createRequestBody(parentNode) {
+    const sourceNode = this.stores.graphStore.rootNode;
+    if (!isParentNode(parentNode)) {
+      throw new Error(`Provided node is not a parent node ${parentNode.id}`);
+    }
+    const {name} = await this.createNewNode(
+      {type: NodeTypes.RequestBody},
+      parentNode,
+    );
+    this.stores.oasStore.addSharedRequestBody({
+      sourceNodeId: sourceNode.id,
+      name,
+    });
+  }
+
+  async createExample(parentNode) {
+    const sourceNode = this.stores.graphStore.rootNode;
+    if (!isParentNode(parentNode)) {
+      throw new Error(`Provided node is not a parent node ${parentNode.id}`);
+    }
+    const {name} = await this.createNewNode(
+      {type: NodeTypes.Example},
+      parentNode,
+    );
+
+    this.stores.oasStore.addSharedExample({
+      sourceNodeId: sourceNode.id,
+      name,
+    });
+  }
+
+  async createResponse(parentNode) {
+    const sourceNode = this.stores.graphStore.rootNode;
+    if (!isParentNode(parentNode)) {
+      throw new Error(`Provided node is not a parent node ${parentNode.id}`);
+    }
+    const {name} = await this.createNewNode(
+      {type: NodeTypes.Response},
+      parentNode,
+    );
+
+    this.stores.oasStore.addSharedResponse({
+      sourceNodeId: sourceNode.id,
+      name,
+    });
+  }
+
+  async createParameter({node: parentNode, parameterType}) {
+    const sourceNode = this.stores.graphStore.rootNode;
+    if (!isParentNode(parentNode)) {
+      throw new Error(`Provided node is not a parent node ${parentNode.id}`);
+    }
+    const {name} = await this.createNewNode(
+      {type: NodeTypes.Parameter},
+      parentNode,
+    );
+
+    this.stores.oasStore.addSharedParameter({
+      sourceNodeId: sourceNode.id,
+      name,
+      parameterType,
+    });
+  }
+
+  async createPath(parentNode) {
+    if (!isParentNode(parentNode)) {
+      throw new Error(`Provided node is not a parent node ${parentNode.id}`);
+    }
+
+    const {name} = await this.createNewNode(
+      {
+        type: NodeTypes.Path,
+      },
+      parentNode,
+    );
+
+    const pathNode = new PathNode({path: name, parentNodeId: parentNode.id});
+    pathNode.create(this.stores.graphStore);
+  }
+
+  async createModel(parentNode) {
+    if (!isParentNode(parentNode)) {
+      throw new Error(`Provided node is not a parent node ${parentNode.id}`);
+    }
+
+    const {name} = await this.createNewNode(
+      {
+        type: NodeTypes.Model,
+      },
+      parentNode,
+    );
+
+    const modelNode = new ModelNode({name, parentNodeId: parentNode.id});
+    modelNode.create(this.stores.graphStore);
+  }
+
+  async deleteNode(nodeId) {
+    //const node = this.stores.graphStore.getNodeById(nodeId);
+    await this.stores.graphStore.removeNode(nodeId);
+    this.invalidateTree();
+  }
+
+  async renameNode(node) {
+    if (node === null) {
+      throw new TypeError('Called DesignTreeCommands.Rename on root');
+    }
+
+    const isComponentNode =
+      NodeTypes.Model === node.type ||
+      NodeTypes.Response === node.type ||
+      NodeTypes.Parameter === node.type ||
+      NodeTypes.Example === node.type ||
+      NodeTypes.RequestBody === node.type;
+
+    const {name} = await this.treeStore.rename(node);
+
+    if (isComponentNode) {
+      this.stores.graphStore.renameNode(node.id, name);
+    } else {
+      if (NodeTypes.Path === node.type) {
+        this.stores.oasStore.path.updatePath(name, node.id);
+      }
+    }
+
+    runInAction(() => {
+      node.name = name;
+    });
+  }
+
+  registerTreeEventListeners() {
+    this.treeStore.events.on(
+      eventTypes.CreateRequestBody,
+      this.createRequestBody.bind(this),
+    );
+
+    this.treeStore.events.on(
+      eventTypes.CreateExample,
+      this.createExample.bind(this),
+    );
+
+    this.treeStore.events.on(
+      eventTypes.CreateResponse,
+      this.createResponse.bind(this),
+    );
+
+    this.treeStore.events.on(
+      eventTypes.CreateParameter,
+      this.createParameter.bind(this),
+    );
+
+    this.treeStore.events.on(eventTypes.CreatePath, this.createPath.bind(this));
+    this.treeStore.events.on(
+      eventTypes.CreateModel,
+      this.createModel.bind(this),
+    );
+
+    this.treeStore.events.on(eventTypes.DeleteNode, this.deleteNode.bind(this));
+    this.treeStore.events.on(eventTypes.RenameNode, this.renameNode.bind(this));
+
+    //this.treeStore.events.on(
+    //eventTypes.CreateModel,
+    //this.createModel.bind(this),
+    //);
+  }
+
+  registerGraphEventListeners() {
+    //this.stores.graphStore.eventEmitter.on(
+    //eventTypes.DidPatchSourceNodePropComplete,
+    //action(() => {
+    //this.invalidateTree();
+    //}),
+    //);
+
     this.stores.graphStore.eventEmitter.on(
       eventTypes.DidAddSourceMapNode,
       action(({node: {id}}) => {
         const node = this.stores.graphStore.getNodeById(id); // t
-
-        console.log('AAdded SourceMapNode', node);
         if (node === undefined || node.parentId === undefined) {
           return;
         }
@@ -278,7 +499,6 @@ class DesignTreeStore extends ApiTreeStore {
           node.type === NodeTypes.Examples ||
           node.type === NodeTypes.RequestBodies
         ) {
-          console.log('invaalid tree');
           //this.invalidateTree();
           this.treeStore.tree.invalidate();
           return;
@@ -301,9 +521,9 @@ class DesignTreeStore extends ApiTreeStore {
           } else {
             if (isParentNode(parentNode)) {
               this.tree.insertNode(getChildNode(node, parentNode), parentNode);
-              this.invalidateTree();
             }
           }
+          this.invalidateTree();
         }
       }),
     );
