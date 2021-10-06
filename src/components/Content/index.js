@@ -1,10 +1,11 @@
-import React, {useState, useEffect} from 'react';
+import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {useLocation, useHistory} from 'react-router-dom';
-import {OpenApiBuilder} from 'openapi3-ts';
+//import {useLocation, useHistory} from 'react-router-dom';
+import {useHistory} from 'react-router-dom';
+//import {OpenApiBuilder} from 'openapi3-ts';
 import styled from 'styled-components';
-import {getJsonPointerFromUrl} from '../../utils';
-import {getModuleFromJsonPointer, ModuleNames} from '../../model';
+//import {getJsonPointerFromUrl} from '../../utils';
+//import {getModuleFromJsonPointer, ModuleNames} from '../../model';
 import Options from './options';
 import Info from './info';
 import PathContent from './path';
@@ -12,44 +13,60 @@ import ModelContent from './model';
 import Parameter from './parameter';
 import Response from './response';
 import YamlEditor from '../Editor/yaml';
+import {observer} from 'mobx-react-lite';
+import {StoresContext} from '../Tree/context';
+import {NodeCategories, NodeTypes} from '../../utils/tree';
 
 const StyledContent = styled.div`
   width: calc(80% - 2px);
 `;
 
-function useQuery() {
-  const query = new URLSearchParams(useLocation().search);
-  const path = query.get('path');
-  return {path};
-}
+//function useQuery() {
+//const query = new URLSearchParams(useLocation().search);
+//const path = query.get('path');
+//return {path};
+//}
 
-const SubContent = () => {
-  const {path} = useQuery();
-  const [pointer, setPointer] = useState(getJsonPointerFromUrl(path));
-  useEffect(() => {
-    setPointer(getJsonPointerFromUrl(path));
-  }, [path]);
-  const moduleName = getModuleFromJsonPointer(pointer);
+const SubContent = ({node}) => {
+  //const {path} = useQuery();
+  //const [pointer, setPointer] = useState(getJsonPointerFromUrl(path));
+  //useEffect(() => {
+  //setPointer(getJsonPointerFromUrl(path));
+  //}, [path]);
+  //const moduleName = getModuleFromJsonPointer(pointer);
+
+  let relativeJsonPath = [];
+  if (node.category === NodeCategories.SourceMap) {
+    relativeJsonPath = node.relativeJsonPath;
+  }
   return (
     <>
-      {moduleName === ModuleNames.info && <Info />}
-      {moduleName === ModuleNames.paths && (
-        <PathContent path={path} relativeJsonPath={pointer} />
+      {node.type === NodeTypes.Info && <Info />}
+      {node.type === NodeTypes.Path && (
+        <PathContent relativeJsonPath={relativeJsonPath} node={node} />
       )}
-      {moduleName === ModuleNames.responses && (
-        <Response relativeJsonPath={pointer} />
+      {node.type === NodeTypes.Response && (
+        <Response relativeJsonPath={relativeJsonPath} node={node} />
       )}
-      {moduleName === ModuleNames.models && (
-        <ModelContent relativeJsonPath={pointer} />
+      {node.type === NodeTypes.Model && (
+        <ModelContent relativeJsonPath={relativeJsonPath} node={node} />
       )}
-      {moduleName === ModuleNames.parameters && (
-        <Parameter relativeJsonPath={pointer} />
+      {node.type === NodeTypes.Parameter && (
+        <Parameter relativeJsonPath={relativeJsonPath} node={node} />
       )}
     </>
   );
 };
 
-export default function Content({openapi}) {
+SubContent.propTypes = {
+  node: PropTypes.object,
+};
+
+const Content = observer(() => {
+  const stores = React.useContext(StoresContext);
+  const {activeNode} = stores.uiStore;
+  const sourceNode = stores.graphStore.rootNode;
+  console.log('storesc', stores.uiStore, activeNode, sourceNode);
   let history = useHistory();
   const [currentView, setCurrentView] = useState('form');
 
@@ -64,18 +81,19 @@ export default function Content({openapi}) {
           onToggleView={toggleView}
           onDelete={() => history.replace('/')}
         />
-        {currentView === 'form' && <SubContent />}
+        {currentView === 'form' && (
+          <SubContent node={activeNode || sourceNode} />
+        )}
         {currentView === 'code' && (
-          <YamlEditor
-            value={OpenApiBuilder.create(openapi).getSpecAsYaml()}
-            onChange={() => {}}
-          />
+          <YamlEditor value={''} onChange={() => {}} />
         )}
       </div>
     </StyledContent>
   );
-}
+});
 
 Content.propTypes = {
   openapi: PropTypes.object,
 };
+
+export default Content;

@@ -183,6 +183,7 @@ class DesignTreeStore extends ApiTreeStore {
         case NodeTypes.Examples:
           raiseErrorIfNotParentNode(node);
           this.treeStore.toggleExpand(node);
+          this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
           break;
         case NodeTypes.Overview:
           this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
@@ -288,6 +289,7 @@ class DesignTreeStore extends ApiTreeStore {
   }
 
   setActiveNode(node) {
+    //console.log('set active node', node);
     this.stores.uiStore.setActiveNode(node);
 
     //if (NodeCategories.SourceMap === node.category) {

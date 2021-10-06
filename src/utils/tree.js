@@ -48,6 +48,7 @@ export const nodeOperations = {
   MoveNode: 'move_node',
   Add: 'add_child_node',
   Move: 'move_child_node',
+  Replace: 'replace_child_node',
   Remove: 'remove_child_node',
 };
 

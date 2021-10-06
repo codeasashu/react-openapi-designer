@@ -1,29 +1,15 @@
 //@flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import {get} from 'lodash';
-import {useSelector, useDispatch} from 'react-redux';
-import {handleModelChange} from 'store/modules/openapi';
+import {observer} from 'mobx-react-lite';
 import SchemaDesigner from '../Designer/Schema';
 import {TitleEditor, MarkdownEditor} from '../Editor';
+import {usePatchOperation, getValueFromStore} from '../../utils/selectors';
+import {nodeOperations} from '../../utils/tree';
 
-const ModelContent = ({relativeJsonPath}) => {
-  const name = relativeJsonPath.slice(-1).pop();
-  const dispatch = useDispatch();
-
-  const changeModel = React.useCallback(
-    (path, value) => dispatch(handleModelChange({path, value})),
-    [dispatch],
-  );
-
-  const title = useSelector(
-    ({openapi}) =>
-      get(openapi, relativeJsonPath.concat(['title']), name) || name,
-  );
-  const description = useSelector(({openapi}) =>
-    get(openapi, relativeJsonPath.concat(['description'])),
-  );
-  const schema = useSelector(({openapi}) => get(openapi, relativeJsonPath));
+const ModelContent = observer(({relativeJsonPath, node}) => {
+  const handlePatch = usePatchOperation();
+  const schema = getValueFromStore(relativeJsonPath);
 
   return schema ? (
     <div className="flex-1 relative">
@@ -32,10 +18,14 @@ const ModelContent = ({relativeJsonPath}) => {
           <div className="flex pl-2 justify-between">
             <TitleEditor
               xl
-              value={title}
-              onChange={(e) =>
-                changeModel(relativeJsonPath.concat(['title']), e.target.value)
-              }
+              value={schema?.title || node.path}
+              onChange={(e) => {
+                handlePatch(
+                  nodeOperations.Replace,
+                  relativeJsonPath.concat(['title']),
+                  e.target.value,
+                );
+              }}
             />
           </div>
           <div className="flex-1">
@@ -43,9 +33,13 @@ const ModelContent = ({relativeJsonPath}) => {
               <MarkdownEditor
                 className="CodeEditor mb-8 relative hover:bg-darken-2 rounded-lg"
                 placeholder="Description...."
-                value={description}
+                value={schema?.description || ''}
                 onChange={(e) =>
-                  changeModel(relativeJsonPath.concat(['description']), e)
+                  handlePatch(
+                    nodeOperations.Replace,
+                    relativeJsonPath.concat(['description']),
+                    e,
+                  )
                 }
               />
             </div>
@@ -55,7 +49,9 @@ const ModelContent = ({relativeJsonPath}) => {
               dark
               initschema={schema}
               namespace="model"
-              onChange={(e) => changeModel(relativeJsonPath, e)}
+              onChange={(e) => {
+                handlePatch(nodeOperations.Replace, relativeJsonPath, e);
+              }}
             />
           </div>
         </div>
@@ -64,10 +60,11 @@ const ModelContent = ({relativeJsonPath}) => {
   ) : (
     <p>No Schema found</p>
   );
-};
+});
 
 ModelContent.propTypes = {
   relativeJsonPath: PropTypes.array,
+  node: PropTypes.object,
 };
 
 export default ModelContent;

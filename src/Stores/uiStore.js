@@ -1,8 +1,63 @@
-import {observable, reaction, action} from 'mobx';
+import {observable, computed, reaction, action, makeObservable} from 'mobx';
 import {NodeCategories, eventTypes} from '../utils/tree';
 
+//Object(h.d)([p.observable], so.prototype, "fullscreen", undefined)
+//Object(h.d)([p.observable], so.prototype, "_showStuckDialog", undefined)
+//Object(h.d)([p.observable], so.prototype, "_smallLayout", undefined)
+//Object(h.d)([p.observable.ref], so.prototype, "_preferences", undefined)
+//Object(h.d)([p.action.bound], so.prototype, "toggleFullscreen", null)
+//Object(h.d)([p.computed], so.prototype, "showStuckDialog", null)
+//Object(h.d)([p.computed], so.prototype, "smallLayout", null)
+//Object(h.d)([p.computed], so.prototype, "twoPanels", null)
+//Object(h.d)([p.action], so.prototype, "setActiveSidebarTree", null)
+//Object(h.d)([p.computed], so.prototype, "activeSidebarTree", null)
+//Object(h.d)([p.computed], so.prototype, "activeLayout", null)
+//Object(h.d)([p.observable], so.prototype, "_chosenSourceNodeUri", undefined)
+//Object(h.d)([p.computed], so.prototype, "chosenSourceNodeUri", null)
+//Object(h.d)([p.computed], so.prototype, "activeSourceNodeId", null)
+//Object(h.d)([p.observable.ref], so.prototype, "activeSourceNode", undefined)
+//Object(h.d)([p.action], so.prototype, "assignMatchingSourceNode", null)
+//Object(h.d)([p.observable], so.prototype, "_chosenSymbolNodeUri", undefined)
+//Object(h.d)([p.computed], so.prototype, "chosenSymbolNodeUri", null)
+//Object(h.d)([p.computed], so.prototype, "activeSymbolNodeId", null)
+//Object(h.d)([p.observable.ref], so.prototype, "activeSymbolNode", undefined)
+//Object(h.d)([p.action], so.prototype, "assignMatchingSymbolNode", null)
+//Object(h.d)([p.computed], so.prototype, "activeNodeId", null)
+//Object(h.d)([p.computed], so.prototype, "activeNode", null)
+//Object(h.d)([p.computed], so.prototype, "activeHttpSpecNode", null)
+//Object(h.d)([p.computed], so.prototype, "sidebarWidth", null)
+//Object(h.d)([p.computed], so.prototype, "sidebarActiveTreeHeight", null)
+
 class UiStore {
+  _chosenSourceNodeUri;
+  _chosenSymbolNodeUri;
+
+  activeSourceNode;
+  activeSymbolNode;
+
   constructor(stores) {
+    makeObservable(this, {
+      toggleFullscreen: action.bound,
+      setActiveSidebarTree: action,
+      activeSidebarTree: computed,
+      //activeLayout: computed,
+
+      _chosenSourceNodeUri: observable,
+      chosenSourceNodeUri: computed,
+      activeSourceNodeId: computed,
+      activeSourceNode: observable.ref,
+      assignMatchingSourceNode: action,
+
+      _chosenSymbolNodeUri: observable,
+      chosenSymbolNodeUri: computed,
+      activeSymbolNodeId: computed,
+      activeSymbolNode: observable.ref,
+      assignMatchingSymbolNode: action,
+
+      activeNode: computed,
+      activeNodeId: computed,
+    });
+
     this.stores = stores;
     this._layouts = new Map();
     this.fullscreen = false;
@@ -13,7 +68,7 @@ class UiStore {
 
     reaction(
       () => this.chosenSourceNodeUri,
-      action((nodeUri) => {
+      (nodeUri) => {
         if (nodeUri === undefined) {
           this.chosenSymbolNodeUri = undefined;
           this.activeSourceNode = undefined;
@@ -24,7 +79,7 @@ class UiStore {
           this.assignMatchingSourceNode();
           this._preferences.activeSourceNodeUri = nodeUri;
         }
-      }),
+      },
       {
         fireImmediately: true,
       },
@@ -39,7 +94,7 @@ class UiStore {
             'activeSymbolNodeUri.' + this.chosenSourceNodeUri
           ];
         } else {
-          this.assignMatchingSourceNode();
+          this.assignMatchingSymbolNode();
           this._preferences['activeSymbolNodeUri.' + this.chosenSourceNodeUri] =
             nodeUri;
         }
@@ -186,7 +241,7 @@ class UiStore {
     return this._preferences.activeSidebarTree;
   }
 
-  get chosenSourceNodeUri() {
+  @computed get chosenSourceNodeUri() {
     return this._chosenSourceNodeUri;
   }
 
@@ -215,7 +270,7 @@ class UiStore {
     }
   }
 
-  get chosenSymbolNodeUri() {
+  @computed get chosenSymbolNodeUri() {
     return this._chosenSymbolNodeUri;
   }
 
@@ -255,10 +310,7 @@ class UiStore {
   }
 
   get activeNode() {
-    if (!this.activeSymbolNode) {
-      return this.activeSourceNode;
-    }
-    return null;
+    return this.activeSymbolNode || this.activeSourceNode;
   }
 
   //get activeHttpSpecNode() {
