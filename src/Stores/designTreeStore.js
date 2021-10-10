@@ -27,6 +27,7 @@ import Node from '../Tree/Node';
 import PathNode from './nodes/pathNode';
 import ModelNode from './nodes/modelNode';
 import ParentNode from '../Tree/ParentNode';
+import {isValidPathMethod, decodeUriFragment} from '../utils';
 
 class DesignTreeStore extends ApiTreeStore {
   activeTreeNode;
@@ -38,6 +39,7 @@ class DesignTreeStore extends ApiTreeStore {
       //treeState: observable,
       activeTreeNode: observable.ref,
       activeGraphNode: computed,
+      deleteNode: action,
     });
     this.stores = e;
     this.graphRootNode = undefined;
@@ -125,7 +127,6 @@ class DesignTreeStore extends ApiTreeStore {
             text: 'Delete ' + node.type,
 
             onClick: () => {
-              console.log('Deleteing ', node.type);
               this.treeStore.events.emit(eventTypes.DeleteNode, node.id);
             },
           },
@@ -138,8 +139,6 @@ class DesignTreeStore extends ApiTreeStore {
           children: node.metadata.operations.items.map((item) => ({
             text: '' + item.method.toUpperCase(),
             onClick: () => {
-              console.log('deleting operation for', item, node);
-
               const _node = this.stores.graphStore.getNodeById(item.id);
               this.stores.graphStore.graph.patchSourceNodeProp(
                 _node.parentSourceNode.id,
@@ -289,7 +288,6 @@ class DesignTreeStore extends ApiTreeStore {
   }
 
   setActiveNode(node) {
-    //console.log('set active node', node);
     this.stores.uiStore.setActiveNode(node);
 
     //if (NodeCategories.SourceMap === node.category) {
@@ -409,9 +407,10 @@ class DesignTreeStore extends ApiTreeStore {
   }
 
   async deleteNode(nodeId) {
-    //const node = this.stores.graphStore.getNodeById(nodeId);
     await this.stores.graphStore.removeNode(nodeId);
-    this.invalidateTree();
+    runInAction(() => {
+      this.invalidateTree();
+    });
   }
 
   async renameNode(node) {
@@ -470,21 +469,9 @@ class DesignTreeStore extends ApiTreeStore {
 
     this.treeStore.events.on(eventTypes.DeleteNode, this.deleteNode.bind(this));
     this.treeStore.events.on(eventTypes.RenameNode, this.renameNode.bind(this));
-
-    //this.treeStore.events.on(
-    //eventTypes.CreateModel,
-    //this.createModel.bind(this),
-    //);
   }
 
   registerGraphEventListeners() {
-    //this.stores.graphStore.eventEmitter.on(
-    //eventTypes.DidPatchSourceNodePropComplete,
-    //action(() => {
-    //this.invalidateTree();
-    //}),
-    //);
-
     this.stores.graphStore.eventEmitter.on(
       eventTypes.DidAddSourceMapNode,
       action(({node: {id}}) => {
@@ -507,9 +494,8 @@ class DesignTreeStore extends ApiTreeStore {
         }
 
         const parentNode = this.tree.findById(node.parentId); // n
-
         if (parentNode !== undefined) {
-          if (node.category === NodeTypes.Operation) {
+          if (node.type === NodeTypes.Operation) {
             const {operations} = parentNode.metadata;
 
             operations.add({
@@ -529,37 +515,155 @@ class DesignTreeStore extends ApiTreeStore {
         }
       }),
     );
+
+    //this.stores.graphStore.eventEmitter.on(
+    //eventTypes.DidPatch,
+    //({operations}) => {
+    //if (
+    //operations.length !== 1 ||
+    //eventTypes.RemoveNode !== operations[0].op
+    //) {
+    //return;
+    //}
+    //console.log('didpaatch', operations);
+
+    //const treeNode = this.tree.findById(operations[0].id);
+
+    //if (treeNode !== undefined) {
+    //this.tree.removeNode(treeNode);
+    //}
+    //},
+    //);
+    //
+
+    this.stores.graphStore.eventEmitter.on(
+      eventTypes.DidUpdateNodeUri,
+      action(() => this.invalidateTree()),
+    );
+
+    this.stores.graphStore.eventEmitter.on(
+      eventTypes.DidMoveNode,
+      action(({id, newPath, newParentId}) => {
+        const node = this.stores.graphStore.getNodeById(id);
+
+        if (node === undefined) {
+          return;
+        }
+
+        if (NodeTypes.Operation === node.type) {
+          const parentNode = this.tree.findById(node.parent.id);
+
+          if (parentNode === undefined) {
+            return;
+          }
+
+          const {operations} = parentNode.metadata;
+
+          operations.remove(node.id);
+
+          if (isValidPathMethod(node.path)) {
+            operations.add({
+              id: node.id,
+              method: node.path,
+            });
+          }
+
+          return;
+        }
+
+        const treeNode = this.tree.findById(id);
+
+        if (treeNode !== undefined && treeNode.parent !== null) {
+          if (treeNode.parent.id !== newParentId) {
+            this.tree.removeNode(treeNode);
+            this.tree.insertNode(treeNode, treeNode.parent);
+          }
+
+          if (newPath !== undefined && treeNode.name !== newPath) {
+            treeNode.name =
+              NodeTypes.Path === treeNode.type
+                ? decodeUriFragment(newPath)
+                : newPath;
+          }
+        }
+      }),
+    );
+
+    //this.stores.graphStore.eventEmitter.on(
+    //eventTypes.DidChangeSourceNode,
+    //action(({change: {prop: e, id: t}}) => {
+    //console.log('In changeSourceNode', e, t);
+    //if (e !== 'spec') {
+    //return;
+    //}
+
+    //const n = this.stores.graphStore.getNodeById(t);
+
+    //if (NodeTypes.Source !== (n == null ? undefined : n.category)) {
+    //return;
+    //}
+
+    //const r = this.tree.treeMap.get(n.id);
+
+    //if (r !== undefined && r.parent !== null) {
+    //r.metadata.spec = n.spec;
+    //this.tree.recompute(r.parent);
+    //} else {
+    //if (this.matchesFilter(t)) {
+    //this.tree.insertGraphNode(n);
+    //}
+    //}
+    //}),
+    //);
+
+    this.stores.graphStore.eventEmitter.on(
+      eventTypes.DidRemoveNode,
+      action(({id, node: {parentId}}) => {
+        let node = this.tree.findById(id); //r
+
+        if (node !== undefined) {
+          if (
+            NodeTypes.Models === node.type ||
+            NodeTypes.Paths === node.type ||
+            NodeTypes.Responses === node.type ||
+            NodeTypes.Parameters === node.type ||
+            NodeTypes.Examples === node.type ||
+            NodeTypes.RequestBodies === node.type
+          ) {
+            this.invalidateTree();
+            return;
+          } else {
+            if (
+              NodeTypes.Model === node.type ||
+              NodeTypes.Path === node.type ||
+              NodeTypes.Response === node.type ||
+              NodeTypes.Parameter === node.type ||
+              NodeTypes.Example === node.type ||
+              NodeTypes.RequestBody === node.type
+            ) {
+              this.tree.removeNode(node);
+              this.invalidateTree();
+              return;
+            } else {
+              return;
+            }
+          }
+        }
+
+        const parent =
+          parentId !== undefined
+            ? this.stores.graphStore.getNodeById(parentId)
+            : undefined;
+
+        if (parent.category === NodeTypes.Path) {
+          const treeParent = this.tree.findById(parent.id);
+          if (treeParent) {
+            treeParent.metadata.operations.remove(id);
+          }
+        }
+      }),
+    );
   }
-
-  //_getActiveHttpServiceParentId() {
-  //const e = Je(
-  //this.stores.oasStore.service.activeHttpNode,
-  //undefined,
-  //undefined,
-  //);
-
-  //if (e.parentId === undefined) {
-  //throw new TypeError('activeHttpNode.parentId is undefined');
-  //}
-
-  //return e.parentId;
-  //}
-
-  //_getAssociatedOperationNode(node) {
-  //const {metadata} = node;
-
-  //const {activeOperationNode: n} = this.stores.oasStore.service;
-
-  //if (n !== undefined && t !== undefined && 'operations' in t) {
-  //if (t.operations.items.some((e) => n.id === e.id)) {
-  //return n;
-  //} else {
-  //0;
-  //return;
-  //}
-  //}
-  //}
-
   //registerGraphEvents() {
   //this.activeDisposables.pushAll([
   //this.stores.graphStore.notifier.on(
@@ -658,299 +762,6 @@ class DesignTreeStore extends ApiTreeStore {
   //}
   //}),
   //),
-  //this.stores.graphStore.notifier.on(
-  //vt.a.DidRemoveNode,
-  //Object(p.action)(
-  //({
-  //id: e,
-
-  //node: {parentId: t},
-  //}) => {
-  //var n;
-  //let r = this.tree.findById(e);
-
-  //if (r !== undefined) {
-  //if (
-  //cl.Models === r.type ||
-  //cl.Paths === r.type ||
-  //cl.Responses === r.type ||
-  //cl.Parameters === r.type ||
-  //cl.Examples === r.type ||
-  //cl.RequestBodies === r.type
-  //) {
-  //this.invalidateTree();
-  //return;
-  //} else {
-  //if (
-  //cl.Model === r.type ||
-  //cl.Path === r.type ||
-  //cl.Response === r.type ||
-  //cl.Parameter === r.type ||
-  //cl.Example === r.type ||
-  //cl.RequestBody === r.type
-  //) {
-  //this.tree.removeNode(r);
-  //return;
-  //} else {
-  //0;
-  //return;
-  //}
-  //}
-  //}
-
-  //const i =
-  //t !== undefined
-  //? this.stores.graphStore.getNodeById(t)
-  //: undefined;
-
-  //if (Hi(i)) {
-  //if (
-  //!((n = this.tree.findById(i.id)) === null || n === undefined)
-  //) {
-  //n.metadata.operations.remove(e);
-  //}
-  //}
-  //},
-  //),
-  //),
-  //]);
-  //}
-
-  //registerCommands() {
-  //this.registerTreeHandler(ve.CreateModel, async (e) => {
-  //if (e === null) {
-  //throw new TypeError('Called DesignTreeCommands.CreateModel on root');
-  //}
-
-  //Object(Ka.assertParentNode)(e);
-  //const t = cl.Model;
-
-  //const {name: n} = await this.createNewNode(
-  //{
-  //type: t,
-  //},
-  //e,
-  //bl(pl[cl.Model], {
-  //lower: false,
-  //}),
-  //);
-
-  //const r = new Gu();
-  //r.data.type = 'embedded';
-  //r.data.name = n;
-  //r.data.parentNodeId = this._getActiveHttpServiceParentId();
-  //await this.stores.createNodeStore.create(r);
-  //});
-
-  //this.registerTreeHandler(ve.CreateResponse, async (e) => {
-  //if (e === null) {
-  //throw new TypeError('Called DesignTreeCommands.CreateResponse on root');
-  //}
-
-  //Object(Ka.assertParentNode)(e);
-
-  //const {id: t} = Xe(
-  //this.stores.uiStore.activeSourceNode,
-  //undefined,
-  //this.stores.graphStore,
-  //);
-
-  //const {name: n} = await this.createNewNode(
-  //{
-  //type: cl.Response,
-  //},
-  //e,
-  //bl(pl[cl.Response], {
-  //lower: false,
-  //}),
-  //);
-
-  //const r = await this.stores.oasStore.service.addSharedResponse({
-  //sourceNodeId: t,
-  //name: n,
-  //});
-
-  //this.setActiveNode(r);
-  //});
-
-  //this.registerTreeHandler(ve.CreateParameter, async (e, t) => {
-  //if (e === null) {
-  //throw new TypeError(
-  //'Called DesignTreeCommands.CreateParameter on root',
-  //);
-  //}
-
-  //Object(Ka.assertParentNode)(e);
-
-  //const {id: n} = Xe(
-  //this.stores.uiStore.activeSourceNode,
-  //undefined,
-  //this.stores.graphStore,
-  //);
-
-  //const {name: r} = await this.createNewNode(
-  //{
-  //type: cl.Parameter,
-  //},
-  //e,
-  //bl(pl[cl.Parameter], {
-  //lower: false,
-  //}),
-  //);
-
-  //const i = await this.stores.oasStore.service.addSharedParameter({
-  //sourceNodeId: n,
-  //name: r,
-  //parameterType: t,
-  //});
-
-  //this.setActiveNode(i);
-  //});
-
-  //this.registerTreeHandler(ve.CreateExample, async (e) => {
-  //if (e === null) {
-  //throw new TypeError('Called DesignTreeCommands.CreateExample on root');
-  //}
-
-  //Object(Ka.assertParentNode)(e);
-
-  //const {id: t} = Xe(
-  //this.stores.uiStore.activeSourceNode,
-  //undefined,
-  //this.stores.graphStore,
-  //);
-
-  //const {name: n} = await this.createNewNode(
-  //{
-  //type: cl.Example,
-  //},
-  //e,
-  //bl(pl[cl.Example], {
-  //lower: false,
-  //}),
-  //);
-
-  //const r = await this.stores.oasStore.service.addSharedExample({
-  //sourceNodeId: t,
-  //name: n,
-  //});
-
-  //this.setActiveNode(r);
-  //});
-
-  //this.registerTreeHandler(ve.CreateRequestBody, async (e) => {
-  //if (e === null) {
-  //throw new TypeError(
-  //'Called DesignTreeCommands.CreateRequestBody on root',
-  //);
-  //}
-
-  //Object(Ka.assertParentNode)(e);
-
-  //const {id: t} = Xe(
-  //this.stores.uiStore.activeSourceNode,
-  //undefined,
-  //this.stores.graphStore,
-  //);
-
-  //const {name: n} = await this.createNewNode(
-  //{
-  //type: cl.RequestBody,
-  //},
-  //e,
-  //bl(pl[cl.RequestBody], {
-  //lower: false,
-  //}),
-  //);
-
-  //const r = await this.stores.oasStore.service.addSharedRequestBody({
-  //sourceNodeId: t,
-  //name: n,
-  //});
-
-  //this.setActiveNode(r);
-  //});
-
-  //this.registerTreeHandler(ve.CreatePath, async (e) => {
-  //Object(Ka.assertParentNode)(e);
-
-  //const {name: t} = await this.createNewNode(
-  //{
-  //type: cl.Path,
-  //},
-  //e,
-  //bl(pl[cl.Path]),
-  //);
-
-  //const n = new zu(this.stores);
-  //n.data.parentNodeId = this._getActiveHttpServiceParentId();
-  //n.data.path = t;
-  //n.data.tags = [];
-
-  //n.data.methods = {
-  //get: 'Your GET endpoint',
-  //};
-
-  //await this.stores.createNodeStore.create(n);
-  //});
-
-  //this.registerTreeHandler(ve.Rename, async (e) => {
-  //if (e === null) {
-  //throw new TypeError('Called DesignTreeCommands.Rename on root');
-  //}
-
-  //const t =
-  //cl.Model === e.type ||
-  //cl.Response === e.type ||
-  //cl.Parameter === e.type ||
-  //cl.Example === e.type ||
-  //cl.RequestBody === e.type;
-
-  //const {name: n} = await this.treeStore.rename(
-  //e,
-  //e.type === undefined
-  //? undefined
-  //: bl(pl[e.type], {
-  //prettify: cl.Path !== e.type ? N.a : undefined,
-  //lower: !t,
-  //}),
-  //);
-
-  //if (t) {
-  //this.stores.graphStore.renameNode(e.id, n);
-  //} else {
-  //if (cl.Path === e.type) {
-  //this.stores.oasStore.path.updatePath(n, e.id);
-  //}
-  //}
-
-  //Object(p.runInAction)(() => {
-  //e.name = n;
-  //});
-  //});
-
-  //this.registerTreeHandler(nodeOperations.DeleteOperation, async (node) => {
-  //if (node === null) {
-  //throw new TypeError(
-  //'Called DesignTreeCommands.DeleteOperation on root',
-  //);
-  //}
-
-  //const t = this._getAssociatedOperationNode(e);
-
-  //if (t === undefined) {
-  //throw new Error('Could not link operation node with tree node');
-  //}
-
-  //await this.stores.commandRegistry.execute(he.Delete, t.id);
-  //});
-  //}
-
-  //isInterestingNode(e) {
-  //if (!(Hi(e) || Qi(e) || qi(e) || Xi(e) || Ki(e) || Bi(e))) {
-  //return Yi(e);
-  //}
-  //}
 }
 
 export default DesignTreeStore;

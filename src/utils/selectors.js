@@ -3,6 +3,23 @@ import {isEqual, get, has} from 'lodash';
 import {nodeOperations} from './tree';
 import {StoresContext} from '../components/Tree/context';
 
+export const usePatchOperationAt = (path) => {
+  const patchSourceNode = usePatchOperation();
+
+  return React.useCallback(
+    (operation, jsonPath) => {
+      let initialPath = jsonPath;
+
+      if (nodeOperations.Move === operation) {
+        initialPath = path.slice(0, -1).concat(jsonPath);
+      }
+
+      patchSourceNode(operation, path, initialPath);
+    },
+    [path, patchSourceNode],
+  );
+};
+
 function usePatchOperation() {
   const stores = React.useContext(StoresContext);
   const {activeSourceNode} = stores.uiStore;

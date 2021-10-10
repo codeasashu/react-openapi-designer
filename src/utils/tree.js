@@ -77,7 +77,9 @@ export const eventTypes = {
   DidPatchSourceNodeProp: 'graph.patch_sourcemap_node',
   DidChangeSourceNode: 'graph.did_changed_source_node',
   DidPatchSourceNodePropComplete: 'graph.did_patch_source_complete',
+  DidUpdateNodeUri: 'graph.did_update_node_uri',
   DidRemoveNode: 'graph.did_remove_node',
+  DidPatch: 'graph.did_patch_node',
   ComputeSourceMap: 'graph.compute_source_map',
 
   // sidebar events
@@ -353,3 +355,9 @@ export const isOperationLike = (node) =>
   isObjectLike(node.data.parsed);
 
 export const isHyphenOnly = (e) => !e.match(/^(?:0|[1-9]\d*)$/) && e === '-';
+
+export function assertParentNode(e) {
+  if (!isParentNode(e)) {
+    throw new TypeError('Parent node expected');
+  }
+}

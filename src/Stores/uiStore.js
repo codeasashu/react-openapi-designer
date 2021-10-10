@@ -68,21 +68,23 @@ class UiStore {
 
     reaction(
       () => this.chosenSourceNodeUri,
-      (nodeUri) => {
-        if (nodeUri === undefined) {
-          this.chosenSymbolNodeUri = undefined;
-          this.activeSourceNode = undefined;
-          //delete this._preferences.activeSourceNodeUri;
-        } else {
-          this.chosenSymbolNodeUri =
-            this._preferences['activeSymbolNodeUri.' + nodeUri];
-          this.assignMatchingSourceNode();
-          this._preferences.activeSourceNodeUri = nodeUri;
-        }
-      },
-      {
-        fireImmediately: true,
-      },
+      action(
+        (nodeUri) => {
+          if (nodeUri === undefined) {
+            this.chosenSymbolNodeUri = undefined;
+            this.activeSourceNode = undefined;
+            //delete this._preferences.activeSourceNodeUri;
+          } else {
+            this.chosenSymbolNodeUri =
+              this._preferences['activeSymbolNodeUri.' + nodeUri];
+            this.assignMatchingSourceNode();
+            this._preferences.activeSourceNodeUri = nodeUri;
+          }
+        },
+        {
+          fireImmediately: true,
+        },
+      ),
     );
 
     reaction(

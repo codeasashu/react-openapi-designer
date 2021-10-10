@@ -116,6 +116,7 @@ class ApiTreeStore {
         return this.activeGraphNode && this.activeGraphNode.id;
       },
       (nodeId) => {
+        console.log('I am here');
         this.setActiveTreeNode(nodeId);
       },
       {

@@ -1,166 +1,103 @@
 import React, {useState} from 'react';
-import {useSelector, useDispatch} from 'react-redux';
-import {
-  handleModelChange,
-  handlePathNameChange,
-  handleAddOperation,
-  changePathParameter,
-} from 'store/modules/openapi';
+import {observer} from 'mobx-react-lite';
 import PropTypes from 'prop-types';
-import {invert, get} from 'lodash';
+import classnames from 'classnames';
+import {ControlGroup, Button} from '@blueprintjs/core';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
-import {useHistory, useLocation} from 'react-router-dom';
+//import {useHistory, useLocation} from 'react-router-dom';
 import {TitleEditor, UrlEditor} from '../Editor';
 import {MethodPane} from '../Panes';
 import PathParams from '../Designer/ParameterGroup/path';
-import {
-  extractMethodFromUri,
-  escapeUri,
-  getPathParameters,
-  validPathMethods,
-  isValidPathMethod,
-} from '../../utils';
+import {decodeUriFragment, validMethods, getMethodColor} from '../../utils';
+import {getValueFromStore, usePatchOperation} from '../../utils/selectors';
+import {nodeOperations, isOperationNode} from '../../utils/tree';
+import {StoresContext} from '../Tree/context';
 
-const methodTabClasses =
-  'bp3-simple-tab-panel rounded-none flex-1 border-l-0 \
-border-r-0 border-b-0 relative';
+const PathContent = observer(({relativeJsonPath, ...props}) => {
+  const handlePatch = usePatchOperation();
+  const stores = React.useContext(StoresContext);
+  const {
+    path: {activePathNode},
+    service: {activeOperationNodes, activeOperationNode},
+  } = stores.oasStore;
 
-function useQuery() {
-  return new URLSearchParams(useLocation().search);
-}
+  const {activeSymbolNode, setActiveNode} = stores.uiStore;
+  if (!activePathNode) {
+    return null;
+  }
 
-const tabIndexes = {
-  [validPathMethods.get]: 0,
-  [validPathMethods.post]: 1,
-  [validPathMethods.put]: 2,
-  [validPathMethods.delete]: 3,
-};
-
-const selectDefaultMethod = (pathItem) => {
-  const methods = Object.keys(pathItem).map((m) => m.toLowerCase());
-  if (methods.length === 0) return null;
-  if (methods.indexOf('get') > -1) return 'get';
-  if (methods.indexOf('post') > -1) return 'post';
-  if (methods.indexOf('put') > -1) return 'put';
-  if (methods.indexOf('delete') > -1) return 'delete';
-  return methods[0].toLowerCase();
-};
-
-const unescapeUri = (path) => path.replaceAll(/~1/g, '/');
-
-const PathContent = ({path, relativeJsonPath, ...props}) => {
-  let relativePath = relativeJsonPath.map((i) => unescapeUri(i));
-  const dispatch = useDispatch();
-  let history = useHistory();
-  let query = useQuery();
-
-  const [isPathParamsVisible, setPathParamsVisibility] = useState(false);
-
-  const pathItem = useSelector(({openapi}) =>
-    get(openapi, relativePath.slice(0, 2), {}),
+  const methods = React.useMemo(
+    () =>
+      validMethods.map((method) => ({
+        method,
+        present:
+          activeOperationNodes.length > 0 &&
+          activeOperationNodes.find((n) => method === n.path),
+      })),
+    [activeOperationNodes],
   );
 
-  const method =
-    extractMethodFromUri(relativePath) || selectDefaultMethod(pathItem);
-
-  const operation = useSelector(({openapi}) => {
-    if (
-      relativePath.length > 0 &&
-      isValidPathMethod(relativePath[relativePath.length - 1]) == false
-    ) {
-      return get(openapi, relativePath.concat([method]), {});
-    }
-    return get(openapi, relativePath, {});
-  });
-
+  const selectedMethodIndex = activeOperationNode
+    ? validMethods.findIndex((e) => e === activeOperationNode.path)
+    : 0;
   const [selectedTab, setSelectedTab] = useState(
-    tabIndexes[method ? method.toLowerCase() : 0],
+    Math.max(0, selectedMethodIndex),
   );
 
-  const onChange = React.useCallback(
-    (path, value) => {
-      dispatch(handleModelChange({path, value}));
-    },
-    [dispatch],
-  );
-
-  const addOperation = (method) => {
-    dispatch(handleAddOperation({path: relativePath[1], method}));
-    query.set(
-      'path',
-      `paths/${escapeUri(relativePath[1])}/${method.toLowerCase()}`,
-    );
-    history.push(`/designer?${query}`);
-  };
-
-  const hasMethod = (jsonPath, method) => {
-    return (
-      jsonPath.length && method && jsonPath.at(-1) === method.toLowerCase()
-    );
-  };
-
-  const updateOperation = (forMethod, newOperation) => {
-    let jsonPath = relativePath.slice(0);
-    if (forMethod == null) {
-      forMethod = method;
-    }
-    if (forMethod && hasMethod(jsonPath, forMethod) == false) {
-      jsonPath = jsonPath.concat([forMethod.toLowerCase()]);
-    }
-    onChange(jsonPath, {
-      ...operation,
-      ...newOperation,
-    });
-    /*
-    {
-      path,
-      ...pathItem,
-      [method.toLowerCase()]: {...operation, ...myOperation},
-    });*/
-  };
-
-  const onTabClick = (selectedIndex) => {
-    setSelectedTab(selectedIndex);
-    const methodName = invert(tabIndexes)[selectedIndex];
-    if (Object.keys(pathItem).indexOf(methodName.toLowerCase()) >= 0) {
-      query.set(
-        'path',
-        `paths/${escapeUri(relativePath[1])}/${methodName.toLowerCase()}`,
+  React.useEffect(() => {
+    if (activeOperationNode && isOperationNode(activeSymbolNode)) {
+      const newIndex = Math.max(
+        0,
+        methods.findIndex((e) => activeOperationNode.path === e.method),
       );
-      history.push(`/designer?${query}`);
+
+      if (selectedTab !== newIndex) {
+        setSelectedTab(newIndex);
+      }
+    }
+  }, [
+    activeOperationNode,
+    activeSymbolNode,
+    methods,
+    selectedTab,
+    setSelectedTab,
+  ]);
+
+  //const relativePathItemPath =
+  //node.type === NodeTypes.Path
+  //? relativeJsonPath
+  //: relativeJsonPath.slice(0, 2);
+  //const pathItem = getValueFromStore(relativePathItemPath);
+  //console.log('node', node, pathItem, relativeJsonPath);
+  //if (node.type === NodeTypes.Path) {
+  //const defaultMethod = selectDefaultMethod(pathItem);
+  //relativeJsonPath.concat([defaultMethod]);
+  //}
+  //const methodIndex = validPathMethods.findIndex((e) => e === i.path);
+  //console.log('relativeb', relativeJsonPath);
+
+  const pathUrlRef = React.useRef(null);
+
+  const handleTabSelect = (index) => {
+    setSelectedTab(index);
+    const selectedMethod = methods[index]; //a
+    const selectedOperation = activeOperationNodes.find(
+      (n) => selectedMethod.method === n.path,
+    ); //s
+
+    if (selectedOperation) {
+      if (
+        activeOperationNode &&
+        selectedOperation.id !== activeOperationNode.id
+      ) {
+        setActiveNode(selectedOperation);
+      }
+    } else {
+      if (activePathNode) {
+        setActiveNode(activePathNode);
+      }
     }
   };
-
-  const onPathChange = React.useCallback(
-    (newPath, oldPath) => {
-      dispatch(handlePathNameChange({newPath, oldPath}));
-      const methodName = invert(tabIndexes)[selectedTab];
-      query.set(
-        'path',
-        `#/paths/${escapeUri(newPath)}/${methodName.toLowerCase()}`,
-      );
-      history.replace(`/designer?${query}`);
-    },
-    [dispatch],
-  );
-
-  const onPathParamChange = React.useCallback(
-    (param, index) => {
-      dispatch(changePathParameter({path: relativePath[1], param, index}))
-        .unwrap()
-        .then((newPath) => {
-          if (newPath) {
-            const methodName = invert(tabIndexes)[selectedTab];
-            query.set(
-              'path',
-              `paths/${escapeUri(newPath)}/${methodName.toLowerCase()}`,
-            );
-            history.push(`/designer?${query}`);
-          }
-        });
-    },
-    [dispatch, relativePath],
-  );
 
   return (
     <div className="flex-1 relative">
@@ -168,107 +105,131 @@ const PathContent = ({path, relativeJsonPath, ...props}) => {
         <div className="flex px-10 mt-10 max-w-6xl justify-between">
           <TitleEditor
             xl
-            value={operation?.summary || ''}
+            value={
+              getValueFromStore(
+                activeOperationNode.relativeJsonPath.concat(['summary']),
+              ) || ''
+            }
             placeholder="Operation Name"
             onChange={(e) => {
-              const summary = e.target.value;
-              updateOperation(method, {...operation, summary});
+              handlePatch(
+                nodeOperations.Replace,
+                relativeJsonPath.concat(['summary']),
+                e.target.value,
+              );
             }}
           />
         </div>
         <div className="px-10 pb-2 max-w-6xl">
           <div className="mt-6">
-            <UrlEditor
-              errors={props.errors?.url}
-              value={relativePath[1]}
-              onChange={(newPath) => {
-                onPathChange(newPath, relativePath[1]);
-              }}
-              togglePathParams={() =>
-                setPathParamsVisibility(!isPathParamsVisible)
-              }
-            />
+            <ControlGroup className="flex">
+              <UrlEditor
+                errors={props.errors?.url}
+                value={decodeUriFragment(relativeJsonPath[1])}
+                onChange={(newPath) => {
+                  stores.oasStore.path.updatePath(newPath);
+                }}
+                //setPathParamsVisibility(!isPathParamsVisible)
+              />
+              <Button
+                text="path params"
+                onClick={() => stores.oasStore.path.togglePathParams()}
+              />
+            </ControlGroup>
           </div>
         </div>
-        {isPathParamsVisible && (
+        {stores.oasStore.path.pathParamsVisible && (
           <div className="px-10 pb-2 max-w-6xl">
+            <div className="flex items-center mt-5 mb-2">
+              <div className="font-semibold text-gray-600 ml-1">
+                Path parameters
+              </div>
+              <Button
+                small
+                minimal
+                className="ml-1"
+                icon="plus"
+                aria-label="add row"
+                onClick={() => {
+                  pathUrlRef.current = 'path';
+                  stores.oasStore.path.addPathParam();
+                }}
+              />
+            </div>
             <PathParams
-              parameters={getPathParameters(pathItem) || []}
-              onChange={(newParam, index) => onPathParamChange(newParam, index)}
+              autoFocus={pathUrlRef}
+              parameterIn="path"
+              parametersPath={activePathNode.relativeJsonPath.concat([
+                'parameters',
+              ])}
+              title=""
+              handleUpdateName={(relativePath, newValue, oldValue) => {
+                if (oldValue !== newValue.trim()) {
+                  stores.oasStore.path.updatePathParamName(
+                    relativePath,
+                    newValue,
+                  );
+                }
+              }}
+              handleRemove={(relativePath) => {
+                console.log('handleRemove22', relativePath);
+                stores.oasStore.path.removePathParam(relativePath);
+              }}
+              onChange={(newParam, index) => {
+                //stores.oasStore.path.updatePathParamName(e, t);
+                console.log('on path paaram change', newParam, index);
+              }}
             />
           </div>
         )}
-        <Tabs
-          className="flex flex-col flex-1"
-          selectedTabClassName="selected-tab"
-          selectedTabPanelClassName="block"
-          selectedIndex={selectedTab}
-          onSelect={onTabClick}>
-          <TabList className="mt-6 px-10 flex bp3-simple-tab-list">
-            <Tab
-              className={`bp3-simple-tab uppercase ${
-                method === 'get' && 'text-green-400'
-              }`}>
-              get
-            </Tab>
-            <Tab
-              className={`bp3-simple-tab uppercase ${
-                method === 'post' && 'text-blue-600'
-              }`}>
-              post
-            </Tab>
-            <Tab
-              className={`bp3-simple-tab uppercase ${
-                method === 'put' && 'text-yellow-600'
-              }`}>
-              put
-            </Tab>
-            <Tab
-              className={`bp3-simple-tab uppercase ${
-                method === 'delete' && 'text-red-400'
-              }`}>
-              delete
-            </Tab>
-          </TabList>
-          <TabPanel className={methodTabClasses}>
-            <MethodPane
-              methodName="get"
-              operation={pathItem['get']}
-              onAddOperation={() => addOperation('get')}
-              onChange={(e) => updateOperation('get', e)}
-            />
-          </TabPanel>
-          <TabPanel className={methodTabClasses}>
-            <MethodPane
-              methodName="post"
-              operation={pathItem['post']}
-              onAddOperation={() => addOperation('post')}
-              onChange={(e) => updateOperation('post', e)}
-            />
-          </TabPanel>
-          <TabPanel className={methodTabClasses}>
-            <MethodPane
-              methodName="put"
-              operation={pathItem['put']}
-              onAddOperation={() => addOperation('put')}
-              onChange={(e) => updateOperation('put', e)}
-            />
-          </TabPanel>
-          <TabPanel className={methodTabClasses}>
-            <MethodPane
-              methodName="delete"
-              operation={pathItem['delete']}
-              onAddOperation={() => addOperation('delete')}
-              onChange={(e) => updateOperation('delete', e)}
-            />
-          </TabPanel>
-        </Tabs>
       </div>
+      <Tabs
+        className="flex flex-col flex-1"
+        selectedTabClassName="selected-tab"
+        selectedTabPanelClassName="block"
+        selectedIndex={selectedTab}
+        onSelect={handleTabSelect}>
+        <TabList className="mt-6 px-10 flex bp3-simple-tab-list">
+          {methods.map((e) => {
+            const methodColor = getMethodColor(e.method);
+            return (
+              <Tab
+                key={e.method}
+                className={classnames('bp3-simple-tab uppercase ', {
+                  [`text-${methodColor} dark:text-${methodColor}`]: e.present,
+                })}>
+                {e.method}
+              </Tab>
+            );
+          })}
+        </TabList>
+        {methods.map((e) => {
+          const mJsonPath = [...activePathNode.relativeJsonPath, e.method];
+          return (
+            <TabPanel
+              key={e.method}
+              className="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative">
+              <MethodPane
+                methodName={e.method}
+                relativeJsonPath={mJsonPath}
+                operation={getValueFromStore(mJsonPath)}
+                onAddOperation={(e) => {
+                  console.log('addOp', e);
+                }}
+                onChange={(e) => {
+                  console.log('upOp', e);
+                }}
+              />
+            </TabPanel>
+          );
+        })}
+      </Tabs>
     </div>
   );
-};
+});
 
 PathContent.propTypes = {
+  node: PropTypes.object,
   path: PropTypes.string,
   method: PropTypes.string,
   relativeJsonPath: PropTypes.array,

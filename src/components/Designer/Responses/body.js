@@ -2,9 +2,10 @@ import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import Headers from './headers';
 import BodySelector from 'components/Pickers/ContentType';
-import MarkupEditor from '../../Editor/markdown';
 import SchemaDesigner from '../Schema';
 import {defaultSchema, sortContentTypes, ContentTypes} from '../../../utils';
+import {nodeOperations} from '../../../utils/tree';
+import {getValueFromStore, usePatchOperation} from '../../../utils/selectors';
 
 const getDefaultContentType = (contentTypes) => {
   const sortedContentTypes = sortContentTypes(contentTypes, [
@@ -15,109 +16,97 @@ const getDefaultContentType = (contentTypes) => {
   return sortedContentTypes.length ? sortedContentTypes[0] : null;
 };
 
-const ResponseBody = ({response, onChange}) => {
-  const [selectedMediaType, setSelectedMediaType] = useState(
-    getDefaultContentType(
-      response?.content ? Object.keys(response.content) : [],
-    ),
+const ResponseBody = ({relativeJsonPath}) => {
+  const handlePatch = usePatchOperation();
+  const responseContents = getValueFromStore(
+    relativeJsonPath.concat(['content']),
   );
-  //const selectedSchema = response.content[selectedMediaType].schema;
-  //const [schema, setSchema] = useState(selectedSchema);
+  const responseHeaders = getValueFromStore(
+    relativeJsonPath.concat(['headers']),
+  );
+  const responseContentTypes = Object.keys(responseContents) || [];
+  const [selectedMediaType, setSelectedMediaType] = useState(
+    getDefaultContentType(responseContentTypes),
+  );
 
   useEffect(() => {
-    if (Object.keys(response.content).indexOf(selectedMediaType) < 0) {
+    if (Object.keys(responseContents).indexOf(selectedMediaType) < 0) {
       setSelectedMediaType(ContentTypes.json);
     }
-  }, [response]);
-
-  //useEffect(() => {
-  ////const newSchema = response.content[selectedMediaType].schema;
-  //setSelectedMediaType(ContentTypes.json);
-  ////setSchema(newSchema);
-  //}, [props.code]);
-
-  //useEffect(() => {
-  //const newSchema = response.content[selectedMediaType].schema;
-  //setSchema(newSchema);
-  //}, [selectedMediaType]);
+  }, [responseContents]);
 
   const handleMediaType = (action, mediaType) => {
     if (action === 'select') {
       setSelectedMediaType(mediaType);
     } else if (action === 'add') {
-      onChange({
-        ...response,
-        content: {
-          ...response.content,
-          [mediaType]: {schema: defaultSchema.object},
-        },
-      });
+      //eslint-disable-next-line no-unused-vars
+      const {[mediaType]: originalSchema, ...rest} = responseContents;
+      handlePatch(
+        nodeOperations.Replace,
+        relativeJsonPath.concat(['content', mediaType]),
+        {schema: originalSchema?.schema || defaultSchema.object},
+      );
       setSelectedMediaType(mediaType);
     } else if (action === 'update') {
-      const {content, ...restOfResponse} = response;
-      const {[selectedMediaType]: originalSchema, ...rest} = content;
-      onChange({
-        ...restOfResponse,
-        content: {...rest, [mediaType]: originalSchema},
-      });
+      const {[selectedMediaType]: originalSchema, ...rest} = responseContents;
+      handlePatch(
+        nodeOperations.Replace,
+        relativeJsonPath.concat(['content']),
+        {...rest, [mediaType]: originalSchema},
+      );
     } else if (action === 'delete') {
-      // @TODO check if response has any contenttype left. If not,
-      // trigger the deleteResponse event from here
-      const {content, ...restOfResponse} = response;
       //eslint-disable-next-line no-unused-vars
-      const {[selectedMediaType]: originalSchema, ...rest} = content;
-      onChange({
-        ...restOfResponse,
-        content: rest,
-      });
+      const {[selectedMediaType]: originalSchema, ...rest} = responseContents;
+      handlePatch(
+        nodeOperations.Replace,
+        relativeJsonPath.concat(['content']),
+        {...rest},
+      );
+      setSelectedMediaType(getDefaultContentType(responseContentTypes));
     }
-  };
-
-  const handleSchemaChange = (schema) => {
-    const newResponse = {
-      ...response,
-      content: {...response.content, [selectedMediaType]: {schema}},
-    };
-    onChange(newResponse);
   };
 
   return (
     <>
-      {response.description !== undefined && (
-        <div className="flex-1">
-          <MarkupEditor
-            value={response.description}
-            onChange={(e) => onChange({...response, description: e})}
-          />
-        </div>
-      )}
-      {response.headers !== undefined && (
-        <Headers
-          parameters={response.headers}
-          onChange={(e) => onChange({...response, headers: e})}
-        />
-      )}
+      <Headers
+        parameters={responseHeaders}
+        onChange={(e) => {
+          handlePatch(
+            nodeOperations.Replace,
+            relativeJsonPath.concat(['headers']),
+            e,
+          );
+        }}
+      />
       <div className="mt-8">
         <BodySelector
           via="response"
           selected={selectedMediaType}
-          contentTypes={Object.keys(response.content)}
+          contentTypes={responseContentTypes}
           onSelect={(c) => handleMediaType('select', c)}
           onAdd={(c) => handleMediaType('add', c)}
           onDelete={(_new, _old) => handleMediaType('delete', _new, _old)}
           onUpdate={(_new, _old) => handleMediaType('update', _new, _old)}
         />
 
-        {response.content && selectedMediaType && (
-          <div className="mt-8">
-            <SchemaDesigner
-              dark
-              namespace="response"
-              initschema={response.content[selectedMediaType]?.schema}
-              onChange={handleSchemaChange}
-            />
-          </div>
-        )}
+        <div className="mt-8">
+          <SchemaDesigner
+            dark
+            namespace="response"
+            initschema={responseContents[selectedMediaType]?.schema}
+            onChange={(e) => {
+              handlePatch(
+                nodeOperations.Replace,
+                relativeJsonPath.concat([
+                  'content',
+                  selectedMediaType,
+                  'schema',
+                ]),
+                e,
+              );
+            }}
+          />
+        </div>
       </div>
     </>
   );
@@ -126,6 +115,8 @@ const ResponseBody = ({response, onChange}) => {
 ResponseBody.propTypes = {
   response: PropTypes.object,
   onChange: PropTypes.func,
+  relativeJsonPath: PropTypes.array,
+  //node: PropTypes.object,
 };
 
 export default ResponseBody;

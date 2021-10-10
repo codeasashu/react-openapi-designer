@@ -25,6 +25,7 @@ class Stores {
   activate() {
     this.graphStore.activate();
     this.uiStore.activate();
+    this.oasStore.activate();
     this.designTreeStore.activate();
   }
 }

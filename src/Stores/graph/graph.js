@@ -4,7 +4,6 @@ import {
   nodeOperations,
   NodeCategories,
   generateGraphId,
-  NodeTypes,
   eventTypes,
 } from '../../utils/tree';
 import {handleOperation} from './operation';
@@ -70,11 +69,11 @@ class Graph {
 
       const newNode = this.dom.nodes[nodeid];
 
-      if (newNode.category === NodeCategories.SourceMap) {
-        this.notifier.emit(eventTypes.DidAddSourceMapNode, {
-          node: newNode,
-        });
-      }
+      //if (newNode.category === NodeCategories.SourceMap) {
+      //this.notifier.emit(eventTypes.DidAddSourceMapNode, {
+      //node: newNode,
+      //});
+      //}
 
       return newNode;
     };
@@ -204,6 +203,7 @@ class Graph {
       ),
     });
 
+    this.notifier.emit(eventTypes.DidPatch, _patch);
     return {
       operations: _patch.operations.map(
         handleOperation(this.dom, _patch, this.notifier),

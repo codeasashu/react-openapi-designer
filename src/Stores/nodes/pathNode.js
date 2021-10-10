@@ -1,11 +1,9 @@
 //import PathNodeData from './pathNodeData';
 import {NodeCategories, nodeOperations} from '../../utils/tree';
 import {trim, set} from 'lodash';
-import {
-  generateOperationId,
-  pathToPointer,
-  getPathParametersFromUri,
-} from '../../utils';
+import {generateOperationId, pathToPointer} from '../../utils';
+
+import {getPathParametersFromUri} from '../../utils/schema';
 
 class PathNode {
   constructor(e) {

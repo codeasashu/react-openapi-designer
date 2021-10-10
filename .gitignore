@@ -1,4 +1,5 @@
 .cache
+*.bkp
 dist
 node_modules/
 demo/

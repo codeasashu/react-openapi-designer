@@ -1,3 +1,9 @@
+import {set, map, difference, compact, isObject} from 'lodash';
+import {validPathMethods} from '../utils';
+
+export const escapeUri = (path) => path.replaceAll(/\//g, '~1');
+export const unescapeUri = (path) => path.replaceAll(/~1/g, '/');
+
 const hasProperties = (schema) =>
   Object.prototype.hasOwnProperty.call(schema, 'properties') &&
   typeof schema.properties === 'object';
@@ -95,4 +101,149 @@ export const generateOperationId = (path, method) => {
   };
   const newPath = decodeUriFragment(path);
   return `${method.toLowerCase()}${newPath.replace(pathRegex, replacer)}`;
+};
+
+export const createPathParamSchema = (name, location) =>
+  Object.assign(Object.assign({}, set({}, location, 'string')), {
+    name: name,
+    in: 'path',
+    required: true,
+  });
+
+export const getPathParametersFromUri = (uri) => {
+  const matcher = /{(.+?)}/g;
+  let matches = matcher.exec(uri);
+  const params = [];
+
+  for (; matches !== null; ) {
+    params.push(matches[1]);
+    matches = matcher.exec(uri);
+  }
+
+  return params;
+};
+
+export const getParametersFromPath = (parameters, path) => {
+  const currentPathParameters = getPathParametersFromUri(
+    decodeUriFragment(path),
+  ); // r
+  const pathParameters = parameters.filter((e) => e.in === 'path'); // i
+  const otherParameters = parameters.filter((e) => e.in !== 'path'); // o
+  const names = map(pathParameters, 'name'); // a
+  const namesNotInPathParameters = difference(names, currentPathParameters); // s
+  const pathParametersNotInNames = difference(currentPathParameters, names); // u
+  const modifiedPathParameters = pathParameters.filter(
+    (e) => !namesNotInPathParameters.includes(e.name),
+  ); // c
+  const modifiedNames = map(modifiedPathParameters, 'name'); // l
+
+  pathParametersNotInNames.forEach((e) => {
+    if (!modifiedNames.includes(e)) {
+      modifiedPathParameters.push(
+        Object.assign(
+          Object.assign({}, set({}, ['schema', 'type'], 'string')),
+          {
+            name: e,
+            in: 'path',
+            required: true,
+          },
+        ),
+      );
+    }
+  });
+
+  return [...modifiedPathParameters, ...otherParameters];
+};
+
+export const updatePathFromParameters = (path, parameters) => {
+  const urlParams = getPathParametersFromUri(path);
+  const parameterParams = compact(parameters || [])
+    .filter((e) => e.in === 'path')
+    .map((e) => e.name);
+  const urlNotinParameters = difference(urlParams, parameterParams);
+  const parametersNotinUrl = difference(parameterParams, urlParams);
+  let url = path;
+
+  if (urlNotinParameters.length === 1 && parametersNotinUrl.length === 1) {
+    if (parametersNotinUrl[0] === '' || parametersNotinUrl[0] === undefined) {
+      url = path.replace(`{${urlNotinParameters[0]}}`, '');
+    } else {
+      if (path.includes(`{${urlNotinParameters[0]}}`)) {
+        url = path.replace(
+          `{${urlNotinParameters[0]}}`,
+          `{${parametersNotinUrl[0]}}`,
+        );
+      } else {
+        if (!path.includes(`{${parametersNotinUrl[0]}}`)) {
+          url = `${path}/{${parametersNotinUrl[0]}}`;
+        }
+      }
+    }
+  } else {
+    if (urlNotinParameters.length === 1 && parametersNotinUrl.length === 0) {
+      url = path.replace(`{${urlNotinParameters[0]}}`, '');
+    } else {
+      if (
+        !(
+          urlNotinParameters.length !== 0 ||
+          parametersNotinUrl.length !== 1 ||
+          parametersNotinUrl[0] === '' ||
+          path.includes(`{${parametersNotinUrl[0]}}`)
+        )
+      ) {
+        url = `${path}/{${parametersNotinUrl[0]}}`;
+      }
+    }
+  }
+
+  return unescapeUri(url)
+    .replace(/\/+$/, '')
+    .replace(/([^:]\/)\/+/g, '$1');
+};
+
+export const modifyParametersFromPath = (params, path) => {
+  const urlParams = getPathParametersFromUri(path);
+  const pathParameters = params.filter((e) => isObject(e) && e.in === 'path');
+  const notPathParameters = params.filter(
+    (e) => isObject(e) && e.in !== 'path',
+  );
+  const arrayOfPathPaemetersName = map(pathParameters, 'name');
+  const parametersNotInUrl = difference(arrayOfPathPaemetersName, urlParams);
+  const urlParamsNotInparameters = difference(
+    urlParams,
+    arrayOfPathPaemetersName,
+  );
+  const remainingPathParameters = pathParameters.filter(
+    (e) => !parametersNotInUrl.includes(e.name),
+  );
+  const remainingPathParametersNames = map(remainingPathParameters, 'name');
+
+  urlParamsNotInparameters.forEach((e) => {
+    if (!remainingPathParametersNames.includes(e)) {
+      remainingPathParameters.push(
+        createPathParamSchema(e, ['schema', 'type']),
+      );
+    }
+  });
+  return [...remainingPathParameters, ...notPathParameters];
+};
+
+function sortByMethod(method1, method2) {
+  const validMethods = Object.keys(validPathMethods);
+  const method1Index = validMethods.indexOf(method1); //n
+  const method2Index = validMethods.indexOf(method2); // r
+
+  if (method1Index === -1 && method2Index !== -1) {
+    return 1;
+  } else {
+    if (method1Index !== -1 && method2Index === -1) {
+      return -1;
+    } else {
+      return method1Index - method2Index;
+    }
+  }
+}
+
+export const sortOperations = (operations, path) => {
+  return [...operations].sort((op1, op2) => sortByMethod(op1[path], op2[path]));
 };

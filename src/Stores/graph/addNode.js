@@ -7,7 +7,6 @@ import {
   eventTypes,
 } from '../../utils/tree';
 import {encodeUriFragment} from '../../utils';
-//import {exampleDoc} from '../../model';
 
 const operations = [
   {

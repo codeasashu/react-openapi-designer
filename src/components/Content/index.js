@@ -27,7 +27,7 @@ const StyledContent = styled.div`
 //return {path};
 //}
 
-const SubContent = ({node}) => {
+const SubContent = observer(({node}) => {
   //const {path} = useQuery();
   //const [pointer, setPointer] = useState(getJsonPointerFromUrl(path));
   //useEffect(() => {
@@ -42,7 +42,7 @@ const SubContent = ({node}) => {
   return (
     <>
       {node.type === NodeTypes.Info && <Info />}
-      {node.type === NodeTypes.Path && (
+      {(node.type === NodeTypes.Path || node.type === NodeTypes.Operation) && (
         <PathContent relativeJsonPath={relativeJsonPath} node={node} />
       )}
       {node.type === NodeTypes.Response && (
@@ -56,7 +56,7 @@ const SubContent = ({node}) => {
       )}
     </>
   );
-};
+});
 
 SubContent.propTypes = {
   node: PropTypes.object,

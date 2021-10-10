@@ -6,8 +6,10 @@ import {StoresContext} from '../Tree/context';
 import Item from './Item';
 import PathItem from './PathItem';
 import {NodeTypes} from '../../utils/tree';
+import {trace} from 'mobx';
 
 const Sidebar = observer((props) => {
+  trace(true);
   const stores = React.useContext(StoresContext);
   const handleScroll = () => {};
 

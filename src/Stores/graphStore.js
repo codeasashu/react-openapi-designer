@@ -1,3 +1,4 @@
+import {observable, action, makeObservable, toJS, runInAction} from 'mobx';
 import {join} from 'lodash';
 import Graph from './graph';
 import {recomputeGraphNodes} from './graph/addNode';
@@ -13,8 +14,14 @@ import {
 class GraphStore {
   rootNode = undefined;
   eventEmitter = {};
+  graph;
 
   constructor(e) {
+    makeObservable(this, {
+      rootNode: observable.ref,
+      graph: observable,
+      setRootNode: action,
+    });
     this.props = e;
 
     this._parserOptions = {
@@ -57,7 +64,7 @@ class GraphStore {
       //});
       //} else {
       if (NodeCategories.SourceMap !== node.category) {
-        throw new Error('Node musst be sourceMap Node');
+        throw new Error('Node must be sourceMap Node');
       }
 
       if (node.relativeJsonPath.length === 0) {
@@ -76,7 +83,7 @@ class GraphStore {
       ]);
     };
 
-    this.removeNode = async (nodeId) => {
+    this.removeNode = (nodeId) => {
       //e
       const node = this.getNodeById(nodeId); //t
 
@@ -89,7 +96,6 @@ class GraphStore {
 
       if (NodeCategories.SourceMap === node.category) {
         const sourceNode = node.parentSourceNode; // n
-
         if (!sourceNode) {
           return;
         }
@@ -144,31 +150,39 @@ class GraphStore {
 
     this.eventEmitter.on(eventTypes.DidPatchSourceNodeProp, (operation) => {
       let task = {};
-      const nodeId = operation.id;
-      const node = this.graph.getNodeById(nodeId);
-      if (operation.prop === 'data.parsed') {
-        task = {
-          op: eventTypes.ComputeSourceMap,
-          nodeId,
-          patch: operation.value,
-        };
-      }
+      runInAction(() => {
+        const nodeId = operation.id;
+        const node = this.graph.getNodeById(nodeId);
+        if (operation.prop === 'data.parsed') {
+          task = {
+            op: eventTypes.ComputeSourceMap,
+            nodeId,
+            patch: operation.value,
+          };
+        }
+        recomputeGraphNodes(node, this.graph, task);
 
-      console.log('operationProp', node, task);
-      recomputeGraphNodes(node, this.graph, task);
+        this.eventEmitter.emit(eventTypes.DidChangeSourceNode, {
+          node,
+          change: operation,
+        });
+      });
+
       this.eventEmitter.emit(eventTypes.DidPatchSourceNodePropComplete);
     });
 
     this.eventEmitter.on(eventTypes.GraphNodeAdd, ({task, node}) => {
       if (task === taskTypes.ReadSourceNode && node.parent == null) {
-        this.graph.setSourceNodeProp(
-          node.id,
-          'data.original',
-          JSON.stringify(exampleDoc),
-        );
-        this.graph.setSourceNodeProp(node.id, 'data.parsed', exampleDoc);
+        runInAction(() => {
+          this.graph.setSourceNodeProp(
+            node.id,
+            'data.original',
+            JSON.stringify(exampleDoc),
+          );
+          this.graph.setSourceNodeProp(node.id, 'data.parsed', exampleDoc);
 
-        recomputeGraphNodes(node, this.graph);
+          recomputeGraphNodes(node, this.graph);
+        });
       }
     });
   }

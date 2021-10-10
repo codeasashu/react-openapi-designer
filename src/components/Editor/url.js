@@ -1,12 +1,6 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
-import {
-  ControlGroup,
-  Button,
-  InputGroup,
-  Icon,
-  Intent,
-} from '@blueprintjs/core';
+import {Button, InputGroup, Icon, Intent} from '@blueprintjs/core';
 import {Tooltip2} from '@blueprintjs/popover2';
 
 const ErrorElement = ({errors}) => {
@@ -36,7 +30,7 @@ const Url = (props) => {
   }, [props.value]);
 
   return (
-    <ControlGroup className="flex">
+    <>
       <Button text="http://localhost" />
       <InputGroup
         className="flex-1"
@@ -45,8 +39,7 @@ const Url = (props) => {
         onBlur={() => props.onChange(value)}
         rightElement={<ErrorElement errors={props.errors} />}
       />
-      <Button text="path params" onClick={props.togglePathParams} />
-    </ControlGroup>
+    </>
   );
 };
 

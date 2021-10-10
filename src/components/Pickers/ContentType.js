@@ -66,7 +66,7 @@ const ContentType = ({selected, contentTypes, ...props}) => {
         <Suggest
           items={Object.values(ContentTypes)}
           createNewItemFromQuery={(ct) => ct}
-          createNewItemRenderer={({query, active, handleClick}) => (
+          createNewItemRenderer={(query, active, handleClick) => (
             <MenuItem
               icon="add"
               text={`Create "${query}"`}
@@ -92,6 +92,9 @@ const ContentType = ({selected, contentTypes, ...props}) => {
           onItemSelect={(e) => props.onAdd(e)}
           selectedItem={selected}
           inputProps={{inputRef}}
+          popoverProps={{
+            shouldReturnFocusOnClose: false,
+          }}
         />
         <Button icon="trash" onClick={() => props.onDelete(selected)} />
       </ControlGroup>

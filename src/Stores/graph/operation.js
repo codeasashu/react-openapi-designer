@@ -1,4 +1,4 @@
-import {get, set, isEqual, isObject, pull, remove} from 'lodash';
+import {get, set, isEqual, isObject, pull, remove, unset} from 'lodash';
 import produce from 'immer';
 import SourceMapNode from './sourceNode';
 import VirtualNode from './virtualNode';
@@ -10,6 +10,7 @@ import {
   eventTypes,
 } from '../../utils/tree';
 import {decodeUriFragment} from '../../utils';
+import {observe} from 'mobx';
 //function handleOperation(e, t, n) { t = emitGroup
 
 //function pn(e) {
@@ -49,7 +50,7 @@ function handleOperation(dom, patch, notifier) {
 
     switch (operation.op) {
       case nodeOperations.AddNode:
-        return (function (dom, operation) {
+        return (function (dom, operation, notifier) {
           const {node} = operation;
 
           const parentNode = node.parentId
@@ -69,7 +70,7 @@ function handleOperation(dom, patch, notifier) {
               nodeInstance = new GraphNode(node, parentNode);
               break;
             case NodeCategories.SourceMap:
-              nodeInstance = (function (node, parentNode) {
+              nodeInstance = (function (node, parentNode, notifier) {
                 if (
                   !parentNode ||
                   NodeCategories.Virtual === parentNode.category
@@ -80,8 +81,11 @@ function handleOperation(dom, patch, notifier) {
                 }
                 const sourceMapNode = new SourceMapNode(node, parentNode);
 
+                notifier.emit(eventTypes.DidAddSourceMapNode, {
+                  node: sourceMapNode,
+                });
                 return sourceMapNode;
-              })(node, parentNode);
+              })(node, parentNode, notifier);
               break;
             case NodeCategories.Virtual:
               nodeInstance = (function (node, parentNode) {
@@ -103,8 +107,23 @@ function handleOperation(dom, patch, notifier) {
           dom.nodesByType[nodeInstance.type] =
             dom.nodesByType[nodeInstance.type] || [];
           dom.nodesByType[nodeInstance.type].push(nodeInstance);
+
+          observe(nodeInstance, 'uri', ({newValue, oldValue}) => {
+            console.log('I am observing', newValue, oldValue);
+            if (oldValue) {
+              delete dom.nodesByUri[oldValue];
+            }
+
+            dom.nodesByUri[newValue] = nodeInstance;
+
+            notifier.emit(eventTypes.DidUpdateNodeUri, {
+              id: nodeInstance.id,
+              newUri: newValue,
+              oldUri: oldValue,
+            });
+          });
           return operation;
-        })(dom, operation);
+        })(dom, operation, notifier);
       case nodeOperations.MoveNode:
         return (function (dom, operation, notifier) {
           const node = getNodeWithException(dom, operation.id); // r
@@ -163,7 +182,7 @@ function handleOperation(dom, patch, notifier) {
 
           notifier.emit(
             eventTypes.DidRemoveNode,
-            Object.assign(Object.assign({}, operation)),
+            Object.assign(Object.assign({}, operation), {node}),
           );
           return operation;
         })(dom, operation, notifier);
@@ -192,6 +211,26 @@ function handleOperation(dom, patch, notifier) {
   };
 }
 
+const renameObjectKey = (e, t, n) => {
+  if (!e || !Object.hasOwnProperty.call(e, t) || n === t) {
+    return e;
+  }
+
+  const r = {};
+
+  for (const [o, i] of Object.entries(e)) {
+    if (t === o) {
+      r[n] = i;
+    } else {
+      if (!(o in r)) {
+        r[o] = i;
+      }
+    }
+  }
+
+  return r;
+};
+
 function patchNodeProp(spec, operation) {
   // e, t
   if (nodeOperations.Text === operation.op) {
@@ -210,29 +249,52 @@ function patchNodeProp(spec, operation) {
   }
 
   if (nodeOperations.Move === operation.op) {
-    const n = operation.from.slice(0, -1);
-
-    if (isEqual(n, operation.path.slice(0, -1))) {
-      return {};
-      //return hn(e || {}, (e) =>
-      //t.path.length > 1
-      //? (Object(xe.set)(
-      //e,
-      //n,
-      //Object(te.renameObjectKey)(
-      //Object(xe.get)(e, n),
-      //String(t.from[t.from.length - 1]),
-      //String(t.path[t.path.length - 1]),
-      //),
-      //),
-      //e)
-      //: Object(te.renameObjectKey)(
-      //e,
-      //String(t.from[t.from.length - 1]),
-      //String(t.path[t.path.length - 1]),
-      //),
-      //);
+    const fromPath = operation.from.slice(0, -1);
+    if (isEqual(fromPath, operation.path.slice(0, -1))) {
+      return produce(spec || {}, (draftSpec) =>
+        operation.path.length > 1
+          ? (set(
+              draftSpec,
+              fromPath,
+              renameObjectKey(
+                get(draftSpec, fromPath),
+                String(operation.from[operation.from.length - 1]),
+                String(operation.path[operation.path.length - 1]),
+              ),
+            ),
+            draftSpec)
+          : renameObjectKey(
+              draftSpec,
+              String(operation.from[operation.from.length - 1]),
+              String(operation.path[operation.path.length - 1]),
+            ),
+      );
     }
+
+    //return hn(e || {}, (e) =>
+    //t.path.length > 1
+    //? (Object(xe.set)(
+    //e,
+    //n,
+    //Object(te.renameObjectKey)(
+    //Object(xe.get)(e, n),
+    //String(t.from[t.from.length - 1]),
+    //String(t.path[t.path.length - 1]),
+    //),
+    //),
+    //e)
+    //: Object(te.renameObjectKey)(
+    //e,
+    //String(t.from[t.from.length - 1]),
+    //String(t.path[t.path.length - 1]),
+    //),
+    //);
+  }
+
+  if (nodeOperations.Remove === operation.op) {
+    return produce(spec || {}, (draftSpec) => {
+      unset(draftSpec, operation.path);
+    });
   }
 
   if (
@@ -240,48 +302,47 @@ function patchNodeProp(spec, operation) {
     nodeOperations.Replace === operation.op
   ) {
     return produce(spec || {}, (draftSpec) => {
-      !(function (draftSpec, operation) {
-        const {path, value, op} = operation;
-        if (!isObject(draftSpec)) {
-          return draftSpec;
+      //!(function (draftSpec, operation) {
+      const {path, value, op} = operation;
+      if (!isObject(draftSpec)) {
+        return draftSpec;
+      }
+
+      const totalItems = path.length; //i
+      const lastIndex = totalItems - 1; // o
+      let counter = -1; //a
+      let initialSpec = draftSpec; // s
+
+      for (; initialSpec != null && totalItems > ++counter; ) {
+        let decodedPath = decodeUriFragment(String(path[counter])); //e
+        let initialValue = value; //i
+
+        if (lastIndex !== counter) {
+          const schema = initialSpec[decodedPath]; // n
+          initialValue = isObject(schema)
+            ? schema
+            : isHyphenOnly(String(path[counter + 1]))
+            ? []
+            : {};
         }
 
-        const totalItems = path.length; //i
-        const lastIndex = totalItems - 1; // o
-        let counter = -1; //a
-        let initialSpec = draftSpec; // s
-
-        for (; initialSpec != null && totalItems > ++counter; ) {
-          let decodedPath = decodeUriFragment(String(path[counter])); //e
-          let initialValue = value; //i
-
-          if (lastIndex !== counter) {
-            const schema = initialSpec[decodedPath]; // n
-            initialValue = isObject(schema)
-              ? schema
-              : isHyphenOnly(String(path[counter + 1]))
-              ? []
-              : {};
-          }
-
-          if (decodedPath === '-' && Array.isArray(initialSpec)) {
-            decodedPath = String(initialSpec.length);
-          }
-
-          if (
-            nodeOperations.Add === op &&
-            !Number.isNaN(Number(decodedPath)) &&
-            Array.isArray(initialSpec) &&
-            lastIndex === counter
-          ) {
-            initialSpec.splice(Number(decodedPath), 0, initialValue);
-          } else {
-            initialSpec[decodedPath] = initialValue;
-          }
-
-          initialSpec = initialSpec[decodedPath];
+        if (decodedPath === '-' && Array.isArray(initialSpec)) {
+          decodedPath = String(initialSpec.length);
         }
-      })(draftSpec, operation);
+
+        if (
+          nodeOperations.Add === op &&
+          !Number.isNaN(Number(decodedPath)) &&
+          Array.isArray(initialSpec) &&
+          lastIndex === counter
+        ) {
+          initialSpec.splice(Number(decodedPath), 0, initialValue);
+        } else {
+          initialSpec[decodedPath] = initialValue;
+        }
+
+        initialSpec = initialSpec[decodedPath];
+      }
     });
   } else {
     return spec;

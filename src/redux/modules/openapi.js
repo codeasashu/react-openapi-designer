@@ -4,11 +4,12 @@ import {OpenApiBuilder} from 'openapi3-ts';
 import OrderedDict from '../../ordered-dict';
 import {exampleDoc, defaultOperation, defaultSchema} from '../../model';
 import {generateOperationId} from '../../utils/schema';
+import {unescapeUri} from '../../utils';
+
 import {
-  unescapeUri,
-  modifyPathFromParameters,
   modifyParametersFromPath,
-} from '../../utils';
+  updatePathFromParameters as modifyPathFromParameters,
+} from '../../utils/schema';
 
 const hasPathInPathItems = (path, pathItems) => {
   return (

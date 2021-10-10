@@ -1,48 +1,38 @@
 //@flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import {get} from 'lodash';
-import {useSelector, useDispatch} from 'react-redux';
-import {handleModelChange} from 'store/modules/openapi';
-import {TitleEditor} from '../Editor';
+import {getValueFromStore, usePatchOperation} from '../../utils/selectors';
+import {nodeOperations} from '../../utils/tree';
+import {TitleEditor, MarkdownEditor} from '../Editor';
 import ResponseBody from '../Designer/Responses/body';
 
-const ResponseContent = ({relativeJsonPath}) => {
-  const name = relativeJsonPath.slice(-1).pop();
-  const dispatch = useDispatch();
-
-  const changeModel = React.useCallback(
-    (path, value) => dispatch(handleModelChange({path, value})),
-    [dispatch],
-  );
-
-  const title = useSelector(
-    ({openapi}) =>
-      get(openapi, relativeJsonPath.concat(['title']), name) || name,
-  );
-  const response = useSelector(({openapi}) => get(openapi, relativeJsonPath));
-
+const ResponseContent = ({relativeJsonPath, node}) => {
+  const handlePatch = usePatchOperation();
+  console.log('bodyyy1', relativeJsonPath);
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
         <div className="max-w-6xl p-10 flex flex-col">
           <div className="flex pl-2 justify-between">
-            <TitleEditor
-              disabled
-              xl
-              value={title}
-              onChange={(e) =>
-                changeModel(relativeJsonPath.concat(['title']), e.target.value)
-              }
-            />
+            <TitleEditor disabled xl defaultValue={node.path} />
           </div>
           <div className="flex-1">
-            <ResponseBody
-              response={response}
-              onChange={(e) => {
-                changeModel(relativeJsonPath, {title, ...e});
-              }}
-            />
+            <div className="flex-1">
+              <MarkdownEditor
+                value={
+                  getValueFromStore(relativeJsonPath.concat(['description'])) ||
+                  ''
+                }
+                onChange={(e) => {
+                  handlePatch(
+                    nodeOperations.Replace,
+                    relativeJsonPath.concat(['description']),
+                    e,
+                  );
+                }}
+              />
+            </div>
+            <ResponseBody relativeJsonPath={relativeJsonPath} node={node} />
           </div>
         </div>
       </div>
@@ -52,6 +42,7 @@ const ResponseContent = ({relativeJsonPath}) => {
 
 ResponseContent.propTypes = {
   relativeJsonPath: PropTypes.array,
+  node: PropTypes.object,
 };
 
 export default ResponseContent;

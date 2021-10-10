@@ -1,12 +1,20 @@
 import {hasIn} from 'lodash';
+import Path from './oas/path';
+import Service from './oas/service';
 import {nodeOperations} from '../utils/tree';
 
 class OasStore {
   constructor(e) {
     this.stores = e;
-    //this.path = new dd(e)
+    this.path = new Path(e);
+    this.service = new Service(e);
     //this.operation = new ld(e)
     //this.service = new hd(e)
+  }
+
+  activate() {
+    this.path.activate();
+    this.service.activate();
   }
 
   addSharedParameter({sourceNodeId, name, parameterType}) {

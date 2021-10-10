@@ -1,8 +1,20 @@
 // @flow
 import React from 'react';
-import {get, set, compact, difference, isObject, map} from 'lodash';
+import {get, compact} from 'lodash';
 
 export const StatusCodes = [200, 201, 202];
+// @TODO support additional methods:
+// ["get", "post", "put", "patch", "delete", "head", "options", "trace"]
+export const validMethods = [
+  'get',
+  'post',
+  'put',
+  'patch',
+  'delete',
+  'head',
+  'options',
+  'trace',
+];
 export const validPathMethods = {
   get: 'get',
   post: 'post',
@@ -121,94 +133,6 @@ export const getJsonPointerFromUrl = (pointer: string) => {
     .filter((n) => !!n);
 };
 
-export const extractPathParams = (path) => {
-  const pathParamRegex = /{(.+?)}/g;
-  let paramsFromRegex = pathParamRegex.exec(path);
-  const parameters = [];
-
-  for (; paramsFromRegex !== null; ) {
-    parameters.push(paramsFromRegex[1]);
-    paramsFromRegex = pathParamRegex.exec(path);
-  }
-  return parameters;
-};
-
-export const modifyPathFromParameters = (path, parameters) => {
-  const urlParams = extractPathParams(path);
-  const parameterParams = compact(parameters || [])
-    .filter((e) => e.in === 'path')
-    .map((e) => e.name);
-  const urlNotinParameters = difference(urlParams, parameterParams);
-  const parametersNotinUrl = difference(parameterParams, urlParams);
-  let url = path;
-
-  if (urlNotinParameters.length === 1 && parametersNotinUrl.length === 1) {
-    if (parametersNotinUrl[0] === '' || parametersNotinUrl[0] === undefined) {
-      url = path.replace(`{${urlNotinParameters[0]}}`, '');
-    } else {
-      if (path.includes(`{${urlNotinParameters[0]}}`)) {
-        url = path.replace(
-          `{${urlNotinParameters[0]}}`,
-          `{${parametersNotinUrl[0]}}`,
-        );
-      } else {
-        if (!path.includes(`{${parametersNotinUrl[0]}}`)) {
-          url = `${path}/{${parametersNotinUrl[0]}}`;
-        }
-      }
-    }
-  } else {
-    if (urlNotinParameters.length === 1 && parametersNotinUrl.length === 0) {
-      url = path.replace(`{${urlNotinParameters[0]}}`, '');
-    } else {
-      if (
-        !(
-          urlNotinParameters.length !== 0 ||
-          parametersNotinUrl.length !== 1 ||
-          parametersNotinUrl[0] === '' ||
-          path.includes(`{${parametersNotinUrl[0]}}`)
-        )
-      ) {
-        url = `${path}/{${parametersNotinUrl[0]}}`;
-      }
-    }
-  }
-
-  return url.replace(/\/+$/, '').replace(/([^:]\/)\/+/g, '$1');
-};
-
-export const modifyParametersFromPath = (params, path) => {
-  const urlParams = extractPathParams(path);
-  const pathParameters = params.filter((e) => isObject(e) && e.in === 'path');
-  const notPathParameters = params.filter(
-    (e) => isObject(e) && e.in !== 'path',
-  );
-  const arrayOfPathPaemetersName = map(pathParameters, 'name');
-  const parametersNotInUrl = difference(arrayOfPathPaemetersName, urlParams);
-  const urlParamsNotInparameters = difference(
-    urlParams,
-    arrayOfPathPaemetersName,
-  );
-  const remainingPathParameters = pathParameters.filter(
-    (e) => !parametersNotInUrl.includes(e.name),
-  );
-  const remainingPathParametersNames = map(remainingPathParameters, 'name');
-
-  urlParamsNotInparameters.forEach((e) => {
-    if (!remainingPathParametersNames.includes(e)) {
-      remainingPathParameters.push(formatPathParameter(e, ['schema', 'type']));
-    }
-  });
-  return [...remainingPathParameters, ...notPathParameters];
-};
-
-const formatPathParameter = (name, location) =>
-  Object.assign(Object.assign({}, set({}, location, 'string')), {
-    name,
-    in: 'path',
-    required: true,
-  });
-
 export const isValidPathMethod = (method) =>
   method && Object.keys(validPathMethods).indexOf(method.toLowerCase()) >= 0;
 
@@ -281,15 +205,30 @@ const encodeUriFragmentIdentifier = (path) => {
   return `#/${path.map(encodeUriFragment).join('/')}`;
 };
 
-export const getPathParametersFromUri = (uri) => {
-  const matcher = /{(.+?)}/g;
-  let matches = matcher.exec(uri);
-  const params = [];
+export const timer = async (timeout = 0) =>
+  new Promise((t) => setTimeout(t, timeout));
 
-  for (; matches !== null; ) {
-    params.push(matches[1]);
-    matches = matcher.exec(uri);
+export const methodColors = {
+  get: 'success',
+  post: 'info',
+  put: 'warning',
+  patch: 'warning',
+  delete: 'danger',
+  copy: 'gray',
+  head: 'gray',
+  link: 'gray',
+  unlink: 'gray',
+  purge: 'gray',
+  lock: 'gray',
+  unlock: 'gray',
+  options: 'gray',
+  trace: 'gray',
+};
+
+export const getMethodColor = (_color) => {
+  if (_color in methodColors) {
+    return methodColors[_color];
+  } else {
+    return 'gray';
   }
-
-  return params;
 };

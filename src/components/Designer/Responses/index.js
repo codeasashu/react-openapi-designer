@@ -6,7 +6,7 @@ import ResponseBody from './body';
 import {defaultSchema} from '../../../model';
 import {ContentTypes} from '../../../utils';
 
-const Response = ({dark, responses, onChange, ...props}) => {
+const Response = ({relativeJsonPath, dark, responses, onChange, ...props}) => {
   const codes = Object.keys(responses)
     .map((e) => parseInt(e))
     .filter((e) => !isNaN(e))
@@ -44,6 +44,7 @@ const Response = ({dark, responses, onChange, ...props}) => {
       />
       {selectedResponse && (
         <ResponseBody
+          relativeJsonPath={relativeJsonPath.concat(['' + selectedCode])}
           response={selectedResponse}
           onChange={(response) => {
             setSelectedResponse(response);
@@ -57,6 +58,7 @@ const Response = ({dark, responses, onChange, ...props}) => {
 };
 
 Response.propTypes = {
+  relativeJsonPath: PropTypes.array,
   dark: PropTypes.bool,
   responses: PropTypes.object,
   onChange: PropTypes.func,

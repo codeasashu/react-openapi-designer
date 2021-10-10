@@ -25,7 +25,7 @@ AddOperation.propTypes = {
   onAdd: PropTypes.func,
 };
 
-const Operation = ({operation, onChange}) => {
+const Operation = ({relativeJsonPath, operation, onChange}) => {
   return (
     <div className="relative">
       <div className="w-full p-10 pb-16 max-w-6xl">
@@ -63,16 +63,19 @@ const Operation = ({operation, onChange}) => {
           </div>
           <div className="my-8 -mx-1 border-t dark:border-darken-4" />
           <ParameterGroup
+            relativeJsonPath={relativeJsonPath.concat(['requestBody'])}
             parameters={operation.parameters || []}
             onChange={(parameters) => onChange({parameters})}
           />
           <div className="my-8 -mx-1 border-t dark:border-darken-4" />
           <RequestBody
+            relativeJsonPath={relativeJsonPath.concat(['requestBody'])}
             requestBody={operation.requestBody || {}}
             onChange={(requestBody) => onChange({requestBody})}
           />
           <div className="my-8 -mx-1 border-t dark:border-darken-4" />
           <Responses
+            relativeJsonPath={relativeJsonPath.concat(['responses'])}
             responses={operation.responses}
             onChange={(responseBody) =>
               onChange({
@@ -87,19 +90,31 @@ const Operation = ({operation, onChange}) => {
 };
 
 Operation.propTypes = {
+  relativeJsonPath: PropTypes.array,
   operation: PropTypes.object,
   onChange: PropTypes.func,
 };
 
-const Method = ({operation, methodName, onAddOperation, onChange}) => {
+const Method = ({
+  relativeJsonPath,
+  operation,
+  methodName,
+  onAddOperation,
+  onChange,
+}) => {
   return operation ? (
-    <Operation operation={operation} onChange={onChange} />
+    <Operation
+      operation={operation}
+      relativeJsonPath={relativeJsonPath}
+      onChange={onChange}
+    />
   ) : (
     <AddOperation method={methodName} onAdd={onAddOperation} />
   );
 };
 
 Method.propTypes = {
+  relativeJsonPath: PropTypes.array,
   methodName: PropTypes.string,
   operation: PropTypes.object,
   onChange: PropTypes.func,
