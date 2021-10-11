@@ -1,10 +1,13 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Switch, Button, Intent} from '@blueprintjs/core';
-import {TitleEditor as Title, MarkdownEditor as Markdown} from '../Editor';
-import RequestBody from '../Designer/RequestBody';
-import Responses from '../Designer/Responses';
-import ParameterGroup from '../Designer/ParameterGroup';
+import {observer} from 'mobx-react-lite';
+import {Button, Intent} from '@blueprintjs/core';
+import Operation from '../Content/operation/operation';
+//import RequestBody from '../Designer/RequestBody';
+//import Responses from '../Designer/Responses';
+//import ParameterGroup from '../Designer/ParameterGroup';
+//import {StoresContext} from '../Tree/context';
+//import {usePatchOperation} from '../../utils/selectors';
 
 const AddOperation = ({method, onAdd}) => {
   return (
@@ -25,93 +28,105 @@ AddOperation.propTypes = {
   onAdd: PropTypes.func,
 };
 
-const Operation = ({relativeJsonPath, operation, onChange}) => {
-  return (
-    <div className="relative">
-      <div className="w-full p-10 pb-16 max-w-6xl">
-        <div className="flex flex-col">
-          <div className="flex flex-row justify-between">
-            <div>
-              <div className="uppercase p-2" style={{fontSize: '9px'}}>
-                Operation ID
-              </div>
-              <Title
-                small
-                value={operation['operationId']}
-                onChange={(e) => onChange({title: e})}
-              />
-            </div>
-            <div className="flex items-baseline">
-              <div className="text-xs uppercase">Deprecated</div>
-              <Switch
-                checked={false}
-                onChange={() => {}}
-                className="ml-2 py-1"
-              />
-            </div>
-          </div>
-          <div className="uppercase px-2 pt-2" style={{fontSize: '9px'}}>
-            Description
-          </div>
-          <div className="flex-1">
-            <Markdown
-              className="CodeEditor mb-8 relative hover:bg-darken-2 rounded-lg"
-              placeholder="Description...."
-              value={operation['description'] || ''}
-              onChange={(e) => onChange({description: e})}
-            />
-          </div>
-          <div className="my-8 -mx-1 border-t dark:border-darken-4" />
-          <ParameterGroup
-            relativeJsonPath={relativeJsonPath.concat(['requestBody'])}
-            parameters={operation.parameters || []}
-            onChange={(parameters) => onChange({parameters})}
-          />
-          <div className="my-8 -mx-1 border-t dark:border-darken-4" />
-          <RequestBody
-            relativeJsonPath={relativeJsonPath.concat(['requestBody'])}
-            requestBody={operation.requestBody || {}}
-            onChange={(requestBody) => onChange({requestBody})}
-          />
-          <div className="my-8 -mx-1 border-t dark:border-darken-4" />
-          <Responses
-            relativeJsonPath={relativeJsonPath.concat(['responses'])}
-            responses={operation.responses}
-            onChange={(responseBody) =>
-              onChange({
-                responses: {...operation.responses, ...responseBody},
-              })
-            }
-          />
-        </div>
-      </div>
-    </div>
-  );
-};
+//const mapParametersJsonPaths = (relativeJsonPath) => ({
+//parametersPath: relativeJsonPath.concat("parameters"),
+//securityPath: relativeJsonPath.concat("security"),
+//typePath: ["schema", "type"],
+//validationsPath: ["schema"],
+//})
 
-Operation.propTypes = {
-  relativeJsonPath: PropTypes.array,
-  operation: PropTypes.object,
-  onChange: PropTypes.func,
-};
+//const Operation = observer(({relativeJsonPath, operation, onChange}) => {
+//const stores = React.useContext(StoresContext);
+//const parameterJsonPath = mapParametersJsonPaths(relativeJsonPath);
 
-const Method = ({
-  relativeJsonPath,
-  operation,
-  methodName,
-  onAddOperation,
-  onChange,
-}) => {
-  return operation ? (
-    <Operation
-      operation={operation}
-      relativeJsonPath={relativeJsonPath}
-      onChange={onChange}
-    />
-  ) : (
-    <AddOperation method={methodName} onAdd={onAddOperation} />
-  );
-};
+//const {
+//activeSourceNode,
+//} = stores.uiStore;
+
+//const handlePatch = usePatchOperation();
+
+//return (
+//<div className="relative">
+//<div className="w-full p-10 pb-16 max-w-6xl">
+//<div className="flex flex-col">
+//<div className="flex flex-row justify-between">
+//<div>
+//<div className="uppercase p-2" style={{fontSize: '9px'}}>
+//Operation ID
+//</div>
+//<Title
+//small
+//value={operation['operationId']}
+//onChange={(e) => onChange({title: e})}
+///>
+//</div>
+//<div className="flex items-baseline">
+//<div className="text-xs uppercase">Deprecated</div>
+//<Switch
+//checked={false}
+//onChange={() => {}}
+//className="ml-2 py-1"
+///>
+//</div>
+//</div>
+//<div className="uppercase px-2 pt-2" style={{fontSize: '9px'}}>
+//Description
+//</div>
+//<div className="flex-1">
+//<Markdown
+//className="CodeEditor mb-8 relative hover:bg-darken-2 rounded-lg"
+//placeholder="Description...."
+//value={operation['description'] || ''}
+//onChange={(e) => onChange({description: e})}
+///>
+//</div>
+//<div className="my-8 -mx-1 border-t dark:border-darken-4" />
+//<ParameterGroup
+//relativeJsonPath={relativeJsonPath.concat(['requestBody'])}
+//parameters={operation.parameters || []}
+//onChange={(parameters) => onChange({parameters})}
+///>
+//<div className="my-8 -mx-1 border-t dark:border-darken-4" />
+//<RequestBody
+//relativeJsonPath={relativeJsonPath.concat(['requestBody'])}
+//requestBody={operation.requestBody || {}}
+//onChange={(requestBody) => onChange({requestBody})}
+///>
+//<div className="my-8 -mx-1 border-t dark:border-darken-4" />
+//<Responses
+//relativeJsonPath={relativeJsonPath.concat(['responses'])}
+//responses={operation.responses}
+//onChange={(responseBody) =>
+//onChange({
+//responses: {...operation.responses, ...responseBody},
+//})
+//}
+///>
+//</div>
+//</div>
+//</div>
+//);
+//});
+
+//Operation.propTypes = {
+//relativeJsonPath: PropTypes.array,
+//operation: PropTypes.object,
+//onChange: PropTypes.func,
+//};
+
+const Method = observer(
+  ({relativeJsonPath, operation, methodName, onAddOperation, onChange}) => {
+    return operation ? (
+      <Operation
+        operation={operation}
+        relativeJsonPath={relativeJsonPath}
+        onChange={onChange}
+      />
+    ) : (
+      <AddOperation method={methodName} onAdd={onAddOperation} />
+    );
+  },
+);
 
 Method.propTypes = {
   relativeJsonPath: PropTypes.array,

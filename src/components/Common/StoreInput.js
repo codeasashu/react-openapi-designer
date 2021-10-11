@@ -20,10 +20,12 @@ const StoreInput = ({
   onChange,
   handleUpdate,
   readOnly,
+  valueInPath,
   cleanuupEmpty,
   jsonOp = nodeOperations.Replace,
 }) => {
-  const value = getValueFromStore(relativeJsonPath);
+  const value = getValueFromStore(relativeJsonPath, valueInPath || false);
+  console.log('headerepath', relativeJsonPath, valueInPath);
   const handlePatch = usePatchOperationAt(relativeJsonPath);
   const [draft, setDraft] = React.useState(value === undefined ? '' : value);
   const [original, setOriginal] = React.useState(draft);
@@ -93,5 +95,6 @@ StoreInput.propTypes = {
   title: PropTypes.string,
   placeholder: PropTypes.string,
   relativeJsonPath: PropTypes.array,
+  valueInPath: PropTypes.bool,
 };
 export default StoreInput;

@@ -3,10 +3,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
 //import Parameter from '../../../designers/parameter';
-import Parameter from './parameter';
+import Parameter from '../../Designer/ParameterGroup/parameter';
 import {getValueFromStore} from '../../../utils/selectors';
 
-const Path = observer(
+const Parameters = observer(
   ({
     title,
     parametersPath,
@@ -20,12 +20,14 @@ const Path = observer(
     const relativeJsonPaths = [];
     if (pathParameters && pathParameters instanceof Array) {
       pathParameters.forEach((value, index) => {
-        values.push(value);
-        relativeJsonPaths.push(parametersPath.concat(index));
+        if (value.in === parameterIn) {
+          values.push(value);
+          relativeJsonPaths.push(parametersPath.concat(index));
+        }
       });
     }
 
-    return (
+    return relativeJsonPaths.length ? (
       <div className="mt-2">
         <div className="font-semibold ml-1 mb-2 text-gray-6 dark:text-gray-4">
           {title}
@@ -46,13 +48,13 @@ const Path = observer(
           />
         ))}
       </div>
-    );
+    ) : null;
   },
 );
 
-Path.propTypes = {
+Parameters.propTypes = {
   parameters: PropTypes.array,
   onChange: PropTypes.func,
 };
 
-export default Path;
+export default Parameters;

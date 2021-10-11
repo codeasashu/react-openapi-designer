@@ -15,6 +15,7 @@ import {isEmpty} from 'lodash';
 import StoreInput from '../../Common/StoreInput';
 
 const Parameter = ({
+  nameInPath,
   className,
   parameterPath,
   typePath,
@@ -76,14 +77,31 @@ const Parameter = ({
   );
   return (
     <ControlGroup className={className}>
-      <StoreInput
-        className="flex-auto"
-        autoFocus={autoFocus}
-        relativeJsonPath={parameterPath.concat(['name'])}
-        placeholder="Name..."
-        handleUpdate={handleUpdateName}
-        dataProp={['parsed']}
-      />
+      {nameInPath ? (
+        <StoreInput
+          valueInPath={true}
+          jsonOp={nodeOperations.Move}
+          className="flex-auto"
+          autoFocus={autoFocus}
+          relativeJsonPath={
+            nameInPath ? parameterPath : parameterPath.concat(['name'])
+          }
+          placeholder="Name..."
+          handleUpdate={handleUpdateName}
+          dataProp={['parsed']}
+        />
+      ) : (
+        <StoreInput
+          className="flex-auto"
+          autoFocus={autoFocus}
+          relativeJsonPath={
+            nameInPath ? parameterPath : parameterPath.concat(['name'])
+          }
+          placeholder="Name..."
+          handleUpdate={handleUpdateName}
+          dataProp={['parsed']}
+        />
+      )}
       <HTMLSelect
         className="flex-shrink"
         value={schema}
@@ -162,6 +180,7 @@ Parameter.propTypes = {
   disableRequired: PropTypes.bool,
   handleRemove: PropTypes.func,
   handleUpdateName: PropTypes.func,
+  nameInPath: PropTypes.bool,
 };
 
 export default Parameter;

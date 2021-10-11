@@ -97,4 +97,14 @@ const getValueFromStore = (relativeJsonPath, valueInPath, dataProp) => {
   return getValue(activeSourceNode, relativeJsonPath, valueInPath, dataProp);
 };
 
-export {usePatchOperation, getValueFromStore};
+const usePrevious = (value) => {
+  const prev = React.useRef(value);
+
+  React.useEffect(() => {
+    prev.current = value;
+  });
+
+  return prev.current;
+};
+
+export {usePatchOperation, getValueFromStore, usePrevious};

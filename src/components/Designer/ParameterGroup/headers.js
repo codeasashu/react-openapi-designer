@@ -1,44 +1,58 @@
-//@flow
+// @flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import Parameter from '../../../designers/parameter';
+import {observer} from 'mobx-react-lite';
+//import Parameter from '../../../designers/parameter';
+import Parameter from './parameter';
+import {getValueFromStore} from '../../../utils/selectors';
 
-const Headers = ({headers, onChange}) => {
-  const handleChange = (header, i) => {
-    const newHeaders = [...headers];
-    newHeaders[i] = {...header, in: 'header'};
-    onChange(newHeaders);
-  };
+const Headers = observer(
+  ({
+    title,
+    parametersPath,
+    parameterIn,
+    handleUpdateName,
+    handleRemove,
+    autoFocus,
+  }) => {
+    const pathParameters = getValueFromStore(parametersPath, false);
+    const values = [];
+    const relativeJsonPaths = [];
+    if (pathParameters && pathParameters instanceof Array) {
+      pathParameters.forEach((value, index) => {
+        values.push(value);
+        relativeJsonPaths.push(parametersPath.concat(index));
+      });
+    }
 
-  const handleDelete = (i) => {
-    onChange(headers.filter((c, j) => j !== i));
-  };
-
-  return headers.length > 0 ? (
-    <div className="mt-6">
-      <div className="font-semibold ml-1 mb-2 text-gray-6 dark:text-gray-4">
-        Headers
-      </div>
-
-      {headers.map((header, i) => {
-        return (
+    return (
+      <div className="mt-2">
+        <div className="font-semibold ml-1 mb-2 text-gray-6 dark:text-gray-4">
+          {title}
+        </div>
+        {relativeJsonPaths.map((parameter, index) => (
           <Parameter
-            name={header['name']}
-            key={i}
-            schema={header['schema']}
-            description={header['description']}
-            onChange={(e) => handleChange(e, i)}
-            onDelete={() => handleDelete(i)}
+            key={parameter.join('/')}
+            parameterPath={parameter}
+            parameterIn={parameterIn}
+            handleUpdateName={handleUpdateName}
+            handleRemove={handleRemove}
+            autoFocus={
+              autoFocus &&
+              parameterIn === autoFocus.current &&
+              parametersPath.length - 1 === index
+            }
+            typePath={parameter.concat(['schema', 'type'])}
           />
-        );
-      })}
-    </div>
-  ) : null;
-};
+        ))}
+      </div>
+    );
+  },
+);
 
 Headers.propTypes = {
+  parameters: PropTypes.array,
   onChange: PropTypes.func,
-  headers: PropTypes.array,
 };
 
 export default Headers;
