@@ -1,4 +1,4 @@
-import {makeAutoObservable} from 'mobx';
+import {makeObservable, observable, action} from 'mobx';
 
 class State {
   expanded = {};
@@ -6,7 +6,13 @@ class State {
   editedNodeId = null;
 
   constructor(options) {
-    makeAutoObservable(this);
+    makeObservable(this, {
+      expanded: observable.shallow,
+      editedNodeId: observable,
+      activeNodeId: observable,
+      setExpanded: action,
+      setExpandedKeyVal: action,
+    });
     this.expanded = options?.expanded || {};
     this.activeNodeId = options?.activeNodeId || null;
     this.editedNodeId = options?.editedNodeId || null;

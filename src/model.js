@@ -155,6 +155,18 @@ export const treeTypes = {
   Example: 'example',
 };
 
+//export const defaultOasSchema = ```
+//openapi: 3.1.0
+//info:
+//title: obd-internal
+//version: '1.0'
+//servers:
+//- url: 'http://localhost:3000'
+//paths: {}
+//components:
+//schemas: {}
+//```;
+
 export const defaultSchema = {
   string: {type: 'string'},
   boolean: {type: 'boolean'},

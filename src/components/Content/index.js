@@ -12,7 +12,8 @@ import PathContent from './path';
 import ModelContent from './model';
 import Parameter from './parameter';
 import Response from './response';
-import YamlEditor from '../Editor/yaml';
+//import YamlEditor from '../Editor/yaml';
+import MonacoEditor from '../Editor/Monaco';
 import {observer} from 'mobx-react-lite';
 import {StoresContext} from '../Tree/context';
 import {NodeCategories, NodeTypes} from '../../utils/tree';
@@ -85,7 +86,8 @@ const Content = observer(() => {
           <SubContent node={activeNode || sourceNode} />
         )}
         {currentView === 'code' && (
-          <YamlEditor value={''} onChange={() => {}} />
+          <MonacoEditor />
+          //<YamlEditor value={''} onChange={() => {}} />
         )}
       </div>
     </StyledContent>

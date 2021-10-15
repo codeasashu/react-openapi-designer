@@ -1,5 +1,5 @@
 import React from 'react';
-import {makeAutoObservable} from 'mobx';
+import {makeObservable, action, observable} from 'mobx';
 import {
   raiseErrorIfNotParentNode,
   generateUUID,
@@ -12,7 +12,11 @@ class Store {
   someprop = '';
   //constructor(e, t, n) {
   constructor(tree, state, n) {
-    makeAutoObservable(this);
+    makeObservable(this, {
+      state: observable.ref,
+      setEditedNode: action,
+      setActiveNode: action,
+    });
     this.state = state;
     this.icons = {};
     this.defaultExpandedDepth = 0;

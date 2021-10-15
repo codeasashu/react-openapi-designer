@@ -13,7 +13,7 @@ const dropZoneIdSymbol = Symbol('DROP_ZONE_ID');
 const countSymbol = Symbol('COUNT');
 
 class Tree {
-  @observable _versionCounter;
+  _versionCounter;
   @observable _root = null;
   _count = 0;
   unwrapped = null;
@@ -24,6 +24,7 @@ class Tree {
     size = 200,
   ) {
     makeObservable(this, {
+      _versionCounter: observable,
       versionCounter: computed,
       _count: observable,
       count: computed,
@@ -31,6 +32,8 @@ class Tree {
       unwrap: action,
       wrap: action,
       _root: observable,
+      invalidateLevel: action,
+      processTreeFragment: action,
     });
     this.iterationOptions = iterOptions;
     this.unwrapped = new SwappableWeakSet();
@@ -46,7 +49,7 @@ class Tree {
     return this._root;
   }
 
-  @computed get versionCounter() {
+  get versionCounter() {
     return this._versionCounter;
   }
 
@@ -581,6 +584,7 @@ class Tree {
     return counter;
   }
 
+  @action
   static resetLevel(node) {
     Object.defineProperty(node, levelSymbol, Tree.level);
   }

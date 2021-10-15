@@ -50,6 +50,7 @@ export const nodeOperations = {
   Move: 'move_child_node',
   Replace: 'replace_child_node',
   Remove: 'remove_child_node',
+  Text: 'text_child_node',
 };
 
 export const NodeCategories = {
@@ -92,6 +93,14 @@ export const eventTypes = {
   RenameNode: 'action.rename_node',
   DeleteNode: 'action.delete_node',
   DeleteHttpMethod: 'action.delete_http_method',
+
+  // Store events
+  StoreEvents: {
+    ExtraPropUpdate: 'store.extra_prop_update',
+    Change: 'store.change',
+    Transformed: 'store.transformed',
+    GoToRef: 'store.goto_ref',
+  },
 };
 
 export const taskTypes = {

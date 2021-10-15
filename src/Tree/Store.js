@@ -11,6 +11,8 @@ import EventEmitter from './EventEmitter';
 
 class Store {
   someprop = '';
+  tree;
+
   //constructor(e, t, n) {
   constructor(tree, state, n) {
     makeAutoObservable(this);
@@ -18,6 +20,7 @@ class Store {
     this.icons = {};
     this.defaultExpandedDepth = 0;
     this._innerPadding = null;
+    this.tree = tree;
     this.instanceRef = React.createRef();
     this.events = new EventEmitter();
 
@@ -25,10 +28,7 @@ class Store {
       this.state.activeNodeId = e;
     };
 
-    this.setEditedNode = (e) => {
-      this.state.editedNodeId = e;
-    };
-
+    //this.
     //this.scrollToItem = (e) => {
     this.scrollToItem = (node) => {
       if (!this.instanceRef.current) {
@@ -76,9 +76,7 @@ class Store {
 
     //this.rename = async (e, t) => {
     this.rename = async (node, validator) => {
-      console.log('rename', node, validator);
       this.setEditedNode(node.id);
-
       ////const disposableCollection = new o.DisposableCollection();
 
       try {
@@ -111,9 +109,12 @@ class Store {
       }
     };
 
-    this.tree = tree;
     Object.assign(this, n);
     this.placeholderId = generateUUID();
+  }
+
+  setEditedNode(e) {
+    this.state.editedNodeId = e;
   }
 
   get innerPadding() {
@@ -164,6 +165,7 @@ class Store {
     const {expanded} = this.state; // n
 
     if (expand === undefined || expanded[node.id] !== expand) {
+      const isExpanded = !this.isNodeExpanded(node);
       this.someprop = node.id;
       this.state.setExpandedKeyVal(
         node.id,
@@ -218,6 +220,11 @@ class Store {
   //static isNodeExpanded(e,t,n) {
   static isNodeExpanded(node, expandedState, defaultExpandedDepth) {
     if (
+      Object.prototype.hasOwnProperty.call(expandedState, node.id) === false
+    ) {
+      return true;
+    }
+    if (
       node.id in expandedState &&
       defaultExpandedDepth >= Tree.getLevel(node)
     ) {
@@ -264,7 +271,6 @@ class Store {
 
     try {
       await this.rename(node, validator);
-
       if (node.parent !== null) {
         this.tree.invalidateNode(node.parent);
       }

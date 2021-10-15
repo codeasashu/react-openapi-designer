@@ -169,7 +169,6 @@ class GraphStore {
       });
 
       this.eventEmitter.emit(eventTypes.DidPatchSourceNodePropComplete);
-      console.log('rootNode22', this.rootNode.data.parsed);
     });
 
     this.eventEmitter.on(eventTypes.GraphNodeAdd, ({task, node}) => {

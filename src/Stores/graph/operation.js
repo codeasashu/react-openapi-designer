@@ -70,7 +70,7 @@ function handleOperation(dom, patch, notifier) {
               nodeInstance = new GraphNode(node, parentNode);
               break;
             case NodeCategories.SourceMap:
-              nodeInstance = (function (node, parentNode, notifier) {
+              nodeInstance = (function (node, parentNode) {
                 if (
                   !parentNode ||
                   NodeCategories.Virtual === parentNode.category
@@ -81,11 +81,8 @@ function handleOperation(dom, patch, notifier) {
                 }
                 const sourceMapNode = new SourceMapNode(node, parentNode);
 
-                notifier.emit(eventTypes.DidAddSourceMapNode, {
-                  node: sourceMapNode,
-                });
                 return sourceMapNode;
-              })(node, parentNode, notifier);
+              })(node, parentNode);
               break;
             case NodeCategories.Virtual:
               nodeInstance = (function (node, parentNode) {
@@ -107,9 +104,12 @@ function handleOperation(dom, patch, notifier) {
           dom.nodesByType[nodeInstance.type] =
             dom.nodesByType[nodeInstance.type] || [];
           dom.nodesByType[nodeInstance.type].push(nodeInstance);
-
+          if (nodeInstance.category === NodeCategories.SourceMap) {
+            notifier.emit(eventTypes.DidAddSourceMapNode, {
+              node: nodeInstance,
+            });
+          }
           observe(nodeInstance, 'uri', ({newValue, oldValue}) => {
-            console.log('I am observing', newValue, oldValue);
             if (oldValue) {
               delete dom.nodesByUri[oldValue];
             }
@@ -291,11 +291,11 @@ function patchNodeProp(spec, operation) {
     //);
   }
 
-  if (nodeOperations.Remove === operation.op) {
-    return produce(spec || {}, (draftSpec) => {
-      unset(draftSpec, operation.path);
-    });
-  }
+  //if (nodeOperations.Remove === operation.op) {
+  //return produce(spec || {}, (draftSpec) => {
+  //unset(draftSpec, operation.path);
+  //});
+  //}
 
   if (
     nodeOperations.Add === operation.op ||

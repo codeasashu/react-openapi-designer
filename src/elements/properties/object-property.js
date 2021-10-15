@@ -123,8 +123,8 @@ ObjectProperty.propTypes = {
     additionalProperties: PropTypes.bool,
     readOnly: PropTypes.bool,
     writeOnly: PropTypes.bool,
-    minProperties: PropTypes.number,
-    maxProperties: PropTypes.number,
+    minProperties: PropTypes.any,
+    maxProperties: PropTypes.any,
   }),
   isSubtype: PropTypes.bool,
   child: PropTypes.string, // @TODO: React node

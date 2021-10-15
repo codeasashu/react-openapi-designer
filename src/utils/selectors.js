@@ -80,7 +80,7 @@ function usePatchOperation() {
   );
 }
 
-const getValue = (
+export const getValue = (
   sourceNode,
   relativeJsonPath,
   valueInPath,

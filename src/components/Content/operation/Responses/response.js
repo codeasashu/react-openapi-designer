@@ -14,7 +14,8 @@ import {nodeOperations} from '../../../../utils/tree';
 import {contentTypes as allContentTypes} from '../../../../model';
 import ContentTypeSuggest from '../../../Pickers/ContentTypeSuggest';
 import {MarkdownEditor} from '../../../Editor';
-import SchemaDesigner from '../../../Designer/Schema';
+//import SchemaDesigner from '../../../Designer/Schema';
+import SchemaDesigner from '../../../Editor/oasSchema';
 
 const Response = observer(({className, contentPath, descriptionPath}) => {
   const handlePatch = usePatchOperation();
@@ -132,19 +133,8 @@ const Response = observer(({className, contentPath, descriptionPath}) => {
       )}
       {mediaType && hasMediaType && (
         <SchemaDesigner
-          dark
-          className="mt-2"
-          namespace="response"
-          initschema={getValueFromStore(
-            contentPath.concat([mediaType, 'schema']),
-          )}
-          onChange={(e) => {
-            handlePatch(
-              nodeOperations.Replace,
-              contentPath.concat([mediaType, 'schema']),
-              e,
-            );
-          }}
+          className="mt-6"
+          relativeJsonPath={contentPath.concat([mediaType, 'schema'])}
         />
       )}
     </div>

@@ -358,7 +358,7 @@ export const MinProperty = (props) => {
 };
 
 MinProperty.propTypes = {
-  value: PropTypes.number,
+  value: PropTypes.any,
   onChange: PropTypes.func,
 };
 
@@ -376,6 +376,6 @@ export const MaxProperty = (props) => {
 };
 
 MaxProperty.propTypes = {
-  value: PropTypes.number,
+  value: PropTypes.any,
   onChange: PropTypes.func,
 };

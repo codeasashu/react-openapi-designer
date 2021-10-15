@@ -11,7 +11,9 @@ import {trace} from 'mobx';
 const Sidebar = observer((props) => {
   trace(true);
   const stores = React.useContext(StoresContext);
-  const handleScroll = () => {};
+  const handleScroll = () => {
+    //console.log('onScrroll', e);
+  };
 
   const rowRenderer = React.useCallback(
     (node, rowOptions) => {

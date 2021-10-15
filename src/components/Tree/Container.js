@@ -2,8 +2,9 @@ import React from 'react';
 import classnames from 'classnames';
 import {observer} from 'mobx-react-lite';
 import {StoreContext, DesignContext} from './context';
-import VariableSizeList from './VariableSizeList';
-import FixedSizeList from './FixedSizeList';
+//import VariableSizeList from './VariableSizeList';
+import {VariableSizeList, FixedSizeList} from 'react-window';
+//import FixedSizeList from './FixedSizeList';
 import TreeRow from './TreeRow';
 
 const TreeContainer = observer((props) => {
@@ -29,7 +30,8 @@ const TreeContainer = observer((props) => {
   const store = React.useContext(StoreContext);
   const innerClassName = getFromDesignContext('innerClassName');
   const className = getFromDesignContext('className');
-  const instanceRef = store.instanceRef;
+  //const instanceRef = store.instanceRef;
+  const instanceRef = React.useRef({});
   const tree = store.tree;
 
   if (typeof innerPadding == 'boolean' && typeof rowHeight == 'function') {
@@ -133,6 +135,8 @@ const TreeContainer = observer((props) => {
         ) : (
           <VariableSizeList
             {...listProps}
+            height={500}
+            ref={instanceRef}
             instanceRef={instanceRef}
             itemSize={getItemSize}>
             {TreeRow}

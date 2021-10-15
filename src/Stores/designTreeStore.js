@@ -16,7 +16,7 @@ import {
   nodeOperations,
 } from '../utils/tree';
 import ComputedTree from '../Tree/ComputedTree';
-import Tree from '../Tree/Tree';
+//import Tree from '../Tree/Tree';
 import {ContextResolver, getChildNode} from '../Tree/Resolver';
 import TreeOrder from '../Tree/Order';
 import TreeStore from '../Tree/Store';
@@ -302,7 +302,8 @@ class DesignTreeStore extends ApiTreeStore {
   }
 
   invalidateTree() {
-    this.tree.setRoot(Tree.createArtificialRoot());
+    this.tree.invalidate();
+    //this.tree.setRoot(Tree.createArtificialRoot());
   }
 
   registerEventListeners() {
@@ -474,6 +475,7 @@ class DesignTreeStore extends ApiTreeStore {
   registerGraphEventListeners() {
     this.stores.graphStore.eventEmitter.on(
       eventTypes.DidAddSourceMapNode,
+      //eventTypes.DidPatchSourceNodePropComplete,
       action(({node: {id}}) => {
         const node = this.stores.graphStore.getNodeById(id); // t
         if (node === undefined || node.parentId === undefined) {
@@ -511,7 +513,8 @@ class DesignTreeStore extends ApiTreeStore {
               this.tree.insertNode(getChildNode(node, parentNode), parentNode);
             }
           }
-          this.invalidateTree();
+          this.treeStore.tree.invalidate();
+          //this.invalidateTree();
         }
       }),
     );
@@ -525,7 +528,6 @@ class DesignTreeStore extends ApiTreeStore {
     //) {
     //return;
     //}
-    //console.log('didpaatch', operations);
 
     //const treeNode = this.tree.findById(operations[0].id);
 
@@ -538,7 +540,9 @@ class DesignTreeStore extends ApiTreeStore {
 
     this.stores.graphStore.eventEmitter.on(
       eventTypes.DidUpdateNodeUri,
-      action(() => this.invalidateTree()),
+      action(() => {
+        this.invalidateTree();
+      }),
     );
 
     this.stores.graphStore.eventEmitter.on(
@@ -592,7 +596,6 @@ class DesignTreeStore extends ApiTreeStore {
     //this.stores.graphStore.eventEmitter.on(
     //eventTypes.DidChangeSourceNode,
     //action(({change: {prop: e, id: t}}) => {
-    //console.log('In changeSourceNode', e, t);
     //if (e !== 'spec') {
     //return;
     //}
