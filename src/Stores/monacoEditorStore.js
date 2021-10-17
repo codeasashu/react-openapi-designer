@@ -13,15 +13,12 @@ const DiagnosticSeverityClassNameMap = {
 };
 
 class MonacoEditorStore {
-  constructor(e, t, n) {
-    this.stores = e;
+  constructor(stores, node, codeStoreOptions) {
+    this.stores = stores;
     this.isMonacoActivated = false;
     this._deltaDecorations = [];
     this._collabDecorations = [];
     this._contentWidgets = new Map();
-    //this._monacoDisposables = new r.DisposableCollection()
-    //this._disposables = new r.DisposableCollection()
-    //this._activeDisposables = new r.DisposableCollection()
 
     this.doActivate = async () => {
       this.refresh();
@@ -32,9 +29,9 @@ class MonacoEditorStore {
           editor: this.monacoCodeStoreEditor,
         }),
         action(() => {
-          const {language: e} = this.node;
+          const {language} = this.node;
 
-          if (e !== undefined) {
+          if (language !== undefined) {
             monaco.editor.setModelLanguage(this.monacoCodeStore.model, 'yaml');
             //this.language = this.node.language;
             this.language = 'yaml';
@@ -70,8 +67,22 @@ class MonacoEditorStore {
           this.node.data.diagnostics,
         );
 
+        this.monacoStore.onDidUpdateValue((e) => {
+          const data = yaml.load(e);
+          this.stores.graphStore.graph.patchSourceNodeProp(
+            this.node.id,
+            'data.parsed',
+            [
+              {
+                op: nodeOperations.Replace,
+                value: data,
+                path: [],
+              },
+            ],
+          );
+        });
+
         this.monacoStore.onModelContentChanged((e) => {
-          console.log('I am changed', e);
           if (e.changes && e.changes.length) {
             if (this.node.data.raw !== this.monacoCodeStore.value) {
               for (const t of e.changes) {
@@ -242,50 +253,49 @@ class MonacoEditorStore {
       }
     };
 
-    this.setHighlightPosition = (e, t) => {
+    this.setHighlightPosition = (position, paths) => {
       if (
-        !(
-          this._highlightPosition &&
-          this._highlightPosition.start.line === e.start.line &&
-          this._highlightPosition.end.line === e.end.line
-        )
+        !this._highlightPosition ||
+        this._highlightPosition.start.line !== position.start.line ||
+        this._highlightPosition.end.line !== position.end.line
       ) {
-        this._highlightPosition = e;
-        this.monacoStore.highlightPaths([e], t ? 0 : undefined);
+        this._highlightPosition = position;
+        this.monacoStore.highlightPaths([position], paths ? 0 : undefined);
       }
     };
 
-    const {id: a, data: s, language: u} = t;
+    const {id, data, language} = node;
 
-    var l;
     //this._mux = Object(ia.createMutex)()
-    this.node = t;
+    this.node = node;
     this.language = 'yaml';
 
     this.monacoCodeStore = new MonacoCodeStore({
-      id: a,
+      id,
       path: this._uri,
-      value: yaml.dump(s.parsed, {
+      value: yaml.dump(data.parsed, {
         noRefs: true,
       }),
-      lang: u,
+      lang: language,
     });
 
-    this.monacoStore = n || {
-      value: (l = this.monacoCodeStore).value,
-      onModelContentChanged: l.onModelContentChanged,
-      highlightPaths: l.highlightPaths,
+    const codeStore = this.monacoCodeStore;
+    this.monacoStore = codeStoreOptions || {
+      value: codeStore.value,
+      onModelContentChanged: codeStore.onModelContentChanged,
+      onDidUpdateValue: codeStore.onDidUpdateValue,
+      highlightPaths: codeStore.highlightPaths,
 
       focus: () => {
-        if (l.editor) {
-          l.editor.focus();
+        if (codeStore.editor) {
+          codeStore.editor.focus();
         }
       },
 
       format: () => {
-        if (l.editor) {
-          l.editor.focus();
-          l.editor.getAction('editor.action.formatDocument').run();
+        if (codeStore.editor) {
+          codeStore.editor.focus();
+          codeStore.editor.getAction('editor.action.formatDocument').run();
         }
       },
     };

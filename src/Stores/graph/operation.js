@@ -291,11 +291,11 @@ function patchNodeProp(spec, operation) {
     //);
   }
 
-  //if (nodeOperations.Remove === operation.op) {
-  //return produce(spec || {}, (draftSpec) => {
-  //unset(draftSpec, operation.path);
-  //});
-  //}
+  if (nodeOperations.Remove === operation.op) {
+    return produce(spec || {}, (draftSpec) => {
+      unset(draftSpec, operation.path);
+    });
+  }
 
   if (
     nodeOperations.Add === operation.op ||
