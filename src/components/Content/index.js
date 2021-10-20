@@ -1,18 +1,13 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-//import {useLocation, useHistory} from 'react-router-dom';
 import {useHistory} from 'react-router-dom';
-//import {OpenApiBuilder} from 'openapi3-ts';
 import styled from 'styled-components';
-//import {getJsonPointerFromUrl} from '../../utils';
-//import {getModuleFromJsonPointer, ModuleNames} from '../../model';
 import Options from './options';
 import Info from './info';
 import PathContent from './path';
 import ModelContent from './model';
 import Parameter from './parameter';
 import Response from './response';
-//import YamlEditor from '../Editor/yaml';
 import MonacoEditor from '../Editor/Monaco';
 import {observer} from 'mobx-react-lite';
 import {StoresContext} from '../Tree/context';
@@ -22,41 +17,29 @@ const StyledContent = styled.div`
   width: calc(80% - 2px);
 `;
 
-//function useQuery() {
-//const query = new URLSearchParams(useLocation().search);
-//const path = query.get('path');
-//return {path};
-//}
+const getComponentForNode = (node) => {
+  switch (node.type) {
+    case NodeTypes.Path:
+    case NodeTypes.Operation:
+      return PathContent;
+    case NodeTypes.Response:
+      return Response;
+    case NodeTypes.Model:
+      return ModelContent;
+    case NodeTypes.Parameter:
+      return Parameter;
+    default:
+      return Info;
+  }
+};
 
 const SubContent = observer(({node}) => {
-  //const {path} = useQuery();
-  //const [pointer, setPointer] = useState(getJsonPointerFromUrl(path));
-  //useEffect(() => {
-  //setPointer(getJsonPointerFromUrl(path));
-  //}, [path]);
-  //const moduleName = getModuleFromJsonPointer(pointer);
-
   let relativeJsonPath = [];
   if (node.category === NodeCategories.SourceMap) {
     relativeJsonPath = node.relativeJsonPath;
   }
-  return (
-    <>
-      {node.type === NodeTypes.Info && <Info />}
-      {(node.type === NodeTypes.Path || node.type === NodeTypes.Operation) && (
-        <PathContent relativeJsonPath={relativeJsonPath} node={node} />
-      )}
-      {node.type === NodeTypes.Response && (
-        <Response relativeJsonPath={relativeJsonPath} node={node} />
-      )}
-      {node.type === NodeTypes.Model && (
-        <ModelContent relativeJsonPath={relativeJsonPath} node={node} />
-      )}
-      {node.type === NodeTypes.Parameter && (
-        <Parameter relativeJsonPath={relativeJsonPath} node={node} />
-      )}
-    </>
-  );
+  const RenderSubContent = getComponentForNode(node);
+  return <RenderSubContent relativeJsonPath={relativeJsonPath} node={node} />;
 });
 
 SubContent.propTypes = {
@@ -67,7 +50,6 @@ const Content = observer(() => {
   const stores = React.useContext(StoresContext);
   const {activeNode} = stores.uiStore;
   const sourceNode = stores.graphStore.rootNode;
-  console.log('storesc', stores.uiStore, activeNode, sourceNode);
   let history = useHistory();
   const [currentView, setCurrentView] = useState('form');
 
@@ -85,10 +67,7 @@ const Content = observer(() => {
         {currentView === 'form' && (
           <SubContent node={activeNode || sourceNode} />
         )}
-        {currentView === 'code' && (
-          <MonacoEditor />
-          //<YamlEditor value={''} onChange={() => {}} />
-        )}
+        {currentView === 'code' && <MonacoEditor />}
       </div>
     </StyledContent>
   );

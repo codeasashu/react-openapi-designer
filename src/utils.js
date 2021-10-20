@@ -232,3 +232,24 @@ export const getMethodColor = (_color) => {
     return 'gray';
   }
 };
+
+export const renameObjectKey = (originalObject, from, to) => {
+  if (
+    !originalObject ||
+    !Object.hasOwnProperty.call(originalObject, from) ||
+    to === from
+  ) {
+    return originalObject;
+  }
+  const newObject = {};
+  for (const [key, value] of Object.entries(originalObject)) {
+    if (from === key) {
+      newObject[to] = value;
+    } else {
+      if (!(key in newObject)) {
+        newObject[key] = value;
+      }
+    }
+  }
+  return newObject;
+};

@@ -196,6 +196,9 @@ export const defaultSecuritySchemes = {
     type: 'openIdConnect',
     openIdConnectUrl: '',
   },
+  oauth2: {
+    type: 'oauth2',
+  },
 };
 
 export const defaultOperation = {

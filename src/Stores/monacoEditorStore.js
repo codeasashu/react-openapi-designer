@@ -1,4 +1,11 @@
-import {action, reaction, flow} from 'mobx';
+import {
+  action,
+  reaction,
+  flow,
+  makeObservable,
+  observable,
+  computed,
+} from 'mobx';
 import monaco from '../components/Editor/Monaco/monaco';
 import MonacoCodeStore from './monacoCodeStore';
 //import * as yaml from 'yaml';
@@ -13,14 +20,27 @@ const DiagnosticSeverityClassNameMap = {
 };
 
 class MonacoEditorStore {
+  isMonacoActivated = false;
+  language;
+  monacoCodeStoreEditor;
+
   constructor(stores, node, codeStoreOptions) {
+    makeObservable(this, {
+      isMonacoActivated: observable,
+      language: observable,
+      monacoCodeStoreEditor: observable.ref,
+      activeSymbol: computed,
+      _uri: computed,
+      deactivateMonaco: action,
+      setHighlightPosition: action,
+    });
     this.stores = stores;
     this.isMonacoActivated = false;
     this._deltaDecorations = [];
     this._collabDecorations = [];
     this._contentWidgets = new Map();
 
-    this.doActivate = async () => {
+    this.activate = async () => {
       this.refresh();
 
       reaction(
@@ -37,14 +57,6 @@ class MonacoEditorStore {
             this.language = 'yaml';
           }
         }),
-        {
-          fireImmediately: true,
-        },
-      );
-
-      reaction(
-        () => this.stores.fileStore.liveCollaborators,
-        this.renderCollabDecorations,
         {
           fireImmediately: true,
         },
@@ -69,17 +81,19 @@ class MonacoEditorStore {
 
         this.monacoStore.onDidUpdateValue((e) => {
           const data = yaml.load(e);
-          this.stores.graphStore.graph.patchSourceNodeProp(
-            this.node.id,
-            'data.parsed',
-            [
-              {
-                op: nodeOperations.Replace,
-                value: data,
-                path: [],
-              },
-            ],
-          );
+          if (this.monacoCodeStore.value !== e) {
+            this.stores.graphStore.graph.patchSourceNodeProp(
+              this.node.id,
+              'data.parsed',
+              [
+                {
+                  op: nodeOperations.Replace,
+                  value: data,
+                  path: [],
+                },
+              ],
+            );
+          }
         });
 
         this.monacoStore.onModelContentChanged((e) => {
@@ -253,17 +267,6 @@ class MonacoEditorStore {
       }
     };
 
-    this.setHighlightPosition = (position, paths) => {
-      if (
-        !this._highlightPosition ||
-        this._highlightPosition.start.line !== position.start.line ||
-        this._highlightPosition.end.line !== position.end.line
-      ) {
-        this._highlightPosition = position;
-        this.monacoStore.highlightPaths([position], paths ? 0 : undefined);
-      }
-    };
-
     const {id, data, language} = node;
 
     //this._mux = Object(ia.createMutex)()
@@ -299,6 +302,17 @@ class MonacoEditorStore {
         }
       },
     };
+  }
+
+  setHighlightPosition(position, paths) {
+    if (
+      !this._highlightPosition ||
+      this._highlightPosition.start.line !== position.start.line ||
+      this._highlightPosition.end.line !== position.end.line
+    ) {
+      this._highlightPosition = position;
+      this.monacoStore.highlightPaths([position], paths ? 0 : undefined);
+    }
   }
 
   get value() {
@@ -370,17 +384,13 @@ class MonacoEditorStore {
 
   async _setMonacoDeltaDecorations(e, t = []) {
     if (this.monacoCodeStoreEditor) {
-      console.log('deltaDecorations', e, t);
       //const n = t.map(Ya.diagnosticsToDecoration)
-
       //if (e) {
       //const t = await this._getSymbolLocation(e)
-
       //if (t) {
       //n.unshift(Ya.symbolToDecoration(t))
       //}
       //}
-
       //this._deltaDecorations = this.monacoCodeStoreEditor.deltaDecorations(this._deltaDecorations, n)
     }
   }
@@ -401,8 +411,11 @@ class MonacoEditorStore {
   }
 
   refresh() {
-    if (this.monacoCodeStore.model.getValue() !== this.node.data.original) {
-      this.monacoCodeStore.model.setValue(this.node.data.original || '');
+    if (this.monacoCodeStore.model.getValue() !== this.node.data.parsed) {
+      const value = yaml.dump(this.node.data.parsed, {
+        noRefs: true,
+      });
+      this.monacoCodeStore.model.setValue(value || '');
     }
 
     this.monacoCodeStore.model.setEOL(monaco.editor.EndOfLineSequence.LF);

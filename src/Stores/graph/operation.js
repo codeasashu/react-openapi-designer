@@ -9,7 +9,7 @@ import {
   isHyphenOnly,
   eventTypes,
 } from '../../utils/tree';
-import {decodeUriFragment} from '../../utils';
+import {decodeUriFragment, renameObjectKey} from '../../utils';
 import {observe} from 'mobx';
 //function handleOperation(e, t, n) { t = emitGroup
 
@@ -210,26 +210,6 @@ function handleOperation(dom, patch, notifier) {
     }
   };
 }
-
-const renameObjectKey = (e, t, n) => {
-  if (!e || !Object.hasOwnProperty.call(e, t) || n === t) {
-    return e;
-  }
-
-  const r = {};
-
-  for (const [o, i] of Object.entries(e)) {
-    if (t === o) {
-      r[n] = i;
-    } else {
-      if (!(o in r)) {
-        r[o] = i;
-      }
-    }
-  }
-
-  return r;
-};
 
 function patchNodeProp(spec, operation) {
   // e, t

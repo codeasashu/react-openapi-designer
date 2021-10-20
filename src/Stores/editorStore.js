@@ -1,9 +1,25 @@
-import {flow, reaction} from 'mobx';
+import {
+  flow,
+  reaction,
+  makeObservable,
+  observable,
+  computed,
+  action,
+} from 'mobx';
 import monacoEditorStore from './monacoEditorStore';
 import {eventTypes, NodeCategories} from '../utils/tree';
 
 class EditorStore {
+  _editors = [];
+  _activeEditorId;
+
   constructor(e) {
+    makeObservable(this, {
+      _editors: observable.shallow,
+      _activeEditorId: observable,
+      activeEditor: computed,
+      assignEditor: action,
+    });
     this.stores = e;
     this._editors = {};
     this._positions = {};
@@ -106,6 +122,15 @@ class EditorStore {
     );
 
     reaction(() => this.activeEditor, this.handleActiveEditorChange);
+
+    this.stores.graphStore.eventEmitter.on(
+      eventTypes.DidPatchSourceNodeProp,
+      action((e) => {
+        if (e.prop === 'data.parsed') {
+          this.refresh();
+        }
+      }),
+    );
 
     this.stores.graphStore.eventEmitter.on(
       eventTypes.DidMoveNode,

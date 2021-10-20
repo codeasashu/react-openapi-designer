@@ -108,6 +108,7 @@ class Stores {
     this.graphStore.registerEventListeners();
     this.uiStore.registerEventListeners();
     this.designTreeStore.registerEventListeners();
+    //this.editorStore.registerEventListeners();
   }
 
   activate() {

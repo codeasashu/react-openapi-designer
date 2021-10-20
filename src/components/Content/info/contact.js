@@ -14,21 +14,21 @@ const Contact = ({contact, onChange}) => {
           className="flex-1 pr-0"
           title="Contact Name"
           placeholder="Contact Name"
-          value={contact?.name}
+          value={contact?.name || ''}
           onChange={(e) => onChange({...contact, name: e.target.value})}
         />
         <InputGroup
           className="flex-1 ml-2 pr-0"
           title="Contact Url"
           placeholder="Contact Url"
-          value={contact?.url}
+          value={contact?.url || ''}
           onChange={(e) => onChange({...contact, url: e.target.value})}
         />
         <InputGroup
           className="flex-1 ml-2 pr-0"
           title="Contact Email"
           placeholder="Contact Email"
-          value={contact?.email}
+          value={contact?.email || ''}
           onChange={(e) => onChange({...contact, email: e.target.value})}
         />
       </div>

@@ -29,7 +29,7 @@ const License = ({license, onChange}) => {
           className="flex-1 mr-2"
           title="License (MIT, Apache 2.0, etc)"
           placeholder="License (MIT, Apache 2.0, etc)"
-          value={license?.name}
+          value={license?.name || ''}
           onChange={(e) => onChange({...license, name: e.target.value})}
         />
         <div className="bp3-html-select">

@@ -1,6 +1,7 @@
 //@flow
 import React from 'react';
 import PropTypes from 'prop-types';
+import {omit} from 'lodash';
 import {
   Button,
   ControlGroup,
@@ -10,7 +11,7 @@ import {
 } from '@blueprintjs/core';
 import {Popover2, Tooltip2} from '@blueprintjs/popover2';
 import {defaultSecuritySchemes} from '../../../model';
-import {getLongestIndex} from '../../../utils';
+import {getLongestIndex, renameObjectKey} from '../../../utils';
 
 const Heading = ({onAdd}) => {
   return (
@@ -153,24 +154,32 @@ DescriptionButton.propTypes = {
   onChange: PropTypes.func,
 };
 
-const SecuritySchemes = ({schemes, onChange, onDelete}) => {
+const SecuritySchemes = ({schemes, onChange}) => {
   const handleChange = (name, scheme, newName = null) => {
-    let oldName = null;
-    if (newName != null) {
-      oldName = name;
-      name = newName;
+    let updatedSchemes = Object.assign({}, schemes, {[name]: scheme});
+    if (newName !== null) {
+      const renamedObj = renameObjectKey(schemes, name, newName);
+      updatedSchemes = Object.assign({}, renamedObj, {[newName]: scheme});
     }
-    onChange({name, scheme, oldName});
+    onChange(updatedSchemes);
   };
 
-  const handleTypeChange = (name, type) => {
-    onChange({name, scheme: defaultSecuritySchemes[type]});
+  const handleTypeChange = (scheme, type) => {
+    const updatedSchemes = Object.assign({}, schemes, {
+      [scheme]: defaultSecuritySchemes[type],
+    });
+    onChange(updatedSchemes);
   };
 
   const generateName = () => {
     const keys = Object.keys(schemes);
     const longestIndex = getLongestIndex(keys, /API Key - ([\d]+)/g);
     return `API Key - ${longestIndex + 1}`;
+  };
+
+  const onDelete = (scheme) => {
+    const rest = omit(schemes, scheme);
+    onChange(rest);
   };
 
   return (
@@ -236,7 +245,6 @@ const SecuritySchemes = ({schemes, onChange, onDelete}) => {
 SecuritySchemes.propTypes = {
   schemes: PropTypes.object,
   onChange: PropTypes.func,
-  onDelete: PropTypes.func,
 };
 
 export default SecuritySchemes;
