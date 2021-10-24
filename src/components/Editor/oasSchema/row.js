@@ -7,30 +7,47 @@ import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import {Button, Icon, Intent, TextArea} from '@blueprintjs/core';
 import {Popover2, Tooltip2} from '@blueprintjs/popover2';
 import LocaleProvider from '../../../utils/locale';
+import {isRefSchema} from '../../../utils/schema';
 import {SchemaDropdown, AdvancedProperties} from 'components/Pickers';
 import SchemaTitleEditor from 'components/Editor/schemaTitle';
+import {eventTypes} from '../../../utils/tree';
 
-const SchemaItemEntity = ({type, text}) => {
+const displayArrayItemEntity = (schema) =>
+  schema.type === 'array' &&
+  Object.prototype.hasOwnProperty.call(schema.items, 'type')
+    ? `${schema.type} [${schema.items.type}]`
+    : null;
+
+const displayRefItemEntity = (schema) =>
+  isRefSchema(schema) ? '$ref' + (schema.$ref && `[${schema.$ref}]`) : null;
+
+const SchemaItemEntity = ({schema}) => {
+  const type = schema.type || (isRefSchema(schema) && '$ref');
   const textStyles =
     (type === 'object' && 'text-blue-600 dark:text-blue-600') ||
     (type === 'string' && 'text-green-400 dark:text-green-400') ||
     (type === 'boolean' && 'text-yellow-400 dark:text-yellow-400') ||
+    (type === '$ref' && 'text-purple-400 dark:text-purple-400') ||
     (type === 'array' && 'text-yellow-600 dark:text-yellow-600') ||
     ((type === 'integer' || type === 'number') &&
       'text-red-400 dark:text-red-400') ||
     'text-black dark:text-white';
+
+  const text =
+    displayArrayItemEntity(schema) ||
+    displayRefItemEntity(schema) ||
+    schema.type;
+
   return (
-    <div
-      role="row-schema"
-      className={`flex flex-no-wrap items-center ${textStyles} cursor-pointer hover:underline truncate`}>
-      <span>{text}</span>
-    </div>
+    <span
+      className={`items-center ${textStyles} cursor-pointer hover:underline truncate`}>
+      {text}
+    </span>
   );
 };
 
 SchemaItemEntity.propTypes = {
-  type: PropTypes.string,
-  text: PropTypes.string,
+  schema: PropTypes.any,
 };
 
 @autoBindMethodsForReact()
@@ -109,8 +126,16 @@ class Row extends React.PureComponent {
   }
 
   render() {
-    const {show, schema, sidebar, required, fieldName, fieldPrefix, children} =
-      this.props;
+    const {
+      stores,
+      show,
+      schema,
+      sidebar,
+      required,
+      fieldName,
+      fieldPrefix,
+      children,
+    } = this.props;
 
     const prefix = fieldPrefix || [];
     const name = fieldName || null;
@@ -172,15 +197,24 @@ class Row extends React.PureComponent {
               <SchemaDropdown
                 handleOnClick={this._handleChangeSchemaType}
                 schema={schema}>
-                <SchemaItemEntity
-                  type={schema.type}
-                  text={
-                    schema.type === 'array' &&
-                    Object.prototype.hasOwnProperty.call(schema.items, 'type')
-                      ? `${schema.type} [${schema.items.type}]`
-                      : schema.type
-                  }
-                />
+                <>
+                  <SchemaItemEntity schema={schema} />
+                  {isRefSchema(schema) && schema.$ref && (
+                    <a
+                      role="button"
+                      className="text-blue-4 ml-2 whitespace-no-wrap"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        stores.oasStore.eventEmitter.emit(
+                          eventTypes.GoToRef,
+                          schema.$ref,
+                        );
+                      }}>
+                      (go to ref)
+                    </a>
+                  )}
+                </>
               </SchemaDropdown>
             </div>
             <span>
@@ -278,6 +312,7 @@ class Row extends React.PureComponent {
 }
 
 Row.propTypes = {
+  stores: PropTypes.any,
   rowIndex: PropTypes.number,
   fieldPrefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   fieldName: PropTypes.string,

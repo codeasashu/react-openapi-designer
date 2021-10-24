@@ -3,7 +3,6 @@ import {
   set,
   isUndefined,
   get,
-  assign,
   uniq,
   has,
   unset,
@@ -85,7 +84,6 @@ class OasSchemaStore {
     const isOpen = get(sidebar, path) === true;
     const status = isUndefined(value) ? !isOpen : !!value;
     set(sidebar, path, status);
-    console.log('sidebar11', sidebar);
     this.sidebar = sidebar;
   }
 
@@ -155,7 +153,6 @@ class OasSchemaStore {
       requiredArray.push(value);
     }
     parentKeys.push('required');
-    console.log('enableRequire', parentKeys, requiredArray);
     this.schema = set(schema, parentKeys, requiredArray);
   }
 
@@ -215,16 +212,21 @@ class OasSchemaStore {
     const schema = cloneDeep(this._schema);
     const parentKeys = getParentKey(key);
     const parentData = parentKeys.length ? get(schema, parentKeys) : schema;
-    if (parentData.type === value) return schema;
-
-    const description = parentData.description
-      ? {description: parentData.description}
-      : {};
-    const newParentDataItem = {...defaultSchema[value], ...description};
+    if (parentData && parentData.type === value) return schema;
+    const description =
+      parentData && parentData.description
+        ? {description: parentData.description}
+        : {};
+    const valueSchema =
+      key.indexOf('$ref') >= 0 ? {$ref: value} : defaultSchema[value];
+    const newParentDataItem = {
+      ...valueSchema,
+      ...description,
+    };
     if (parentKeys.length) {
       this.schema = set(schema, parentKeys, newParentDataItem);
     } else {
-      this.schema = assign(schema, newParentDataItem);
+      this.schema = newParentDataItem;
     }
   }
 

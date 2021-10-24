@@ -101,6 +101,9 @@ export const eventTypes = {
     Transformed: 'store.transformed',
     GoToRef: 'store.goto_ref',
   },
+
+  // Schema events
+  GoToRef: 'schema.goto_ref',
 };
 
 export const taskTypes = {

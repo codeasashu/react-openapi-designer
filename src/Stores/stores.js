@@ -5,11 +5,13 @@ import EditorStore from './editorStore';
 import DesignTreeStore from './designTreeStore';
 import JsonSchemaStore from './jsonSchemaStore';
 import OasSchemaStore from './oasSchemaStore';
+import BrowserStore from './browserStore';
 import EventEmitter from '../EventEmitter';
 
 class Stores {
   constructor() {
     this.eventEmitter = new EventEmitter();
+    this.browserStore = new BrowserStore(this);
     this.graphStore = new GraphStore(this);
     this.uiStore = new UiStore(this);
     this.oasStore = new OasStore(this);
@@ -108,6 +110,7 @@ class Stores {
     this.graphStore.registerEventListeners();
     this.uiStore.registerEventListeners();
     this.designTreeStore.registerEventListeners();
+    this.oasStore.registerEventListeners();
     //this.editorStore.registerEventListeners();
   }
 

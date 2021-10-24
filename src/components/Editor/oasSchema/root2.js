@@ -13,7 +13,7 @@ import SchemaRow from './row';
 import SchemaChild from './child';
 import Code from './code';
 
-const SchemaElement = observer(({store}) => {
+const SchemaElement = observer(({store, stores}) => {
   const wrapperProps = {
     schema: store.schema,
     open: store.sidebar,
@@ -34,22 +34,22 @@ const SchemaElement = observer(({store}) => {
       <SchemaRow
         show
         root
+        stores={stores}
         sidebar={store.sidebar}
         schema={store.schema}
         handleField={() => store.addChildField(['properties'])}
         handleSidebar={({key}) => store.setOpenDropdownPath(key)}
-        handleSchemaType={store.changeType}
+        handleSchemaType={({key, value}) => store.changeType(key, value)}
         handleTitle={store.changeValue}
-        handleDescription={(e) => {
-          console.log('desc', e);
-          store.changeValue([], {...store.schema, ...{description: e.value}});
-        }}
+        handleDescription={(e) =>
+          store.changeValue([], {...store.schema, ...{description: e.value}})
+        }
         handleAdditionalProperties={({key, value}) =>
           store.changeValue(key, value)
         }
       />
       {!!store.sidebar.properties.show && (
-        <SchemaChild wrapperProps={wrapperProps} />
+        <SchemaChild wrapperProps={wrapperProps} stores={stores} />
       )}
     </>
   );
@@ -57,6 +57,7 @@ const SchemaElement = observer(({store}) => {
 
 SchemaElement.propTypes = {
   store: PropTypes.object,
+  stores: PropTypes.object,
 };
 
 const AddExampleBtn = ({onAdd}) => {
@@ -104,7 +105,7 @@ ExampleRenderer.propTypes = {
   onDelete: PropTypes.func,
 };
 
-const RootSchema = observer(({store, className, onChange}) => {
+const RootSchema = observer(({store, stores, className, onChange}) => {
   const schema = store.schema;
   const initialschema = schema;
 
@@ -169,7 +170,7 @@ const RootSchema = observer(({store, className, onChange}) => {
                   Generate from JSON
                 </Button>
 
-                <SchemaElement store={store} />
+                <SchemaElement store={store} stores={stores} />
               </>
             )}
           </div>

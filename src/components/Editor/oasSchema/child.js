@@ -5,14 +5,26 @@ import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import {isUndefined, get} from 'lodash';
 import SchemaRow from './row';
 
-const mapping = (name, schema, props) => {
+const mapping = (name, schema, props, stores) => {
   const nameArray = [].concat(name, 'properties');
   switch (schema.type) {
     case 'array':
-      return <SchemaArray prefix={name} schema={schema} wrapperProps={props} />;
+      return (
+        <SchemaArray
+          prefix={name}
+          schema={schema}
+          wrapperProps={props}
+          stores={stores}
+        />
+      );
     case 'object':
       return (
-        <SchemaObject prefix={nameArray} schema={schema} wrapperProps={props} />
+        <SchemaObject
+          prefix={nameArray}
+          schema={schema}
+          wrapperProps={props}
+          stores={stores}
+        />
       );
     default:
       return null;
@@ -28,9 +40,10 @@ class SchemaArray extends PureComponent {
   }
 
   render() {
-    const {prefix, schema, wrapperProps} = this.props;
+    const {stores, prefix, schema, wrapperProps} = this.props;
     return this.shouldShowSubItems(schema) ? (
       <SchemaRow
+        stores={stores}
         show={!isUndefined(schema.items)}
         schema={schema.items}
         sidebar={wrapperProps.open}
@@ -59,6 +72,7 @@ class SchemaArray extends PureComponent {
 }
 
 SchemaArray.propTypes = {
+  stores: PropTypes.object,
   name: PropTypes.string,
   prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   schema: PropTypes.object,
@@ -74,7 +88,7 @@ const exists = (data, value) =>
 @autoBindMethodsForReact()
 class SchemaItem extends PureComponent {
   render() {
-    const {name, prefix, schema, wrapperProps} = this.props;
+    const {name, prefix, stores, schema, wrapperProps} = this.props;
     const itemSchema = Object.assign(
       {},
       {title: '', description: ''},
@@ -86,6 +100,7 @@ class SchemaItem extends PureComponent {
 
     return (
       <SchemaRow
+        stores={stores}
         show={get(wrapperProps.open, [].concat(prefix, 'show'))}
         rowIndex={this.props.rowIndex}
         schema={itemSchema}
@@ -123,6 +138,7 @@ class SchemaItem extends PureComponent {
 }
 
 SchemaItem.propTypes = {
+  stores: PropTypes.object,
   rowIndex: PropTypes.number,
   name: PropTypes.string,
   prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
@@ -132,12 +148,13 @@ SchemaItem.propTypes = {
 
 class SchemaObject extends PureComponent {
   render() {
-    const {prefix, schema, wrapperProps} = this.props;
+    const {prefix, schema, stores, wrapperProps} = this.props;
     return (
       <>
         {Object.keys(schema.properties).map((name, index) => {
           return (
             <SchemaItem
+              stores={stores}
               key={index}
               rowIndex={index}
               name={name}
@@ -153,19 +170,21 @@ class SchemaObject extends PureComponent {
 }
 
 SchemaObject.propTypes = {
+  stores: PropTypes.object,
   prefix: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   schema: PropTypes.object,
   wrapperProps: PropTypes.object,
 };
 
 const SchemaChild = (props) => {
-  const {wrapperProps} = props;
-  const item = mapping([], wrapperProps.schema, wrapperProps);
+  const {wrapperProps, stores} = props;
+  const item = mapping([], wrapperProps.schema, wrapperProps, stores);
   return <React.Fragment>{item}</React.Fragment>;
 };
 
 SchemaChild.propTypes = {
   wrapperProps: PropTypes.object,
+  stores: PropTypes.object,
 };
 
 export default SchemaChild;

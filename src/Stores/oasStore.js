@@ -1,13 +1,15 @@
-import {hasIn} from 'lodash';
+import {hasIn, escapeRegExp} from 'lodash';
+import {toFSPath, resolve, isURL} from '@stoplight/path';
 import Path from './oas/path';
 import Service from './oas/service';
-import {nodeOperations} from '../utils/tree';
+import {eventTypes, nodeOperations} from '../utils/tree';
 
 class OasStore {
   constructor(e) {
     this.stores = e;
     this.path = new Path(e);
     this.service = new Service(e);
+    this.eventEmitter = e.eventEmitter;
     //this.operation = new ld(e)
     //this.service = new hd(e)
   }
@@ -15,6 +17,41 @@ class OasStore {
   activate() {
     this.path.activate();
     this.service.activate();
+  }
+
+  registerEventListeners() {
+    this.eventEmitter.on(eventTypes.GoToRef, (refPath) => {
+      const sourceNode = this.stores.uiStore.activeSourceNode;
+      if (!sourceNode || !refPath) {
+        return;
+      }
+
+      if (isURL(refPath)) {
+        this.stores.browserStore.openUrlInBrowser(refPath);
+        return;
+      }
+      let n;
+      let t = toFSPath(
+        resolve(
+          sourceNode.uri.replace(
+            new RegExp(escapeRegExp(sourceNode.path) + '$'),
+            '',
+          ),
+          refPath,
+        ),
+      );
+
+      const r = t.indexOf('#');
+
+      if (r !== -1) {
+        n = t.length < r + 2 ? undefined : t.slice(r + 1);
+      }
+
+      const s = this.stores.graphStore.getNodeByUri(`/p/reference.yaml${n}`);
+      if (s) {
+        this.stores.uiStore.setActiveNode(s);
+      }
+    });
   }
 
   addSharedParameter({sourceNodeId, name, parameterType}) {

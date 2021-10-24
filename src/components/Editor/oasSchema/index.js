@@ -16,7 +16,7 @@ const Schema = ({relativeJsonPath}) => {
     sourceNodeId: activeSourceNodeId,
   });
 
-  return <RootSchema store={store} />;
+  return <RootSchema store={store} stores={stores} />;
 };
 
 Schema.propTypes = {

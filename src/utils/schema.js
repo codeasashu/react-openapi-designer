@@ -18,6 +18,9 @@ const hasExamples = (schema) =>
 
 const isObjectSchema = (schema) => hasType(schema) && schema.type === 'object';
 
+export const isRefSchema = (schema) =>
+  schema && Object.prototype.hasOwnProperty.call(schema, '$ref');
+
 export const fillType = (schema) => {
   let _schema = Object.assign({}, schema);
   if (!hasType(schema) && !hasProperties(schema)) {
@@ -247,3 +250,5 @@ function sortByMethod(method1, method2) {
 export const sortOperations = (operations, path) => {
   return [...operations].sort((op1, op2) => sortByMethod(op1[path], op2[path]));
 };
+
+export const replaceHash = (e) => e.replace(/^[^#]+#/, '');

@@ -34,6 +34,7 @@ export const ContentTypes = {
 };
 
 export const defaultSchema = {
+  $ref: {$ref: ''},
   string: {type: 'string'},
   boolean: {type: 'boolean'},
   number: {type: 'number'},
