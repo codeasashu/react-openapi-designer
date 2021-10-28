@@ -41,7 +41,6 @@ const TreeRow = observer((props) => {
   const handleEvent = (eventType, node) => {
     //return React.useCallback(
     return (e) => {
-      console.log('clicked', node, e);
       if (node !== null) {
         store.events.emit(eventType, e, node);
       }

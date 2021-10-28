@@ -305,7 +305,6 @@ class Path {
     //((r = i.parentSourceNode.data.resolved) !== null) && (r !== undefined) ? r : i.parentSourceNode.data.parsed
     //)
 
-    console.log('here', e, o, i, this.activePathNode);
     const s = getParametersFromPath(Array.isArray(o) ? o : [], e);
 
     this.stores.graphStore.graph.patchSourceNodeProp(

@@ -1,42 +1,33 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {useDispatch} from 'react-redux';
-import {handleModelDelete} from 'store/modules/openapi';
-import {useLocation} from 'react-router-dom';
 import {Button, ButtonGroup, Icon} from '@blueprintjs/core';
-import {getJsonPointerFromUrl} from '../../utils';
-import {getModuleFromJsonPointer, ModuleNames} from '../../model';
-
-function useQuery() {
-  const query = new URLSearchParams(useLocation().search);
-  const location = query.get('location');
-  const path = query.get('path');
-  return {location, path};
-}
-const shouldShow = (pointer: []) => {
-  const moduleName = getModuleFromJsonPointer(pointer);
-  if (moduleName === ModuleNames.info) {
-    return false;
-  }
-  return true;
-};
+import {StoresContext} from '../Tree/context';
+import {NodeCategories} from '../../utils/tree';
 
 const Options = (props) => {
-  const dispatch = useDispatch();
-  const {path} = useQuery();
-  const pointer = getJsonPointerFromUrl(path);
+  const stores = React.useContext(StoresContext);
+  const {activeNode} = stores.uiStore;
+  const [confirmDelete, setConfirmDelete] = React.useState(false);
 
   return (
     <div className="border-b border-transparent PanelActionBar w-full flex items-center px-5 py-2">
-      {shouldShow(pointer) && (
+      {activeNode && activeNode.category === NodeCategories.SourceMap && (
         <div className="flex items-center">
           <Button
             small
             icon={<Icon size={14} icon="trash" />}
-            text="delete"
+            text={confirmDelete ? 'Are you sure?' : 'delete'}
+            onMouseLeave={() => {
+              setConfirmDelete(false);
+            }}
             onClick={() => {
-              dispatch(handleModelDelete({path: pointer}));
-              props.onDelete(pointer);
+              if (confirmDelete) {
+                if (props.onDelete) {
+                  props.onDelete();
+                }
+              } else {
+                setConfirmDelete(true);
+              }
             }}
           />
         </div>

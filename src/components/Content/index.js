@@ -1,7 +1,7 @@
 import React, {useState} from 'react';
 import PropTypes from 'prop-types';
-import {useHistory} from 'react-router-dom';
 import styled from 'styled-components';
+import {observer} from 'mobx-react-lite';
 import Options from './options';
 import Info from './info';
 import PathContent from './path';
@@ -9,9 +9,8 @@ import ModelContent from './model';
 import Parameter from './parameter';
 import Response from './response';
 import MonacoEditor from '../Editor/Monaco';
-import {observer} from 'mobx-react-lite';
 import {StoresContext} from '../Tree/context';
-import {NodeCategories, NodeTypes} from '../../utils/tree';
+import {NodeCategories, NodeTypes, eventTypes} from '../../utils/tree';
 
 const StyledContent = styled.div`
   width: calc(80% - 2px);
@@ -40,7 +39,6 @@ const SubContent = observer(({node}) => {
   if (node.category === NodeCategories.SourceMap) {
     relativeJsonPath = node.relativeJsonPath;
   }
-  console.log('node11', node);
   if (node.category === NodeCategories.Source) {
     return null;
   }
@@ -56,7 +54,6 @@ const Content = observer(() => {
   const stores = React.useContext(StoresContext);
   const {activeNode} = stores.uiStore;
   const sourceNode = stores.graphStore.rootNode;
-  let history = useHistory();
   const [currentView, setCurrentView] = useState('form');
 
   const toggleView = () =>
@@ -68,7 +65,9 @@ const Content = observer(() => {
         <Options
           view={currentView}
           onToggleView={toggleView}
-          onDelete={() => history.replace('/')}
+          onDelete={() => {
+            stores.graphStore.removeNode(activeNode.id);
+          }}
         />
         {currentView === 'form' && (
           <SubContent node={activeNode || sourceNode} />

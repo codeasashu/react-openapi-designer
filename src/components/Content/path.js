@@ -172,7 +172,6 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
                 }
               }}
               handleRemove={(relativePath) => {
-                console.log('handleRemove22', relativePath);
                 stores.oasStore.path.removePathParam(relativePath);
               }}
               onChange={(newParam, index) => {
@@ -217,7 +216,6 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
                 relativeJsonPath={mJsonPath}
                 operation={getValueFromStore(mJsonPath)}
                 onAddOperation={() => {
-                  console.log('addOp', e, e.method);
                   stores.oasStore.service.addOperation({
                     sourceNodeId: activePathNode.parentSourceNode.id,
                     path: activePathNode.path,

@@ -659,10 +659,11 @@ class DesignTreeStore extends ApiTreeStore {
             ? this.stores.graphStore.getNodeById(parentId)
             : undefined;
 
-        if (parent.category === NodeTypes.Path) {
+        if (parent.type === NodeTypes.Path) {
           const treeParent = this.tree.findById(parent.id);
           if (treeParent) {
             treeParent.metadata.operations.remove(id);
+            this.invalidateTree();
           }
         }
       }),
