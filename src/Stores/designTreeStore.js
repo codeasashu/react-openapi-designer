@@ -182,11 +182,11 @@ class DesignTreeStore extends ApiTreeStore {
         case NodeTypes.Examples:
           raiseErrorIfNotParentNode(node);
           this.treeStore.toggleExpand(node);
-          this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
+          //this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
           break;
         case NodeTypes.Overview:
           this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
-          this.stores.uiStore.unsetActiveSymbolNode();
+          //this.stores.uiStore.unsetActiveSymbolNode();
           break;
         case NodeTypes.Path:
           if (node.metadata.operations.items.length > 0) {
@@ -200,6 +200,7 @@ class DesignTreeStore extends ApiTreeStore {
 
           break;
         default:
+          console.log('ncc', node);
           this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
       }
     };

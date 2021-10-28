@@ -28,8 +28,10 @@ const getComponentForNode = (node) => {
       return ModelContent;
     case NodeTypes.Parameter:
       return Parameter;
-    default:
+    case NodeTypes.Overview:
       return Info;
+    default:
+      return null;
   }
 };
 
@@ -37,6 +39,10 @@ const SubContent = observer(({node}) => {
   let relativeJsonPath = [];
   if (node.category === NodeCategories.SourceMap) {
     relativeJsonPath = node.relativeJsonPath;
+  }
+  console.log('node11', node);
+  if (node.category === NodeCategories.Source) {
+    return null;
   }
   const RenderSubContent = getComponentForNode(node);
   return <RenderSubContent relativeJsonPath={relativeJsonPath} node={node} />;

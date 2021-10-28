@@ -15,10 +15,24 @@
 }
 
 .DesignTreeListItem .bp3-tag {
-  min-height: 16px;
+    min-height: 16px;
     padding: 0 4px;
     font-size: 11px;
-  }
+}
+
+.TreeListItem--active::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 4px;
+    height: 100%;
+    background: var(--color-link);
+}
+
+.TreeListItem__icon, .TreeListItem__label, .TreeListItem__input {
+    padding-left: 5px;
+}
 
 .TreeListItem__input {
     overflow: hidden;
@@ -59,7 +73,6 @@
     cursor: pointer;
     padding: 7px 15px;
     z-index: 2;
-    font-weight: 500;
     border-width: 1px;
     margin-left: -1px;
 }
@@ -118,14 +131,17 @@
  * Tab styles
  */
 .bp3-simple-tab.bp3-dark, .bp3-dark .bp3-simple-tab {
-    /*color: #738694;*/
-    /*background-color: #293742;*/
-    /*border-color: rgba(16,22,26,.4);*/
+    color: #738694;
+    background-color: #293742;
+    border-color: rgba(16,22,26,.4);
+    font-size: 12px;
+    font-weight: 400;
 }
-.bp3-simple-tab.bp3-dark.selected-tab, .bp3-dark .bp3-simple-tab.selected-tab {
-    /*color: #fff;*/
-    /*background-color: #202b33;*/
-    /*border-bottom-color: #202b33;*/
+.bp3-simple-tab.bp3-dark:hover, .bp3-dark .bp3-simple-tab:hover {
+    color: #ced9e0;
+}
+.bp3-focus-disabled :focus {
+    outline: none!important;
 }
 .bp3-simple-tab:first-of-type {
     border-top-left-radius: 3px;
@@ -137,24 +153,6 @@
 .bp3-simple-tab.selected-tab {
     cursor: default;
 }
-.bp3-simple-tab {
-    /*color: #738694;*/
-    /*@apply bg-gray-100 dark:bg-gray-700*/
-}
-.bp3-simple-tab-panel {
-    /*background-color: #fff;*/
-}
-.bp3-dark .bp3-simple-tab-panel {
-    /*background-color: #202b33;*/
-    /*border-color: rgba(16,22,26,.4);*/
-}
-/*.bp3-simple-tab-panel.block{*/
-    /*display: block;*/
-/*}*/
-
-/*.methodTabs .bp3-tab-list:first-child {*/
-    /*@apply mt-6 px-10 flex*/
-/*}*/
 
 .very-hidden-input{
     position: absolute;

@@ -30,8 +30,8 @@ class OasStore {
         this.stores.browserStore.openUrlInBrowser(refPath);
         return;
       }
-      let n;
-      let t = toFSPath(
+      let nodeUri;
+      let resolvedRefPath = toFSPath(
         resolve(
           sourceNode.uri.replace(
             new RegExp(escapeRegExp(sourceNode.path) + '$'),
@@ -41,15 +41,20 @@ class OasStore {
         ),
       );
 
-      const r = t.indexOf('#');
+      const hashLoc = resolvedRefPath.indexOf('#');
 
-      if (r !== -1) {
-        n = t.length < r + 2 ? undefined : t.slice(r + 1);
+      if (hashLoc !== -1) {
+        nodeUri =
+          resolvedRefPath.length < hashLoc + 2
+            ? undefined
+            : resolvedRefPath.slice(hashLoc + 1);
       }
 
-      const s = this.stores.graphStore.getNodeByUri(`/p/reference.yaml${n}`);
-      if (s) {
-        this.stores.uiStore.setActiveNode(s);
+      const node = this.stores.graphStore.getNodeByUri(
+        `/p/reference.yaml${nodeUri}`,
+      );
+      if (node) {
+        this.stores.uiStore.setActiveNode(node);
       }
     });
   }

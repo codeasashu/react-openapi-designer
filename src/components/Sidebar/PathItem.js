@@ -38,6 +38,13 @@ const PathItem = observer(({isEdited, node}) => {
   const uiStore = stores.uiStore;
   const isActiveNode = node.id === uiStore.activeNodeId;
 
+  const handleMethodClick = (e, id) => {
+    e.stopPropagation();
+    //const t = e.currentTarget.dataset.id;
+    console.log('clicked', id);
+    stores.designTreeStore.setActiveNode(stores.graphStore.getNodeById(id));
+  };
+
   let methodsTags = null;
 
   if (
@@ -67,7 +74,9 @@ const PathItem = observer(({isEdited, node}) => {
                   'opacity-75 hover:opacity-100': !activeNode,
                   'opacity-100': !!activeNode,
                 },
-              )}>
+              )}
+              role="button"
+              onClick={(e) => handleMethodClick(e, id)}>
               {method}
             </span>
           ) : null;

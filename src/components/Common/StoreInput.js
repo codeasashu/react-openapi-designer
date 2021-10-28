@@ -1,83 +1,86 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {observer} from 'mobx-react-lite';
 import classnames from 'classnames';
 import {has, trim} from 'lodash';
 import {InputGroup} from '@blueprintjs/core';
 import {getValueFromStore, usePatchOperationAt} from '../../utils/selectors';
 import {nodeOperations} from '../../utils/tree';
 
-const StoreInput = ({
-  errors,
-  autoFocus,
-  inputType,
-  style,
-  className,
-  title,
-  placeholder,
-  relativeJsonPath,
-  min,
-  id,
-  onChange,
-  handleUpdate,
-  readOnly,
-  valueInPath,
-  cleanuupEmpty,
-  jsonOp = nodeOperations.Replace,
-}) => {
-  const value = getValueFromStore(relativeJsonPath, valueInPath || false);
-  console.log('headerepath', relativeJsonPath, valueInPath);
-  const handlePatch = usePatchOperationAt(relativeJsonPath);
-  const [draft, setDraft] = React.useState(value === undefined ? '' : value);
-  const [original, setOriginal] = React.useState(draft);
-  const handleChange = React.useCallback(
-    (e) => {
-      if (has(e, 'target.value')) {
-        setDraft(e.target.value);
-      } else {
-        setDraft(e);
-      }
-
-      if (onChange) {
-        onChange(e);
-      }
-    },
-    [setDraft],
-  );
-
-  return (
-    <InputGroup
-      errors={errors}
-      autoFocus={autoFocus}
-      type={inputType}
-      style={style}
-      title={title}
-      placeholder={placeholder}
-      min={min}
-      id={id}
-      value={draft}
-      className={classnames(className, 'StudioInput')}
-      readOnly={readOnly}
-      onChange={handleChange}
-      onBlur={() => {
-        if (readOnly) {
-          return;
-        }
-        if (handleUpdate) {
-          handleUpdate(relativeJsonPath, draft, original);
-          setOriginal(draft);
-          return;
-        }
-        let _draft = draft;
-        if (trim(_draft) === '' && cleanuupEmpty) {
-          handlePatch();
+const StoreInput = observer(
+  ({
+    errors,
+    autoFocus,
+    inputType,
+    style,
+    className,
+    title,
+    placeholder,
+    relativeJsonPath,
+    min,
+    id,
+    onChange,
+    handleUpdate,
+    readOnly,
+    valueInPath,
+    cleanuupEmpty,
+    jsonOp = nodeOperations.Replace,
+  }) => {
+    const value = getValueFromStore(relativeJsonPath, valueInPath || false);
+    console.log('headerepath', relativeJsonPath, valueInPath);
+    const handlePatch = usePatchOperationAt(relativeJsonPath);
+    const [draft, setDraft] = React.useState(value === undefined ? '' : value);
+    const [original, setOriginal] = React.useState(draft);
+    const handleChange = React.useCallback(
+      (e) => {
+        if (has(e, 'target.value')) {
+          setDraft(e.target.value);
         } else {
-          handlePatch(jsonOp, _draft);
+          setDraft(e);
         }
-        setOriginal(draft);
-      }}
-    />
-  );
-};
+
+        if (onChange) {
+          onChange(e);
+        }
+      },
+      [setDraft],
+    );
+
+    return (
+      <InputGroup
+        errors={errors}
+        autoFocus={autoFocus}
+        type={inputType}
+        style={style}
+        title={title}
+        placeholder={placeholder}
+        min={min}
+        id={id}
+        value={draft}
+        className={classnames(className, 'StudioInput')}
+        readOnly={readOnly}
+        onChange={handleChange}
+        onBlur={() => {
+          if (readOnly) {
+            return;
+          }
+          if (handleUpdate) {
+            handleUpdate(relativeJsonPath, draft, original);
+            setOriginal(draft);
+            return;
+          }
+          let _draft = draft;
+          if (trim(_draft) === '' && cleanuupEmpty) {
+            handlePatch();
+          } else {
+            handlePatch(jsonOp, _draft);
+          }
+          setOriginal(draft);
+        }}
+      />
+    );
+  },
+);
 
 StoreInput.propTypes = {
   errors: PropTypes.array,

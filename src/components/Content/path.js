@@ -195,10 +195,13 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
             return (
               <Tab
                 key={e.method}
-                className={classnames('bp3-simple-tab uppercase ', {
-                  [`text-${methodColor} dark:text-${methodColor}`]: e.present,
-                })}>
-                {e.method}
+                className={classnames('bp3-simple-tab uppercase ')}>
+                <span
+                  className={classnames('uppercase ', {
+                    [`text-${methodColor} dark:text-${methodColor}`]: e.present,
+                  })}>
+                  {e.method}
+                </span>
               </Tab>
             );
           })}
@@ -213,11 +216,14 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
                 methodName={e.method}
                 relativeJsonPath={mJsonPath}
                 operation={getValueFromStore(mJsonPath)}
-                onAddOperation={(e) => {
-                  console.log('addOp', e);
-                }}
-                onChange={(e) => {
-                  console.log('upOp', e);
+                onAddOperation={() => {
+                  console.log('addOp', e, e.method);
+                  stores.oasStore.service.addOperation({
+                    sourceNodeId: activePathNode.parentSourceNode.id,
+                    path: activePathNode.path,
+                    method: e.method,
+                    setActive: true,
+                  });
                 }}
               />
             </TabPanel>

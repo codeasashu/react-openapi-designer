@@ -36,7 +36,7 @@ const Item = ({
       {isEdited ? (
         <NodeEditor node={node} placeholder={placeholder} />
       ) : (
-        <span className="" title={node.name}>
+        <span className="TreeListItem__label" title={node.name}>
           {node.name}
         </span>
       )}

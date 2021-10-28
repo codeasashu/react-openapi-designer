@@ -210,20 +210,20 @@ export const timer = async (timeout = 0) =>
   new Promise((t) => setTimeout(t, timeout));
 
 export const methodColors = {
-  get: 'success',
-  post: 'info',
-  put: 'warning',
-  patch: 'warning',
-  delete: 'danger',
-  copy: 'gray',
-  head: 'gray',
-  link: 'gray',
-  unlink: 'gray',
-  purge: 'gray',
-  lock: 'gray',
-  unlock: 'gray',
-  options: 'gray',
-  trace: 'gray',
+  get: 'green-600',
+  post: 'blue-400',
+  put: 'yellow-500',
+  patch: 'yellow-500',
+  delete: 'red-500',
+  copy: 'gray-400',
+  head: 'gray-400',
+  link: 'gray-400',
+  unlink: 'gray-400',
+  purge: 'gray-400',
+  lock: 'gray-400',
+  unlock: 'gray-400',
+  options: 'gray-400',
+  trace: 'gray-400',
 };
 
 export const getMethodColor = (_color) => {

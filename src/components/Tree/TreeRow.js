@@ -39,14 +39,15 @@ const TreeRow = observer((props) => {
   const getFromDesignContext = (item) => React.useContext(DesignContext)[item];
 
   const handleEvent = (eventType, node) => {
-    return React.useCallback(
-      (e) => {
-        if (node !== null) {
-          store.events.emit(eventType, e, node);
-        }
-      },
-      [store, eventType, node],
-    );
+    //return React.useCallback(
+    return (e) => {
+      console.log('clicked', node, e);
+      if (node !== null) {
+        store.events.emit(eventType, e, node);
+      }
+    };
+    //[store, eventType, node],
+    //);
   };
 
   const handleContextMenu = (node, generateContextMenu) => {

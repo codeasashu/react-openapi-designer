@@ -33,11 +33,11 @@ class Service {
     this.activeOperationNodes = [];
 
     this.addOperation = (
-      node,
+      operation,
       value = {
         // t
         summary: '',
-        operationId: generateOperationId(node.path, node.method),
+        operationId: generateOperationId(operation.path, operation.method),
 
         responses: {
           200: {
@@ -51,7 +51,7 @@ class Service {
         path, //r
         method, //i
         setActive, //o
-      } = e;
+      } = operation;
 
       //Xe(this.stores.graphStore.getNodeById(n), n, this.stores.graphStore)
       const jsonPath = ['paths', path, method]; // a
