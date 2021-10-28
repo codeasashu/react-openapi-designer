@@ -88,7 +88,7 @@ const replaceInPath = (e, t, n) => {
   return o;
 };
 
-const decodeUriFragment = (path) =>
+export const decodeUriFragment = (path) =>
   replaceInPath(replaceInPath(path, '~1', '/'), '~0', '~');
 
 export const generateOperationId = (path, method) => {

@@ -14,6 +14,7 @@ import {
   nodeOperations,
 } from '../../utils/tree';
 import {
+  decodeUriFragment,
   getParametersFromPath,
   createPathParamSchema,
   updatePathFromParameters,
@@ -117,6 +118,28 @@ class Path {
       await when(() => this.activePathNode && this.activePathNode.data.parsed, {
         timeout: 2000,
       });
+
+      let activeNode = this.activePathNode;
+      let pathData = activeNode.data.parsed || {};
+      const existingParameters =
+        pathData.parameters && pathData.parameters.length
+          ? pathData.parameters
+          : [];
+
+      if (existingParameters.length === 0) {
+        const pathUri = decodeUriFragment(activeNode.path);
+        this.stores.graphStore.graph.patchSourceNodeProp(
+          activeNode.parentSourceNode.id,
+          'data.parsed',
+          [
+            {
+              op: nodeOperations.Replace,
+              value: [],
+              path: ['paths', pathUri, 'parameters'],
+            },
+          ],
+        );
+      }
 
       this.stores.graphStore.graph.patchSourceNodeProp(
         this.activePathNode.parentSourceNode.id,
@@ -275,7 +298,6 @@ class Path {
     }
 
     n = i.data.parsed || {};
-
     const o = n.parameters && n.parameters.length ? n.parameters : [];
 
     //const a = te.resolveInlineRef.bind(
