@@ -121,11 +121,8 @@ class OasStore {
             content: {
               'application/json': {
                 schema: {
-                  properties: {
-                    id: {
-                      type: 'string',
-                    },
-                  },
+                  type: 'object',
+                  properties: {},
                 },
               },
             },
@@ -200,7 +197,8 @@ class OasStore {
             content: {
               'application/json': {
                 schema: {
-                  type: 'string',
+                  type: 'object',
+                  properties: {},
                 },
               },
             },

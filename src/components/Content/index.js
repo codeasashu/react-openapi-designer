@@ -8,6 +8,7 @@ import PathContent from './path';
 import ModelContent from './model';
 import Parameter from './parameter';
 import Response from './response';
+import RequestBody from './RequestBody';
 import MonacoEditor from '../Editor/Monaco';
 import {StoresContext} from '../Tree/context';
 import {NodeCategories, NodeTypes} from '../../utils/tree';
@@ -23,6 +24,8 @@ const getComponentForNode = (node) => {
       return PathContent;
     case NodeTypes.Response:
       return Response;
+    case NodeTypes.RequestBody:
+      return RequestBody;
     case NodeTypes.Model:
       return ModelContent;
     case NodeTypes.Parameter:
