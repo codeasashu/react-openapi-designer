@@ -239,100 +239,30 @@ export const defaultOperation = {
 export const exampleDoc = {
   openapi: '3.0.0',
   info: {
-    title: 'app1',
+    title: '',
     version: '1.0',
-    summary: 'App API summary',
-    description: 'App API Description',
+    summary: '',
+    description: '',
     contact: {
-      name: 'Ashutosh',
-      url: 'abc url',
-      email: 'ashu@fdj.com',
-    },
-    termsOfService: 'abc',
-    license: {
-      name: 'Asshu license',
-      identifier: '0BSD',
+      name: '',
+      url: '',
+      email: '',
     },
   },
-  paths: {
-    '/users/id/{abc}': {
-      parameters: [{in: 'path', schema: {type: 'string'}, name: 'abc'}],
-      get: {...defaultOperation, summary: 'abcd', operationId: 'get-users-id'},
-    },
-    '/users/abc': {
-      get: {...defaultOperation, summary: 'pqr', operationId: 'get-users-abc'},
-    },
-  },
+  paths: {},
   components: {
-    schemas: {
-      Users: {
-        description: '',
-        type: 'object',
-        properties: {
-          a: {type: 'string'},
-        },
-      },
-    },
-    responses: {
-      testresp: {
-        description: 'Example response',
-        content: {
-          'application/json': {
-            schema: {
-              type: 'object',
-              properties: {
-                a: {type: 'string'},
-              },
-            },
-          },
-        },
-      },
-    },
-    parameters: {
-      test: {
-        name: 'test12',
-        in: 'query',
-        required: false,
-        schema: {
-          type: 'string',
-        },
-        description: 'test',
-      },
-    },
+    schemas: {},
+    responses: {},
+    parameters: {},
     examples: {},
     requestBodies: {},
     headers: {},
-    securitySchemes: {
-      'API Key - 1': {
-        name: 'API Key test',
-        type: 'apiKey',
-        in: 'header',
-        description: 'kljkl',
-      },
-      'API Key - 2': {
-        type: 'http',
-        scheme: 'basic',
-        description: 'basic scheme',
-      },
-      'API Key - 3': {
-        type: 'openIdConnect',
-        openIdConnectUrl: 'oidurl',
-        description: 'oid desc',
-      },
-    },
+    securitySchemes: {},
     links: {},
     callbacks: {},
   },
   tags: [],
-  servers: [
-    {
-      description: 'ppap',
-    },
-    {
-      url: 'abc s1',
-      description: 'ppap2',
-    },
-  ],
+  servers: [],
 };
 
 export const ModuleNames = {
