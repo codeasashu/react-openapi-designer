@@ -139,9 +139,9 @@ class Service {
 
     this.stores.graphStore.eventEmitter.on(
       eventTypes.DidRemoveNode,
-      ({node: e}) => {
-        if (e && NodeCategories.Source !== e.category) {
-          if (NodeCategories.SourceMap === e.category) {
+      ({node}) => {
+        if (node && NodeCategories.Source !== node.category) {
+          if (NodeCategories.SourceMap === node.category) {
             this.populateActiveOperationNodes();
           }
         } else {

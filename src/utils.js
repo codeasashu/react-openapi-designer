@@ -254,3 +254,41 @@ export const renameObjectKey = (originalObject, from, to) => {
   }
   return newObject;
 };
+
+export const startsWith = (needle, haystack) => {
+  if (needle instanceof Array) {
+    if (haystack instanceof Array) {
+      if (needle.length < haystack.length) {
+        return false;
+      }
+
+      for (const item in haystack) {
+        // eslint-disable-next-line no-prototype-builtins
+        if (!haystack.hasOwnProperty(item)) {
+          continue;
+        }
+
+        const needlePos = parseInt(needle[item]);
+        const haystackPos = parseInt(haystack[item]);
+
+        if (isNaN(needlePos) && isNaN(haystackPos)) {
+          if (haystack[item] !== needle[item]) {
+            return false;
+          }
+        } else if (haystackPos !== needlePos) {
+          return false;
+        }
+      }
+    }
+  } else {
+    if (typeof needle != 'string') {
+      return false;
+    }
+
+    if (typeof haystackPos == 'string') {
+      return needle.startsWith(haystack);
+    }
+  }
+
+  return true;
+};

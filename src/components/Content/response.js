@@ -8,7 +8,6 @@ import ResponseBody from '../Designer/Responses/body';
 
 const ResponseContent = ({relativeJsonPath, node}) => {
   const handlePatch = usePatchOperation();
-  console.log('bodyyy1', relativeJsonPath);
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">

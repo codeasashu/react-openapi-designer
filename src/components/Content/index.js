@@ -10,7 +10,7 @@ import Parameter from './parameter';
 import Response from './response';
 import MonacoEditor from '../Editor/Monaco';
 import {StoresContext} from '../Tree/context';
-import {NodeCategories, NodeTypes, eventTypes} from '../../utils/tree';
+import {NodeCategories, NodeTypes} from '../../utils/tree';
 
 const StyledContent = styled.div`
   width: calc(80% - 2px);
@@ -78,8 +78,6 @@ const Content = observer(() => {
   );
 });
 
-Content.propTypes = {
-  openapi: PropTypes.object,
-};
+Content.propTypes = {};
 
 export default Content;

@@ -182,4 +182,11 @@
 .bp3-dark .dark\:bg-danger {
     background-color: #f56565;
 }
-
+.text-sm {
+    font-size: 11px;
+}
+.StudioInput, .bp3-dark .StudioInput {
+    border-width: 1px;
+    border-radius: 2px;
+    height: 30px;
+}

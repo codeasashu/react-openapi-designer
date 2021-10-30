@@ -1,32 +1,7 @@
 import {observable, computed, reaction, action, makeObservable} from 'mobx';
-import {NodeCategories, eventTypes} from '../utils/tree';
-
-//Object(h.d)([p.observable], so.prototype, "fullscreen", undefined)
-//Object(h.d)([p.observable], so.prototype, "_showStuckDialog", undefined)
-//Object(h.d)([p.observable], so.prototype, "_smallLayout", undefined)
-//Object(h.d)([p.observable.ref], so.prototype, "_preferences", undefined)
-//Object(h.d)([p.action.bound], so.prototype, "toggleFullscreen", null)
-//Object(h.d)([p.computed], so.prototype, "showStuckDialog", null)
-//Object(h.d)([p.computed], so.prototype, "smallLayout", null)
-//Object(h.d)([p.computed], so.prototype, "twoPanels", null)
-//Object(h.d)([p.action], so.prototype, "setActiveSidebarTree", null)
-//Object(h.d)([p.computed], so.prototype, "activeSidebarTree", null)
-//Object(h.d)([p.computed], so.prototype, "activeLayout", null)
-//Object(h.d)([p.observable], so.prototype, "_chosenSourceNodeUri", undefined)
-//Object(h.d)([p.computed], so.prototype, "chosenSourceNodeUri", null)
-//Object(h.d)([p.computed], so.prototype, "activeSourceNodeId", null)
-//Object(h.d)([p.observable.ref], so.prototype, "activeSourceNode", undefined)
-//Object(h.d)([p.action], so.prototype, "assignMatchingSourceNode", null)
-//Object(h.d)([p.observable], so.prototype, "_chosenSymbolNodeUri", undefined)
-//Object(h.d)([p.computed], so.prototype, "chosenSymbolNodeUri", null)
-//Object(h.d)([p.computed], so.prototype, "activeSymbolNodeId", null)
-//Object(h.d)([p.observable.ref], so.prototype, "activeSymbolNode", undefined)
-//Object(h.d)([p.action], so.prototype, "assignMatchingSymbolNode", null)
-//Object(h.d)([p.computed], so.prototype, "activeNodeId", null)
-//Object(h.d)([p.computed], so.prototype, "activeNode", null)
-//Object(h.d)([p.computed], so.prototype, "activeHttpSpecNode", null)
-//Object(h.d)([p.computed], so.prototype, "sidebarWidth", null)
-//Object(h.d)([p.computed], so.prototype, "sidebarActiveTreeHeight", null)
+import HistoryTree from '../Tree/HistoryTree';
+import {NodeCategories, eventTypes, NodeTypes} from '../utils/tree';
+import {startsWith} from '../utils';
 
 class UiStore {
   _chosenSourceNodeUri;
@@ -65,6 +40,28 @@ class UiStore {
     this._smallLayout = false;
     this._chosenSourceNodeUri = undefined;
     this._chosenSymbolNodeUri = undefined;
+    this._preferences = observable.object(
+      {
+        activeSidebarTree: 'design',
+        sidebarWidth: 18,
+        sidebarActiveTreeHeight: 50,
+        nodeHistory: [],
+      },
+      undefined,
+      {
+        deep: false,
+      },
+    );
+    this._history = new HistoryTree(this._preferences.nodeHistory);
+
+    reaction(
+      () => this.activeNode,
+      (e) => {
+        if (e) {
+          this._history.addItem(UiStore.getHistoryItemForNode(e));
+        }
+      },
+    );
 
     reaction(
       () => this.chosenSourceNodeUri,
@@ -217,6 +214,54 @@ class UiStore {
         this.handleAddNode({node});
       },
     );
+
+    this.stores.graphStore.eventEmitter.on(
+      eventTypes.DidMoveNode,
+      ({id, oldUri}) => {
+        this._history.removeItemsByUri(oldUri);
+        const node = this.stores.graphStore.getNodeById(id);
+
+        if (
+          node !== undefined &&
+          NodeCategories.Source !== node.category &&
+          NodeTypes.Directory !== node.type
+        ) {
+          this._history.addItem(UiStore.getHistoryItemForNode(node));
+        }
+      },
+    );
+    this.stores.graphStore.eventEmitter.on(
+      eventTypes.DidRemoveNode,
+      ({node}) => {
+        if (NodeCategories.Virtual !== node.category) {
+          if (this.chosenSymbolNodeUri === node.uri) {
+            this.chosenSymbolNodeUri = undefined;
+          }
+        }
+        const {uri} = node;
+        this._history.removeItemsByUri(uri);
+
+        const activeNodeUri = this.activeNode && this.activeNode?.uri;
+        if (this._history.length === 0) {
+          this.clearActiveNode();
+        } else if (activeNodeUri && uri && startsWith(activeNodeUri, uri)) {
+          const lastNode = this._history.items.head;
+          const newNode = lastNode
+            ? this.stores.graphStore.getNodeByUri(lastNode.uri)
+            : undefined;
+
+          if (newNode) {
+            this.setActiveNode(newNode);
+          } else {
+            if (lastNode) {
+              this._history.removeItemsByUri(lastNode.uri);
+            }
+
+            this.clearActiveNode();
+          }
+        }
+      },
+    );
   }
 
   get _storageKey() {
@@ -315,30 +360,6 @@ class UiStore {
     return this.activeSymbolNode || this.activeSourceNode;
   }
 
-  //get activeHttpSpecNode() {
-  //const e = this.activeNode;
-
-  //if (e) {
-  //if (fr.a.Operation === e.type || jr.a.Operation === e.type) {
-  //return (function (e) {
-  //if (b.b.SourceMap === e.category) {
-  //return e.children.find((e) => Kr.NodeType.HttpOperation === e.type);
-  //}
-  //})(e);
-  //} else {
-  //if (
-  //we.b.File === e.type &&
-  //[b.d.OAS2, b.d.OAS3].includes(e.spec || '')
-  //) {
-  //return eo(e);
-  //} else {
-  //0;
-  //return;
-  //}
-  //}
-  //}
-  //}
-
   get sidebarWidth() {
     return this._preferences.sidebarWidth;
   }
@@ -398,12 +419,20 @@ class UiStore {
     }
   }
 
-  //static getHistoryItemForNode(e) {
-  //return {
-  //uri: e.uri,
-  //name: Object(mi.a)(e),
-  //};
-  //}
+  getNodeHistory() {
+    return [...this._history.items].map((e) =>
+      Object.assign(Object.assign({}, e), {
+        available: this.stores.graphStore.getNodeByUri(e.uri) !== undefined,
+      }),
+    );
+  }
+
+  static getHistoryItemForNode(e) {
+    return {
+      uri: e.uri,
+      name: e.uri,
+    };
+  }
 }
 
 export default UiStore;

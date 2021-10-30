@@ -106,10 +106,13 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
           <TitleEditor
             xl
             value={
-              getValueFromStore(
-                activeOperationNode.relativeJsonPath.concat(['summary']),
-              ) || ''
+              activeOperationNode
+                ? getValueFromStore(
+                    activeOperationNode.relativeJsonPath.concat(['summary']),
+                  ) || ''
+                : ''
             }
+            disabled={!activeOperationNode}
             placeholder="Operation Name"
             onChange={(e) => {
               handlePatch(

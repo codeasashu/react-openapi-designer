@@ -1,4 +1,4 @@
-import {observable, action, makeObservable, toJS, runInAction} from 'mobx';
+import {observable, action, makeObservable, runInAction} from 'mobx';
 import {join} from 'lodash';
 import Graph from './graph';
 import {recomputeGraphNodes} from './graph/addNode';

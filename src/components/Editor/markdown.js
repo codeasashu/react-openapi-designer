@@ -1,6 +1,7 @@
 // @flow
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import Editor from 'react-simple-code-editor';
 import Prism from 'prismjs';
 
@@ -13,7 +14,9 @@ const Markdown = ({value: initValue, onChange, ...props}) => {
 
   const _handleChange = (e) => {
     setValue(e);
-    onChange(e);
+    if (onChange) {
+      onChange(e);
+    }
   };
 
   const _handleBlur = () => {
@@ -26,8 +29,12 @@ const Markdown = ({value: initValue, onChange, ...props}) => {
     <>
       <Editor
         textareaClassName={props.textareaClassName}
-        className={props.className}
+        className={classnames(
+          props.className,
+          'relative max-h-400px overflow-auto',
+        )}
         preClassName=""
+        placeholder={props.placeholder || ''}
         value={value}
         highlight={(code) =>
           code && Prism.highlight(code, Prism.languages.markup, 'markup')
@@ -35,10 +42,12 @@ const Markdown = ({value: initValue, onChange, ...props}) => {
         onValueChange={(e) => _handleChange(e)}
         onBlur={(e) => _handleBlur(e.target.value)}
         padding={10}
+        autoFocus={true}
         style={{
           fontFamily: '"Fira code", "Fira Mono", monospace',
           fontSize: 12,
           width: '100%',
+          minHeight: 38,
         }}
       />
       {props.error && <div className="text-sm text-red-400">{props.error}</div>}

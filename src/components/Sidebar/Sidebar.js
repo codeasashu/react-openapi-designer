@@ -6,10 +6,8 @@ import {StoresContext} from '../Tree/context';
 import Item from './Item';
 import PathItem from './PathItem';
 import {NodeTypes} from '../../utils/tree';
-import {trace} from 'mobx';
 
 const Sidebar = observer((props) => {
-  trace(true);
   const stores = React.useContext(StoresContext);
   const handleScroll = () => {
     //console.log('onScrroll', e);
@@ -60,8 +58,6 @@ const Sidebar = observer((props) => {
 
 Sidebar.propTypes = {
   style: PropTypes.object,
-  //onClick: PropTypes.func,
-  openapi: PropTypes.object,
 };
 
 export default Sidebar;

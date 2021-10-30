@@ -200,7 +200,6 @@ class DesignTreeStore extends ApiTreeStore {
 
           break;
         default:
-          console.log('ncc', node);
           this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
       }
     };
@@ -624,7 +623,6 @@ class DesignTreeStore extends ApiTreeStore {
       eventTypes.DidRemoveNode,
       action(({id, node: {parentId}}) => {
         let node = this.tree.findById(id); //r
-
         if (node !== undefined) {
           if (
             NodeTypes.Models === node.type ||
@@ -645,7 +643,6 @@ class DesignTreeStore extends ApiTreeStore {
               NodeTypes.Example === node.type ||
               NodeTypes.RequestBody === node.type
             ) {
-              this.tree.removeNode(node);
               this.invalidateTree();
               return;
             } else {
