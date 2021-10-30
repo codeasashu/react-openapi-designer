@@ -38,14 +38,14 @@ const ApiKey = ({scheme, name, onChange}) => {
         onChange={(e) => {
           onChange(scheme, e.target.value);
         }}
-        className="pr-0"
+        className="pr-0 StudioInput flex-1"
       />
       <InputGroup
         title="name"
         placeholder="name"
         value={scheme?.name}
         onChange={(e) => onChange({...scheme, name: e.target.value})}
-        className="pr-0"
+        className="pr-0 StudioInput flex-1"
       />
       <div className="bp3-html-select">
         <select
@@ -75,7 +75,7 @@ const Http = ({scheme, name, onChange}) => {
         title="key"
         placeholder="key"
         value={name}
-        className="pr-0"
+        className="pr-0 StudioInput flex-1"
         onChange={(e) => onChange(scheme, e.target.value)}
       />
       <div className="bp3-html-select">
@@ -106,14 +106,14 @@ const OpenIdConnect = ({scheme, name, onChange}) => {
         title="key"
         placeholder="key"
         value={name}
-        className="pr-0"
+        className="pr-0 StudioInput flex-1"
         onChange={(e) => onChange(scheme, e.target.value)}
       />
       <InputGroup
         title="key"
         placeholder="key"
         value={scheme.openIdConnectUrl}
-        className="pr-0"
+        className="pr-0 StudioInput flex-1"
         onChange={(e) =>
           onChange({...scheme, openIdConnectUrl: e.target.value})
         }

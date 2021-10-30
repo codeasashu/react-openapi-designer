@@ -58,12 +58,14 @@ const Servers = ({servers, onChange}) => {
       {servers.map((server, i) => (
         <ControlGroup key={i}>
           <InputGroup
+            className="StudioInput flex-1"
             placeholder="http://example.tld"
             value={server?.url || ''}
             onChange={(e) => handleChange(i, {url: e.target.value})}
           />
           <InputGroup
-            placeholder="http://example.tld"
+            className="StudioInput"
+            placeholder="Name (optional)"
             value={server?.description || ''}
             onChange={(e) => handleChange(i, {description: e.target.value})}
           />

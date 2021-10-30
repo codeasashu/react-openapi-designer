@@ -15,7 +15,7 @@ const Info = observer(() => {
   return (
     <div className="flex-1 relative">
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
-        <div className="px-10 mt-10 max-w-6xl justify-between">
+        <div className="w-10/12 m-auto p-10">
           <div className="flex items-center mb-8">
             <div className="FormHttpService__version bp3-tag bg-green p-2">
               <div className="FormEditableText text-xl font-bold">
@@ -34,6 +34,7 @@ const Info = observer(() => {
             <input
               className="px-2 py-1 font-medium bg-transparent hover:bg-darken-2 focus:bg-darken-2 rounded-lg ml-4 flex-1 text-2xl"
               value={getValueFromStore(['info', 'title']) || ''}
+              placeholder="Name"
               onChange={(e) =>
                 handlePatch(
                   nodeOperations.Replace,
@@ -64,6 +65,7 @@ const Info = observer(() => {
           <div className="flex-1">
             <MarkdownEditor
               value={getValueFromStore(['info', 'description']) || ''}
+              placeholder="API description..."
               onChange={(e) =>
                 handlePatch(nodeOperations.Replace, ['info', 'description'], e)
               }
