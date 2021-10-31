@@ -4,8 +4,6 @@ import {observer} from 'mobx-react-lite';
 import {StoresContext} from '../../Tree/context';
 import MonacoCodeEditor from './editor';
 
-//const Od = () => Object(d.b)().readOnlyFs
-
 const OasEditor = observer(function () {
   const stores = React.useContext(StoresContext);
   const uiStore = stores.uiStore;
@@ -32,9 +30,8 @@ const OasEditor = observer(function () {
 
   const activeNode = uiStore.activeSourceNode;
 
-  if (activeNode === null || activeNode.data.raw === undefined) {
+  if (activeNode == null || activeNode.data.raw === undefined) {
     return null;
-    //return c.createElement(Ef, null)
   }
 
   //const v = ((n = ((t = o.editorConfig) === null) || (t === undefined) ? undefined : t.lineWidth) !== null) && (n !== undefined) ? n : -1

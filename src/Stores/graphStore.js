@@ -182,6 +182,7 @@ class GraphStore {
           this.graph.setSourceNodeProp(node.id, 'data.parsed', exampleDoc);
 
           recomputeGraphNodes(node, this.graph);
+          this.props.uiStore.setActiveNode(node);
         });
       }
     });

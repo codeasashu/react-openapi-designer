@@ -24,7 +24,6 @@ const Path = observer(
         relativeJsonPaths.push(parametersPath.concat(index));
       });
     }
-    console.log('pathparams', pathParameters, relativeJsonPaths);
 
     return (
       <div className="mt-2">

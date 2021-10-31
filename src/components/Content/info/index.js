@@ -1,6 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
+import AutosizeInput from 'react-input-autosize';
 import {InputGroup} from '@blueprintjs/core';
 import {MarkdownEditor} from 'components/Editor';
 import Servers from './servers';
@@ -19,7 +20,10 @@ const Info = observer(() => {
           <div className="flex items-center mb-8">
             <div className="FormHttpService__version bp3-tag bg-green p-2">
               <div className="FormEditableText text-xl font-bold">
-                <input
+                <AutosizeInput
+                  inputClassName="bg-transparent hover:bg-darken-1 focus:bg-darken-2"
+                  minWidth={30}
+                  key={'/'}
                   value={getValueFromStore(['info', 'version']) || '0.1'}
                   onChange={(e) => {
                     handlePatch(

@@ -186,7 +186,7 @@ class DesignTreeStore extends ApiTreeStore {
           break;
         case NodeTypes.Overview:
           this.setActiveNode(this.stores.graphStore.getNodeById(node.id));
-          //this.stores.uiStore.unsetActiveSymbolNode();
+          this.stores.uiStore.unsetActiveSymbolNode();
           break;
         case NodeTypes.Path:
           if (node.metadata.operations.items.length > 0) {

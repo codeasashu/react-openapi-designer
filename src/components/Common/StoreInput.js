@@ -27,7 +27,6 @@ const StoreInput = observer(
     jsonOp = nodeOperations.Replace,
   }) => {
     const value = getValueFromStore(relativeJsonPath, valueInPath || false);
-    console.log('headerepath', relativeJsonPath, valueInPath);
     const handlePatch = usePatchOperationAt(relativeJsonPath);
     const [draft, setDraft] = React.useState(value === undefined ? '' : value);
     const [original, setOriginal] = React.useState(draft);
