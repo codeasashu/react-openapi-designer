@@ -6,7 +6,7 @@ import {
   addPath,
   renameComponent,
   handlePathNameChange,
-} from 'store/modules/openapi';
+} from '../store/modules/openapi';
 //import Tree from './Common/TreeList/Tree';
 import Tree from './Tree/List';
 import {isValidPathMethod} from '../utils';

@@ -382,7 +382,7 @@ class Tree {
     do {
       this.resetCounter(currentNode);
       currentNode = currentNode.parent;
-    } while (condition && currentNode !== null);
+    } while (condition && currentNode != null);
   }
 
   invalidateLevel(node) {

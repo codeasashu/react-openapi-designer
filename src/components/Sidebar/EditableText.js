@@ -68,6 +68,7 @@ const EditableText = ({node, placeholder = ''}) => {
       content={<Callout intent={Intent.DANGER}>{error}</Callout>}>
       <input
         ref={inputRef}
+        label="create item"
         autoFocus={true}
         autoComplete="off"
         className="w-full DesignTreeListItem__input"

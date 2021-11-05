@@ -1,4 +1,4 @@
-import monaco from '../components/Editor/Monaco/monaco';
+import * as monaco from 'monaco-editor';
 import EventEmitter from '../Tree/EventEmitter';
 
 class MonacoCodeStore {

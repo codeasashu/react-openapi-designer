@@ -6,7 +6,7 @@ import {
   observable,
   computed,
 } from 'mobx';
-import monaco from '../components/Editor/Monaco/monaco';
+import * as monaco from 'monaco-editor';
 import MonacoCodeStore from './monacoCodeStore';
 //import * as yaml from 'yaml';
 import yaml from 'js-yaml';

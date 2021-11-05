@@ -252,3 +252,5 @@ export const sortOperations = (operations, path) => {
 };
 
 export const replaceHash = (e) => e.replace(/^[^#]+#/, '');
+
+export const reverseString = (e) => e.split('').reverse().join('');

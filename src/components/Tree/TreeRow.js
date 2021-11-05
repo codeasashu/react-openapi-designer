@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {observer} from 'mobx-react-lite';
-import {ContextMenu, Menu, MenuDivider, MenuItem} from '@blueprintjs/core';
+import {Menu, MenuDivider, MenuItem} from '@blueprintjs/core';
+import {ContextMenu2} from '@blueprintjs/popover2';
 import Tree from '../../Tree/Tree';
 import {DesignContext, StoreContext} from './context';
 import {eventTypes, isParentNode} from '../../utils/tree';
@@ -39,43 +40,11 @@ const TreeRow = observer((props) => {
   const getFromDesignContext = (item) => React.useContext(DesignContext)[item];
 
   const handleEvent = (eventType, node) => {
-    //return React.useCallback(
     return (e) => {
       if (node !== null) {
         store.events.emit(eventType, e, node);
       }
     };
-    //[store, eventType, node],
-    //);
-  };
-
-  const handleContextMenu = (node, generateContextMenu) => {
-    return React.useCallback(
-      (e) => {
-        if (!generateContextMenu) {
-          return;
-        }
-
-        const menuItems = generateContextMenu(node);
-
-        if (menuItems !== undefined) {
-          e.preventDefault();
-          e.stopPropagation();
-
-          if (menuItems.length > 0) {
-            ContextMenu.show(
-              <SidebarContextMenu items={menuItems} />,
-              {
-                left: e.clientX,
-                top: e.clientY,
-              },
-              () => {},
-            );
-          }
-        }
-      },
-      [generateContextMenu, node],
-    );
   };
 
   const itemClassName = getFromDesignContext('itemClassName');
@@ -87,9 +56,6 @@ const TreeRow = observer((props) => {
   }
 
   const handleClick = handleEvent(eventTypes.NodeClick, node);
-  //const handleMouseEnter = handleEvent(eventTypes.NodeMouseEnter, node);
-  //const handleMouseLeave = handleEvent(eventTypes.NodeMouseLeave, node);
-  const contextMenu = handleContextMenu(node, generateContextMenu);
 
   if (node === null) {
     return <div style={style} />;
@@ -128,23 +94,46 @@ const TreeRow = observer((props) => {
 
   if (node.id === store.state.editedNodeId) {
     return (
-      <div key={node.id} className={nodeClasses} style={rowStyles}>
-        {renderer}
-      </div>
-    );
-  } else {
-    return (
       <div
         key={node.id}
         className={nodeClasses}
         style={rowStyles}
-        onClick={handleClick}
-        //onMouseEnter={handleMouseEnter}
-        //onMouseLeave={handleMouseLeave}
-        onContextMenu={contextMenu}>
+        aria-label={node.type}
+        role="edititem">
         {renderer}
       </div>
     );
+  } else {
+    const menuItems = node ? generateContextMenu(node) : undefined;
+    if (menuItems !== undefined && menuItems.length > 0) {
+      return (
+        <ContextMenu2 content={<SidebarContextMenu items={menuItems} />}>
+          <div
+            key={node.id}
+            data-testid={`tree-row-${node.id}`}
+            role="menuitem"
+            aria-label={node.type}
+            className={nodeClasses}
+            style={rowStyles}
+            onClick={handleClick}>
+            {renderer}
+          </div>
+        </ContextMenu2>
+      );
+    } else {
+      return (
+        <div
+          key={node.id}
+          data-testid={`tree-row-${node.id}`}
+          role="menuitem"
+          aria-label={node.type}
+          className={nodeClasses}
+          style={rowStyles}
+          onClick={handleClick}>
+          {renderer}
+        </div>
+      );
+    }
   }
 });
 

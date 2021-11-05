@@ -49,35 +49,35 @@ class DesignTreeStore extends ApiTreeStore {
 
     this.generateContextMenu = (node) => {
       const menuItems = [];
-      if (node.type === 'paths') {
+      if (node.type === NodeTypes.Paths) {
         menuItems.push({
           text: 'New Path',
           onClick: () => {
             this.treeStore.events.emit(eventTypes.CreatePath, node);
           },
         });
-      } else if (node.type === 'models') {
+      } else if (node.type === NodeTypes.Models) {
         menuItems.push({
           text: 'New Model',
           onClick: () => {
             this.treeStore.events.emit(eventTypes.CreateModel, node);
           },
         });
-      } else if (node.type === 'responses') {
+      } else if (node.type === NodeTypes.Responses) {
         menuItems.push({
           text: 'New Response',
           onClick: () => {
             this.treeStore.events.emit(eventTypes.CreateResponse, node);
           },
         });
-      } else if (node.type === 'examples') {
+      } else if (node.type === NodeTypes.Examples) {
         menuItems.push({
           text: 'New Example',
           onClick: () => {
             this.treeStore.events.emit(eventTypes.CreateExample, node);
           },
         });
-      } else if (node.type === 'parameters') {
+      } else if (node.type === NodeTypes.Parameters) {
         ['query', 'path', 'header', 'cookie'].forEach((param) => {
           const parameterType = param[0].toUpperCase() + param.slice(1);
           menuItems.push({
@@ -90,7 +90,7 @@ class DesignTreeStore extends ApiTreeStore {
             },
           });
         });
-      } else if (node.type === 'requestBodies') {
+      } else if (node.type === NodeTypes.RequestBodies) {
         menuItems.push({
           text: 'New Request Body',
           onClick: () => {
@@ -133,7 +133,11 @@ class DesignTreeStore extends ApiTreeStore {
         );
       }
 
-      if (node.type === 'path' && 'operations' in node.metadata) {
+      if (
+        node.type === 'path' &&
+        node.metadata &&
+        'operations' in node.metadata
+      ) {
         menuItems.push({
           text: 'Delete Operation',
           children: node.metadata.operations.items.map((item) => ({

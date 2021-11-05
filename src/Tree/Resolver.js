@@ -1,5 +1,4 @@
 import {get} from 'lodash';
-import {toJS} from 'mobx';
 import {
   generateUUID,
   NodeTypes,

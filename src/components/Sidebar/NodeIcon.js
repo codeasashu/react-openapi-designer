@@ -22,7 +22,7 @@ const NodeIcon = ({expanded, icons, node}) => {
   })(iconObj, !!expanded);
 
   return (
-    <span className="TreeListItem__icon">
+    <span className="TreeListItem__icon" role="icon">
       {icon != null ? (
         <Icon
           icon={icon}

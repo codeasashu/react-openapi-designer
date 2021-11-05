@@ -103,6 +103,8 @@ class Store {
           this.events.on(eventTypes.AfterEditComplete, success);
           this.events.on(eventTypes.EditCancel, failed);
         });
+      } catch (err) {
+        console.error('[Rename node error]', err);
       } finally {
         //disposableCollection.dispose();
         this.setEditedNode(null);
@@ -165,7 +167,6 @@ class Store {
     const {expanded} = this.state; // n
 
     if (expand === undefined || expanded[node.id] !== expand) {
-      const isExpanded = !this.isNodeExpanded(node);
       this.someprop = node.id;
       this.state.setExpandedKeyVal(
         node.id,
