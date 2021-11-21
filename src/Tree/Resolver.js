@@ -1,8 +1,6 @@
 import {get} from 'lodash';
 import {
   generateUUID,
-  NodeTypes,
-  NodeCategories,
   isExampleNode,
   isPathNode,
   isPathsNode,
@@ -11,61 +9,61 @@ import {
   isRequestBodyNode,
   isParameterNode,
 } from '../utils/tree';
+import {NodeTypes, NodeCategories} from '../datasets/tree';
 import {decodeUriFragment} from '../utils';
-import {treeTypes} from '../model';
 import Node from './Node';
 import OperationNode, {sortOperations} from './OperationNode';
 
 const mapSchema = (node, parent, metadata) => {
-  if (node.type === treeTypes.Model) {
+  if (node.type === NodeTypes.Model) {
     return new Node({
       id: node.id,
-      type: treeTypes.Model,
+      type: NodeTypes.Model,
       name: node.name,
       parent,
       metadata,
     });
   }
-  if (node.type === treeTypes.Response) {
+  if (node.type === NodeTypes.Response) {
     return new Node({
       id: node.id,
-      type: treeTypes.Response,
+      type: NodeTypes.Response,
       name: node.name,
       parent,
       metadata,
     });
   }
-  if (node.type === treeTypes.Example) {
+  if (node.type === NodeTypes.Example) {
     return new Node({
       id: node.id,
-      type: treeTypes.Example,
+      type: NodeTypes.Example,
       name: node.name,
       parent,
       metadata,
     });
   }
-  if (node.type === treeTypes.Parameter) {
+  if (node.type === NodeTypes.Parameter) {
     return new Node({
       id: node.id,
-      type: treeTypes.Parameter,
+      type: NodeTypes.Parameter,
       name: node.name,
       parent,
       metadata,
     });
   }
-  if (node.type === treeTypes.RequestBody) {
+  if (node.type === NodeTypes.RequestBody) {
     return new Node({
       id: node.id,
-      type: treeTypes.RequestBody,
+      type: NodeTypes.RequestBody,
       name: node.name,
       parent,
       metadata,
     });
   }
-  if (node.type === treeTypes.Path) {
+  if (node.type === NodeTypes.Path) {
     return new Node({
       id: node.id,
-      type: treeTypes.Path,
+      type: NodeTypes.Path,
       name: node.name,
       parent,
       metadata,
@@ -76,19 +74,19 @@ const mapSchema = (node, parent, metadata) => {
 };
 
 const getNodeChildren = (nodeType, openapi) => {
-  if (nodeType === treeTypes.Models) {
+  if (nodeType === NodeTypes.Models) {
     return get(openapi, 'components.schemas', {});
   }
-  if (nodeType === treeTypes.Examples) {
+  if (nodeType === NodeTypes.Examples) {
     return get(openapi, 'components.examples', {});
   }
-  if (nodeType === treeTypes.Parameters) {
+  if (nodeType === NodeTypes.Parameters) {
     return get(openapi, 'components.parameters', {});
   }
-  if (nodeType === treeTypes.Responses) {
+  if (nodeType === NodeTypes.Responses) {
     return get(openapi, 'components.responses', {});
   }
-  if (nodeType === treeTypes.RequestBodies) {
+  if (nodeType === NodeTypes.RequestBodies) {
     return get(openapi, 'components.requestBodies', {});
   }
 
@@ -96,20 +94,20 @@ const getNodeChildren = (nodeType, openapi) => {
 };
 
 const determineChildNodeType = (nodeType) => {
-  if (nodeType === treeTypes.Models) {
-    return treeTypes.Model;
+  if (nodeType === NodeTypes.Models) {
+    return NodeTypes.Model;
   }
-  if (nodeType === treeTypes.Examples) {
-    return treeTypes.Example;
+  if (nodeType === NodeTypes.Examples) {
+    return NodeTypes.Example;
   }
-  if (nodeType === treeTypes.Parameters) {
-    return treeTypes.Parameter;
+  if (nodeType === NodeTypes.Parameters) {
+    return NodeTypes.Parameter;
   }
-  if (nodeType === treeTypes.Responses) {
-    return treeTypes.Response;
+  if (nodeType === NodeTypes.Responses) {
+    return NodeTypes.Response;
   }
-  if (nodeType === treeTypes.RequestBodies) {
-    return treeTypes.RequestBody;
+  if (nodeType === NodeTypes.RequestBodies) {
+    return NodeTypes.RequestBody;
   }
 
   throw new Error('Invalid Node provided');
@@ -129,7 +127,7 @@ const resolvePath = (node, openapi) => {
   const nodes = get(openapi, ['paths'], {});
   const children = [];
   for (const nodeName in nodes) {
-    children.push({id: generateUUID(), name: nodeName, type: treeTypes.Path});
+    children.push({id: generateUUID(), name: nodeName, type: NodeTypes.Path});
   }
   return children.map((t) => mapSchema(t, node));
 };
@@ -139,12 +137,12 @@ const resolveAll = (node) => {
     {
       id: generateUUID(),
       name: 'API Overview',
-      type: treeTypes.Overview,
+      type: NodeTypes.Overview,
       parent: node,
     },
     {
       id: generateUUID(),
-      type: treeTypes.Paths,
+      type: NodeTypes.Paths,
       name: 'Paths',
       children: [],
       parent: node,
@@ -155,35 +153,35 @@ const resolveAll = (node) => {
     },
     {
       id: generateUUID(),
-      type: treeTypes.Models,
+      type: NodeTypes.Models,
       name: 'Models',
       children: [],
       parent: node,
     },
     {
       id: generateUUID(),
-      type: treeTypes.RequestBodies,
+      type: NodeTypes.RequestBodies,
       name: 'Request Bodies',
       children: [],
       parent: node,
     },
     {
       id: generateUUID(),
-      type: treeTypes.Responses,
+      type: NodeTypes.Responses,
       name: 'Responses',
       children: [],
       parent: node,
     },
     {
       id: generateUUID(),
-      type: treeTypes.Parameters,
+      type: NodeTypes.Parameters,
       name: 'Parameters',
       children: [],
       parent: node,
     },
     {
       id: generateUUID(),
-      type: treeTypes.Examples,
+      type: NodeTypes.Examples,
       name: 'Examples',
       children: [],
       parent: node,
@@ -193,18 +191,18 @@ const resolveAll = (node) => {
 
 export const Resolve = (openapi) => (node) => {
   switch (node.type) {
-    case treeTypes.Paths:
+    case NodeTypes.Paths:
       return resolvePath(node, openapi);
-    case treeTypes.Models:
-      return resolveSchema(node, openapi, treeTypes.Models);
-    case treeTypes.RequestBodies:
-      return resolveSchema(node, openapi, treeTypes.RequestBodies);
-    case treeTypes.Responses:
-      return resolveSchema(node, openapi, treeTypes.Responses);
-    case treeTypes.Parameters:
-      return resolveSchema(node, openapi, treeTypes.Parameters);
-    case treeTypes.Examples:
-      return resolveSchema(node, openapi, treeTypes.Examples);
+    case NodeTypes.Models:
+      return resolveSchema(node, openapi, NodeTypes.Models);
+    case NodeTypes.RequestBodies:
+      return resolveSchema(node, openapi, NodeTypes.RequestBodies);
+    case NodeTypes.Responses:
+      return resolveSchema(node, openapi, NodeTypes.Responses);
+    case NodeTypes.Parameters:
+      return resolveSchema(node, openapi, NodeTypes.Parameters);
+    case NodeTypes.Examples:
+      return resolveSchema(node, openapi, NodeTypes.Examples);
     default:
       if (node.parent === null) {
         return resolveAll(node);

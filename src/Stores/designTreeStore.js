@@ -7,14 +7,12 @@ import {
   computed,
 } from 'mobx';
 import {
-  eventTypes,
   raiseErrorIfNotParentNode,
-  NodeTypes,
   isOperationNode,
   isParentNode,
   generateUUID,
-  nodeOperations,
 } from '../utils/tree';
+import {eventTypes, NodeTypes, nodeOperations} from '../datasets/tree';
 import ComputedTree from '../Tree/ComputedTree';
 //import Tree from '../Tree/Tree';
 import {ContextResolver, getChildNode} from '../Tree/Resolver';
@@ -22,7 +20,7 @@ import TreeOrder from '../Tree/Order';
 import TreeStore from '../Tree/Store';
 import TreeState from '../Tree/State';
 import ApiTreeStore from './apiTreeStore';
-import {icons} from '../model';
+import icons from '../datasets/icons';
 import Node from '../Tree/Node';
 import PathNode from './nodes/pathNode';
 import ModelNode from './nodes/modelNode';

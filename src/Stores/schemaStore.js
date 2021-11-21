@@ -5,7 +5,7 @@ import {Ts, ks} from './schema/utils';
 import TreeState from '../Tree/State';
 import TreeStore from '../Tree/Store';
 import Tree from '../Tree/Tree';
-import {eventTypes} from '../utils/tree';
+import {eventTypes} from '../datasets/tree';
 
 class SchemaStore extends EventEmitter {
   constructor(e, t) {

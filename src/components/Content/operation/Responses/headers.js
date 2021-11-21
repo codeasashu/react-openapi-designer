@@ -3,13 +3,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
 import {set} from 'lodash';
-import Parameter from '../../../Designer/ParameterGroup/parameter';
+import Parameter from '../../../Common/Parameters/parameter';
 import {
   getValueFromStore,
   usePatchOperation,
 } from '../../../../utils/selectors';
 import {Button, Icon} from '@blueprintjs/core';
-import {nodeOperations} from '../../../../utils/tree';
+import {nodeOperations} from '../../../../datasets/tree';
 
 const Headers = observer(({headersPath}) => {
   const handlePatch = usePatchOperation();

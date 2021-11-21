@@ -1,30 +1,13 @@
-import {
-  get,
-  set,
-  cloneDeep,
-  isEqual,
-  isObject,
-  pull,
-  remove,
-  unset,
-} from 'lodash';
+import {get, set, isEqual, isObject, pull, remove, unset} from 'lodash';
 import produce from 'immer';
 import SourceMapNode from './sourceNode';
 import VirtualNode from './virtualNode';
 import GraphNode from './graphNode';
-import {
-  nodeOperations,
-  NodeCategories,
-  isHyphenOnly,
-  eventTypes,
-} from '../../utils/tree';
+import {isHyphenOnly} from '../../utils/tree';
+
+import {nodeOperations, NodeCategories, eventTypes} from '../../datasets/tree';
 import {decodeUriFragment, renameObjectKey} from '../../utils';
 import {observe} from 'mobx';
-//function handleOperation(e, t, n) { t = emitGroup
-
-//function pn(e) {
-//return '/' + e.map(encodeUriFragment).join('/');
-//}
 
 function getNodeWithException(dom, nodeid) {
   const node = dom.nodes[nodeid];

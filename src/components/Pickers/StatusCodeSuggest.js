@@ -1,29 +1,17 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {nodeOperations} from '../../utils/tree';
+import {nodeOperations} from '../../datasets/tree';
 import {trim} from 'lodash';
 import {getValueFromStore, usePatchOperation} from '../../utils/selectors';
-import {allStausCodes} from '../../model';
+import {statusCodes} from '../../datasets/http';
 import {Select} from '@blueprintjs/select';
 import {Button, MenuItem, Position} from '@blueprintjs/core';
 
 // bc = allStatusCodes
-const items = Object.keys(allStausCodes).map((e) => ({
+const items = Object.keys(statusCodes).map((e) => ({
   statusCode: parseInt(e),
-  description: allStausCodes[e],
+  description: statusCodes[e],
 }));
-
-/*
- * c.createElement($f, {
-    relativeJsonPath: e,
-    valueInPath: t,
-}, (
-    {
-        patchRelativeJson: e,
-        original: t,
-    }
-) => 
-*/
 
 const filterStatusCodes = (e, t, n, r) => {
   const i = t.description.toLowerCase();

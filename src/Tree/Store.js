@@ -4,8 +4,8 @@ import {
   raiseErrorIfNotParentNode,
   generateUUID,
   isParentNode,
-  eventTypes,
 } from '../utils/tree';
+import {eventTypes} from '../datasets/tree';
 import Tree from './Tree';
 import EventEmitter from './EventEmitter';
 

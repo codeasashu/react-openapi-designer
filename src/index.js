@@ -1,22 +1,6 @@
-// @flow
-import React from 'react';
-import OasDesigner from './components/Designer';
-import {StoresContext} from './components/Tree/context';
-import Stores from './Stores';
-import './overrides.scss';
-import './app.css';
-const OpenapiSpecDesigner = (props) => {
-  return (
-    <StoresContext.Provider value={new Stores()}>
-      <OasDesigner {...props} />
-    </StoresContext.Provider>
-  );
-};
+import App from './app';
 
-const ReactOpenapiDesigner = {
-  OasDesigner: OpenapiSpecDesigner,
-};
+import './css/overrides.scss';
+import './css/app.css';
 
-export {OasDesigner} from '.';
-
-export default ReactOpenapiDesigner;
+export default App;

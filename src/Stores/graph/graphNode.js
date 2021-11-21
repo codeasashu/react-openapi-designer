@@ -1,6 +1,7 @@
 import {trimStart} from 'lodash';
 import {computed, makeObservable, observable} from 'mobx';
-import {NodeCategories, getExtension} from '../../utils/tree';
+import {getExtension} from '../../utils/tree';
+import {NodeCategories} from '../../datasets/tree';
 import Node from './node';
 import NodeData from './nodeData';
 

@@ -2,34 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {observer} from 'mobx-react';
-import {StoresContext} from '../Tree/context';
+import {StoresContext} from '../Context';
 import EditableText from './EditableText';
-import {reverseString} from '../../utils/schema';
-
-const methodColors = {
-  get: 'success',
-  post: 'info',
-  put: 'warning',
-  patch: 'warning',
-  delete: 'danger',
-  copy: 'gray',
-  head: 'gray',
-  link: 'gray',
-  unlink: 'gray',
-  purge: 'gray',
-  lock: 'gray',
-  unlock: 'gray',
-  options: 'gray',
-  trace: 'gray',
-};
-const parsePath = (e) => e.replace(/[{}]/g, (e) => (e === '}' ? '{' : '}'));
-const getMethodTagColor = (methodName) => {
-  if (methodName in methodColors) {
-    return methodColors[methodName];
-  } else {
-    return 'gray';
-  }
-};
+import {reverseString, parsePath} from '../../utils/schema';
+import {getMethodColor as getMethodTagColor} from '../../utils';
 
 const PathItem = observer(({isEdited, node}) => {
   //const handleCaretClick = handleEvent(eventTypes.NodeCaretClick, node);

@@ -5,7 +5,7 @@ import {
   NodeTypes,
   nodeOperations,
   eventTypes,
-} from '../../utils/tree';
+} from '../../datasets/tree';
 import {encodeUriFragment} from '../../utils';
 
 const operations = [

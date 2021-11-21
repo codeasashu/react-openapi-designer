@@ -1,5 +1,5 @@
 import {pathToPointer} from '../../utils';
-import {nodeOperations} from '../../utils/tree';
+import {nodeOperations} from '../../datasets/tree';
 
 const getSchema = (title, tags) => {
   const schema = {

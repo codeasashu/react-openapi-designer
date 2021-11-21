@@ -1,9 +1,9 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {StoreContext} from '../Tree/context';
+import {StoreContext} from '../Context';
 import {Callout, Intent, Position} from '@blueprintjs/core';
 import {Popover2} from '@blueprintjs/popover2';
-import {eventTypes} from '../../utils/tree';
+import {eventTypes} from '../../datasets/tree';
 
 const NodeEditor = ({node, placeholder}) => {
   const store = React.useContext(StoreContext);

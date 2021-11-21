@@ -8,7 +8,7 @@ import {
   usePatchOperation,
   usePatchOperationAt,
 } from '../../../utils/selectors';
-import {nodeOperations} from '../../../utils/tree';
+import {nodeOperations} from '../../../datasets/tree';
 
 const Description = observer(({relativeJsonPath}) => {
   const handlePatch = usePatchOperation();

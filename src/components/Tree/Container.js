@@ -1,7 +1,7 @@
 import React from 'react';
 import classnames from 'classnames';
 import {observer} from 'mobx-react-lite';
-import {StoreContext, DesignContext} from './context';
+import {StoreContext, DesignContext} from '../Context';
 //import VariableSizeList from './VariableSizeList';
 import {VariableSizeList, FixedSizeList} from 'react-window';
 //import FixedSizeList from './FixedSizeList';

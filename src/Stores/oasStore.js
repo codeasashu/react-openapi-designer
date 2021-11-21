@@ -2,7 +2,7 @@ import {hasIn, escapeRegExp} from 'lodash';
 import {toFSPath, resolve, isURL} from '@stoplight/path';
 import Path from './oas/path';
 import Service from './oas/service';
-import {eventTypes, nodeOperations} from '../utils/tree';
+import {eventTypes, nodeOperations} from '../datasets/tree';
 
 class OasStore {
   constructor(e) {

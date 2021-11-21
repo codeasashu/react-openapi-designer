@@ -11,10 +11,11 @@ import {
   cloneDeep,
   isObject,
 } from 'lodash';
-import OrderedDict from '../ordered-dict';
-import {defaultSchema, generateExampleName} from '../utils';
-import GenerateSchema from '../generate-schema';
-import {nodeOperations} from '../utils/tree';
+import OrderedDict from '../utils/ordered-dict';
+import {generateExampleName} from '../utils';
+import GenerateSchema from '../utils/generate-schema';
+import {nodeOperations} from '../datasets/tree';
+import {schema as defaultSchema} from '../datasets/openapi';
 import {fillSchema} from '../utils/schema';
 const jsf = require('json-schema-faker');
 

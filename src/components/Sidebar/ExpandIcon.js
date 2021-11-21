@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {StoreContext} from '../Tree/context';
+import {StoreContext} from '../Context';
 import {isParentNode} from '../../utils/tree';
 import {Icon} from '@blueprintjs/core';
 

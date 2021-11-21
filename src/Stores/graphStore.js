@@ -2,14 +2,13 @@ import {observable, action, makeObservable, runInAction} from 'mobx';
 import {join} from 'lodash';
 import Graph from './graph';
 import {recomputeGraphNodes} from './graph/addNode';
-import {exampleDoc} from '../model';
-
+import {spec as defaultSpec} from '../datasets/openapi';
 import {
   NodeCategories,
-  eventTypes,
   taskTypes,
   nodeOperations,
-} from '../utils/tree';
+  eventTypes,
+} from '../datasets/tree';
 
 class GraphStore {
   rootNode = undefined;
@@ -177,9 +176,9 @@ class GraphStore {
           this.graph.setSourceNodeProp(
             node.id,
             'data.original',
-            JSON.stringify(exampleDoc),
+            JSON.stringify(defaultSpec),
           );
-          this.graph.setSourceNodeProp(node.id, 'data.parsed', exampleDoc);
+          this.graph.setSourceNodeProp(node.id, 'data.parsed', defaultSpec);
 
           recomputeGraphNodes(node, this.graph);
           this.props.uiStore.setActiveNode(node);

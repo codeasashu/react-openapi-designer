@@ -1,12 +1,8 @@
 import {reaction} from 'mobx';
 import Node from '../Tree/Node';
 import ParentNode from '../Tree/ParentNode';
-import {
-  isParentNode,
-  eventTypes,
-  assertUniqueName,
-  generateUUID,
-} from '../utils/tree';
+import {isParentNode, assertUniqueName, generateUUID} from '../utils/tree';
+import {eventTypes} from '../datasets/tree';
 
 class ApiTreeStore {
   constructor(e) {

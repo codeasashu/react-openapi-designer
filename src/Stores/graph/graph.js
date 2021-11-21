@@ -1,11 +1,6 @@
 import {action, computed, makeObservable} from 'mobx';
-import {
-  formatUri,
-  nodeOperations,
-  NodeCategories,
-  generateGraphId,
-  eventTypes,
-} from '../../utils/tree';
+import {formatUri, generateGraphId} from '../../utils/tree';
+import {nodeOperations, NodeCategories, eventTypes} from '../../datasets/tree';
 import {handleOperation} from './operation';
 
 class Graph {

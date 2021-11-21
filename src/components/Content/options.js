@@ -1,8 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Button, ButtonGroup, Icon} from '@blueprintjs/core';
-import {StoresContext} from '../Tree/context';
-import {NodeCategories} from '../../utils/tree';
+import {StoresContext} from '../Context';
+import {NodeCategories} from '../../datasets/tree';
 
 const Options = (props) => {
   const stores = React.useContext(StoresContext);

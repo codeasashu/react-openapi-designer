@@ -7,7 +7,7 @@ import {
   action,
 } from 'mobx';
 import monacoEditorStore from './monacoEditorStore';
-import {eventTypes, NodeCategories} from '../utils/tree';
+import {eventTypes, NodeCategories} from '../datasets/tree';
 
 class EditorStore {
   _editors = [];

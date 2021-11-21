@@ -1,5 +1,5 @@
 import SchemaDropdown from './schema';
 import AdvancedProperties from './advanced-properties';
-import StatusCodes from './StatusCode';
+import StatusCodeSuggest from './StatusCodeSuggest';
 
-export {SchemaDropdown, AdvancedProperties, StatusCodes};
+export {SchemaDropdown, AdvancedProperties, StatusCodeSuggest};

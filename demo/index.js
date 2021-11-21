@@ -1,8 +1,5 @@
 import React from 'react';
 import {render} from 'react-dom';
-import ReactOpenapiDesigner from '../src';
+import Designer from '../src';
 
-render(
-  <ReactOpenapiDesigner.OasDesigner dark />,
-  document.getElementById('root'),
-);
+render(<Designer dark />, document.getElementById('root'));

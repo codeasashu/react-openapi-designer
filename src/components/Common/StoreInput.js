@@ -5,7 +5,7 @@ import classnames from 'classnames';
 import {has, trim} from 'lodash';
 import {InputGroup} from '@blueprintjs/core';
 import {getValueFromStore, usePatchOperationAt} from '../../utils/selectors';
-import {nodeOperations} from '../../utils/tree';
+import {nodeOperations} from '../../datasets/tree';
 
 const StoreInput = observer(
   ({
@@ -25,6 +25,7 @@ const StoreInput = observer(
     valueInPath,
     cleanuupEmpty,
     jsonOp = nodeOperations.Replace,
+    ...props
   }) => {
     const value = getValueFromStore(relativeJsonPath, valueInPath || false);
     const handlePatch = usePatchOperationAt(relativeJsonPath);
@@ -80,6 +81,7 @@ const StoreInput = observer(
           }
           setOriginal(draft);
         }}
+        {...props}
       />
     );
   },

@@ -2,16 +2,17 @@ import React, {useState} from 'react';
 import {observer} from 'mobx-react-lite';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import {ControlGroup, Button} from '@blueprintjs/core';
+import {ControlGroup, Button, Intent} from '@blueprintjs/core';
 import {Tab, Tabs, TabList, TabPanel} from 'react-tabs';
-//import {useHistory, useLocation} from 'react-router-dom';
 import {TitleEditor, UrlEditor} from '../Editor';
-import {MethodPane} from '../Panes';
-import PathParams from '../Designer/ParameterGroup/path';
-import {decodeUriFragment, validMethods, getMethodColor} from '../../utils';
+import Operation from './operation/operation';
+import PathParams from '../Common/Parameters/path';
+import {decodeUriFragment, getMethodColor} from '../../utils';
 import {getValueFromStore, usePatchOperation} from '../../utils/selectors';
-import {nodeOperations, isOperationNode} from '../../utils/tree';
-import {StoresContext} from '../Tree/context';
+import {isOperationNode} from '../../utils/tree';
+import {nodeOperations} from '../../datasets/tree';
+import {httpMethods} from '../../datasets/http';
+import {StoresContext} from '../Context';
 
 const PathContent = observer(({relativeJsonPath, ...props}) => {
   const handlePatch = usePatchOperation();
@@ -28,7 +29,7 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
 
   const methods = React.useMemo(
     () =>
-      validMethods.map((method) => ({
+      httpMethods.map((method) => ({
         method,
         present:
           activeOperationNodes.length > 0 &&
@@ -38,7 +39,7 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
   );
 
   const selectedMethodIndex = activeOperationNode
-    ? validMethods.findIndex((e) => e === activeOperationNode.path)
+    ? httpMethods.findIndex((e) => e === activeOperationNode.path)
     : 0;
   const [selectedTab, setSelectedTab] = useState(
     Math.max(0, selectedMethodIndex),
@@ -210,23 +211,39 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
         </TabList>
         {methods.map((e) => {
           const mJsonPath = [...activePathNode.relativeJsonPath, e.method];
+          const operation = getValueFromStore(mJsonPath);
           return (
             <TabPanel
               key={e.method}
               className="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative">
-              <MethodPane
-                methodName={e.method}
-                relativeJsonPath={mJsonPath}
-                operation={getValueFromStore(mJsonPath)}
-                onAddOperation={() => {
-                  stores.oasStore.service.addOperation({
-                    sourceNodeId: activePathNode.parentSourceNode.id,
-                    path: activePathNode.path,
-                    method: e.method,
-                    setActive: true,
-                  });
-                }}
-              />
+              <div
+                className="relative"
+                role={`operation-${e.method.toLowerCase()}`}>
+                {operation ? (
+                  <Operation
+                    operation={operation}
+                    relativeJsonPath={relativeJsonPath}
+                    onChange={() => {}}
+                  />
+                ) : (
+                  <div className="pt-24 text-center">
+                    <Button
+                      large
+                      intent={Intent.PRIMARY}
+                      icon="plus"
+                      onClick={() => {
+                        stores.oasStore.service.addOperation({
+                          sourceNodeId: activePathNode.parentSourceNode.id,
+                          path: activePathNode.path,
+                          method: e.method,
+                          setActive: true,
+                        });
+                      }}
+                      text={`${e.method.toUpperCase()} Operation`}
+                    />
+                  </div>
+                )}
+              </div>
             </TabPanel>
           );
         })}

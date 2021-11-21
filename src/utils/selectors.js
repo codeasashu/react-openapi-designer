@@ -1,7 +1,7 @@
 import React from 'react';
 import {isEqual, get, has} from 'lodash';
-import {NodeCategories, nodeOperations, NodeTypes} from './tree';
-import {StoresContext} from '../components/Tree/context';
+import {NodeCategories, nodeOperations, NodeTypes} from '../datasets/tree';
+import {StoresContext} from '../components/Context';
 import {replaceHash} from './schema';
 import {decodeUriFragment} from '../utils';
 

@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
-import {StoreContext, DesignContext} from './context';
+import {StoreContext, DesignContext} from '../Context';
 
 const TreeProvider = observer(
   ({store, className, innerClassName, itemClassName, children}) => {

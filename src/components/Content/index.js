@@ -10,8 +10,8 @@ import Parameter from './parameter';
 import Response from './response';
 import RequestBody from './RequestBody';
 import MonacoEditor from '../Editor/Monaco';
-import {StoresContext} from '../Tree/context';
-import {NodeCategories, NodeTypes} from '../../utils/tree';
+import {StoresContext} from '../Context';
+import {NodeCategories, NodeTypes} from '../../datasets/tree';
 
 const StyledContent = styled.div`
   width: calc(80% - 2px);

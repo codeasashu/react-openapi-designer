@@ -1,6 +1,5 @@
 import React from 'react';
 import TreeStore from '../../Tree/Store';
-//import SchemaStore from '../../Stores/schemaStore';
 import OasSchemaStore from '../../Stores/schemaStore';
 
 const StoreContext = React.createContext(TreeStore);

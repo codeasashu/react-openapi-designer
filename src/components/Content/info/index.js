@@ -9,7 +9,7 @@ import SecuritySchemes from './security';
 import Contact from './contact';
 import License from './license';
 import {usePatchOperation, getValueFromStore} from '../../../utils/selectors';
-import {nodeOperations} from '../../../utils/tree';
+import {nodeOperations} from '../../../datasets/tree';
 
 const Info = observer(() => {
   const handlePatch = usePatchOperation();

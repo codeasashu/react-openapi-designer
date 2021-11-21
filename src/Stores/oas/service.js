@@ -1,13 +1,14 @@
 import {reaction, action, computed, makeObservable, observable} from 'mobx';
 import {generateOperationId} from '../../utils';
 import {sortOperations} from '../../utils/schema';
+import {isOperationNode} from '../../utils/tree';
+
 import {
   NodeCategories,
   NodeTypes,
   eventTypes,
   nodeOperations,
-  isOperationNode,
-} from '../../utils/tree';
+} from '../../datasets/tree';
 
 class Service {
   httpServices = [];

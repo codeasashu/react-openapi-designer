@@ -9,7 +9,7 @@ import {
   usePatchOperation,
   usePatchOperationAt,
 } from '../../../utils/selectors';
-import {nodeOperations} from '../../../utils/tree';
+import {nodeOperations} from '../../../datasets/tree';
 import LocaleProvider from '../../../utils/locale';
 import AdvancedProperties from '../../Pickers/advanced-properties';
 import {isEmpty} from 'lodash';
@@ -84,27 +84,28 @@ const Parameter = observer(
             jsonOp={nodeOperations.Move}
             className="flex-auto"
             autoFocus={autoFocus}
+            aria-label="name"
             relativeJsonPath={
               nameInPath ? parameterPath : parameterPath.concat(['name'])
             }
             placeholder="Name..."
             handleUpdate={handleUpdateName}
-            dataProp={['parsed']}
           />
         ) : (
           <StoreInput
             className="flex-auto"
+            aria-label="name"
             autoFocus={autoFocus}
             relativeJsonPath={
               nameInPath ? parameterPath : parameterPath.concat(['name'])
             }
             placeholder="Name..."
             handleUpdate={handleUpdateName}
-            dataProp={['parsed']}
           />
         )}
         <HTMLSelect
           className="flex-shrink"
+          aria-label="schema"
           value={schema}
           options={schemaOptions}
           onChange={(e) => {
@@ -120,7 +121,6 @@ const Parameter = observer(
           autoFocus={autoFocus}
           relativeJsonPath={parameterPath.concat(['description'])}
           placeholder="Description..."
-          dataProp={['parsed']}
         />
         <ButtonGroup>
           <Tooltip2
@@ -129,6 +129,7 @@ const Parameter = observer(
             <Button
               disabled={disableRequired || false}
               icon="issue"
+              title="required"
               active={parameterValue.required}
               intent={parameterValue.required ? 'warning' : undefined}
               onClick={() => {
@@ -151,7 +152,7 @@ const Parameter = observer(
             }
             placement="right">
             <Tooltip2 content={<span>{LocaleProvider('adv_setting')}</span>}>
-              <Button icon="property" />
+              <Button icon="property" title="advanced properties" />
             </Tooltip2>
           </Popover2>
           <Tooltip2 content="Delete field">

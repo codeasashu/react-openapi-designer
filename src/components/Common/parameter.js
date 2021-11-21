@@ -13,7 +13,7 @@ import {
   InputGroup,
 } from '@blueprintjs/core';
 import AdvancedProperties from '../elements/advanced-properties';
-import LocaleProvider from '../locale';
+import LocaleProvider from '../utils/locale';
 
 @autoBindMethodsForReact()
 class Parameter extends PureComponent {

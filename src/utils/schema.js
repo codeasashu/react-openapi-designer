@@ -1,5 +1,8 @@
 import {set, map, difference, compact, isObject} from 'lodash';
-import {validPathMethods} from '../utils';
+import {pathMethods} from '../datasets/http';
+
+export const parsePath = (e) =>
+  e.replace(/[{}]/g, (e) => (e === '}' ? '{' : '}'));
 
 export const escapeUri = (path) => path.replaceAll(/\//g, '~1');
 export const unescapeUri = (path) => path.replaceAll(/~1/g, '/');
@@ -232,7 +235,7 @@ export const modifyParametersFromPath = (params, path) => {
 };
 
 function sortByMethod(method1, method2) {
-  const validMethods = Object.keys(validPathMethods);
+  const validMethods = Object.keys(pathMethods);
   const method1Index = validMethods.indexOf(method1); //n
   const method2Index = validMethods.indexOf(method2); // r
 

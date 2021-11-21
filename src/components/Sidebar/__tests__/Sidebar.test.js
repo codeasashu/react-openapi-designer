@@ -5,7 +5,7 @@ import {act, render, screen, within, Stores} from '../../../../test-utils';
 import userEvent from '@testing-library/user-event';
 import Sidebar from '../Sidebar';
 import {wait} from '@testing-library/user-event/dist/utils';
-import {NodeTypes} from '../../../utils/tree';
+import {NodeTypes} from '../../../datasets/tree';
 import {isArray, cloneDeep} from 'lodash';
 import {toJS} from 'mobx';
 

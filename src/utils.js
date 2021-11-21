@@ -1,47 +1,7 @@
 // @flow
 import React from 'react';
 import {get, compact} from 'lodash';
-
-export const StatusCodes = [200, 201, 202];
-// @TODO support additional methods:
-// ["get", "post", "put", "patch", "delete", "head", "options", "trace"]
-export const validMethods = [
-  'get',
-  'post',
-  'put',
-  'patch',
-  'delete',
-  'head',
-  'options',
-  'trace',
-];
-export const validPathMethods = {
-  get: 'get',
-  post: 'post',
-  put: 'put',
-  delete: 'delete',
-};
-
-export const ContentTypes = {
-  json: 'application/json',
-  xml: 'application/xml',
-  form: 'application/x-www-form-urlencoded',
-  multipart: 'multipart/form-data',
-  text: 'text/plain; charset=utf-8',
-  html: 'text/html',
-  pdf: 'application/pdf',
-  png: 'image/png',
-};
-
-export const defaultSchema = {
-  $ref: {$ref: ''},
-  string: {type: 'string'},
-  boolean: {type: 'boolean'},
-  number: {type: 'number'},
-  integer: {type: 'integer'},
-  array: {type: 'array', items: {type: 'string'}},
-  object: {type: 'object', properties: {}, required: [], examples: {}},
-};
+import {pathMethods, methodColors} from './datasets/http';
 
 function escapeRegExpChars(text: string) {
   return text.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
@@ -135,7 +95,7 @@ export const getJsonPointerFromUrl = (pointer: string) => {
 };
 
 export const isValidPathMethod = (method) =>
-  method && Object.keys(validPathMethods).indexOf(method.toLowerCase()) >= 0;
+  method && Object.keys(pathMethods).indexOf(method.toLowerCase()) >= 0;
 
 export const extractMethodFromUri = (relativePath) => {
   if (relativePath.length < 3) return null;
@@ -208,23 +168,6 @@ const encodeUriFragmentIdentifier = (path) => {
 
 export const timer = async (timeout = 0) =>
   new Promise((t) => setTimeout(t, timeout));
-
-export const methodColors = {
-  get: 'green-600',
-  post: 'blue-400',
-  put: 'yellow-500',
-  patch: 'yellow-500',
-  delete: 'red-500',
-  copy: 'gray-400',
-  head: 'gray-400',
-  link: 'gray-400',
-  unlink: 'gray-400',
-  purge: 'gray-400',
-  lock: 'gray-400',
-  unlock: 'gray-400',
-  options: 'gray-400',
-  trace: 'gray-400',
-};
 
 export const getMethodColor = (_color) => {
   if (_color in methodColors) {

@@ -1,301 +1,207 @@
 // @flow
-import React from 'react';
-import {Button, Callout} from '@blueprintjs/core';
+import React, {useEffect, useState} from 'react';
+import classnames from 'classnames';
+import {observer} from 'mobx-react-lite';
+import {Button} from '@blueprintjs/core';
 import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
-import {autoBindMethodsForReact} from 'class-autobind-decorator';
 import PropTypes from 'prop-types';
-import {connect} from 'react-redux';
-import {bindActionCreators} from 'redux';
 import {isEqual} from 'lodash';
-import {defaultSchema} from '../../../model';
-import {
-  schemaSlice,
-  generateExampleFromSchema,
-} from '../../../redux/modules/schema';
-import {dropdownSlice} from '../../../redux/modules/dropdown';
 import {JsonEditor, DebouncedEditor} from '../../Editor';
 import SchemaRow from './row';
 import SchemaChild from './child';
+import Code from './code';
 
-@autoBindMethodsForReact()
-class RootSchema extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = {
-      validGeneratedJson: false,
-      generateCode: false,
-      userCode: '{}',
-      selectedTab: 0,
-    };
-  }
+const SchemaElement = observer(({store, stores}) => {
+  const wrapperProps = {
+    schema: store.schema,
+    open: store.sidebar,
+    changeName: ({key, name, value}) => store.changeName(key, name, value),
+    addField: ({key, value}) => store.addField(key, value),
+    addChildField: ({key}) => store.addChildField(key),
+    setOpenDropdownPath: ({key, value}) =>
+      store.setOpenDropdownPath(key, value),
+    changeValue: ({key, value}) => store.changeValue(key, value),
+    changeType: ({key, value}) => store.changeType(key, value),
+    enableRequire: ({key, value, required}) =>
+      store.enableRequire(key, value, required),
+    deleteItem: ({key}) => store.deleteItem(key),
+  };
 
-  componentDidUpdate(oldProps) {
-    if (
-      typeof this.props.onChange === 'function' &&
-      this.props.schema !== oldProps.schema
-    ) {
-      const newData = this.props.schema || '';
-      const oldData = oldProps.schema || '';
-      if (!isEqual(oldData, newData)) return this.props.onChange(newData);
-    }
-    if (!isEqual(this.props.initschema, oldProps.initschema)) {
-      this.props.changeEditorSchema({
-        value: this.props.initschema || defaultSchema.object,
-      });
-    }
-  }
+  return (
+    <>
+      <SchemaRow
+        show
+        root
+        stores={stores}
+        sidebar={store.sidebar}
+        schema={store.schema}
+        handleField={() => store.addChildField(['properties'])}
+        handleSidebar={({key}) => store.setOpenDropdownPath(key)}
+        handleSchemaType={({key, value}) => store.changeType(key, value)}
+        handleTitle={store.changeValue}
+        handleDescription={(e) =>
+          store.changeValue([], {...store.schema, ...{description: e.value}})
+        }
+        handleAdditionalProperties={({key, value}) =>
+          store.changeValue(key, value)
+        }
+      />
+      {!!store.sidebar.properties.show && (
+        <SchemaChild wrapperProps={wrapperProps} stores={stores} />
+      )}
+    </>
+  );
+});
 
-  componentDidMount() {
-    const {initschema} = this.props;
-    //@TODO Add schema validation
-    if (initschema) {
-      this.props.changeEditorSchema({value: initschema});
-    }
-  }
+SchemaElement.propTypes = {
+  store: PropTypes.object,
+  stores: PropTypes.object,
+};
 
-  addChildField() {
-    this.props.addChildField({key: ['properties']});
-    this.props.setOpenDropdownPath({key: ['properties'], value: true});
-  }
+const AddExampleBtn = ({onAdd}) => {
+  return (
+    <Button
+      icon="small-plus"
+      minimal
+      small
+      className="ml-2 mb-1/2"
+      onClick={onAdd}>
+      Example
+    </Button>
+  );
+};
 
-  _toggleGenerateFromCode(desiredState = false) {
-    this.setState({generateCode: desiredState});
-  }
+AddExampleBtn.propTypes = {
+  onAdd: PropTypes.func,
+};
 
-  _handleGenerateFromCode() {
-    const {generateSchema} = this.props;
-    const {userCode} = this.state;
-    try {
-      generateSchema(userCode);
-      this.setState({userCode: '{}', generateCode: false});
-    } catch (error) {
-      console.error(error);
-    }
-  }
-
-  _setUserCode(userCode) {
-    try {
-      JSON.parse(userCode);
-      this.setState({validGeneratedJson: true});
-    } catch (error) {
-      this.setState({validGeneratedJson: false});
-    }
-    this.setState({userCode});
-  }
-
-  addExample(key, value) {
-    const {generateExampleFromSchema} = this.props;
-    generateExampleFromSchema({key, value});
-  }
-
-  _deleteExample(title) {
-    const {deleteExample} = this.props;
-    deleteExample(title);
-    this.setState({selectedTab: 'schema'});
-  }
-
-  _handleChangeExampleTitle(oldTitle, newTitle) {
-    const {renameExample} = this.props;
-    renameExample({oldTitle, newTitle});
-    this.setState({selectedTab: newTitle});
-  }
-
-  _handleDescription({value}) {
-    const {schema, changeValue} = this.props;
-    changeValue({
-      key: [],
-      value: {...schema, ...{description: value}},
-    });
-  }
-
-  renderForm() {
-    const {schema, open} = this.props;
-    return (
-      <>
-        <Button
-          outlined
-          icon="clean"
-          className="mt-3 ml-4 mb-2"
-          onClick={() => this._toggleGenerateFromCode(true)}>
-          Generate from JSON
-        </Button>
-        <SchemaRow
-          show
-          root
-          sidebar={open}
-          schema={schema}
-          handleField={this.addChildField}
-          handleSidebar={this.props.setOpenDropdownPath}
-          handleSchemaType={this.props.changeType}
-          handleTitle={this.props.changeValue}
-          handleDescription={this._handleDescription}
-          handleAdditionalProperties={this.props.changeValue}
+const ExampleRenderer = ({title, content, ...props}) => {
+  return (
+    <div>
+      <div className="flex p-1">
+        <DebouncedEditor
+          className="pl-1 flex-1"
+          onBlur={(e) => props.onTitleChange(title, e)}
+          value={title}
         />
-        {!!open.properties.show && (
-          <SchemaChild wrapperProps={{...this.props}} />
-        )}
-      </>
-    );
-  }
-
-  renderGenerateCode() {
-    const {userCode, validGeneratedJson} = this.state;
-    return (
-      <div className="mx-4 my-3">
-        <div className="mb-2">
-          <Button
-            icon="clean"
-            outlined
-            intent="primary"
-            disabled={!validGeneratedJson}
-            onClick={this._handleGenerateFromCode}>
-            Generate
-          </Button>
-          <Button
-            icon="small-cross"
-            outlined
-            className="ml-2"
-            onClick={() => this._toggleGenerateFromCode(false)}>
-            Cancel
-          </Button>
-        </div>
-        <Callout className="mb-2">
-          Paste or write a JSON example below, then click <em>Generate</em>
-          above to build a schema.
-        </Callout>
-        <div>
-          <JsonEditor value={userCode} onChange={this._setUserCode} />
-        </div>
+        <Button
+          className="ml-3"
+          onClick={() => props.onDelete(title)}
+          icon="trash"
+        />
       </div>
-    );
-  }
+      <JsonEditor value={content} onBlur={(e) => props.onChange(title, e)} />
+    </div>
+  );
+};
 
-  renderSchema() {
-    const {generateCode} = this.state;
-    return generateCode === true
-      ? this.renderGenerateCode()
-      : this.renderForm();
-  }
+ExampleRenderer.propTypes = {
+  title: PropTypes.any,
+  content: PropTypes.any,
+  onTitleChange: PropTypes.func,
+  onChange: PropTypes.func,
+  onDelete: PropTypes.func,
+};
 
-  renderExample(title, content) {
-    return (
-      <div>
-        <div className="flex p-1">
-          <DebouncedEditor
-            className="pl-1 flex-1"
-            onChange={() => {}}
-            onBlur={(e) => this._handleChangeExampleTitle(title, e)}
-            value={title}
-          />
-          <Button
-            className="ml-3"
-            onClick={() => this._deleteExample(title)}
-            icon="trash"
-          />
-        </div>
-        <JsonEditor value={content} onBlur={(e) => this.addExample(title, e)} />
-      </div>
-    );
-  }
+const RootSchema = observer(({store, stores, className, onChange}) => {
+  const schema = store.schema;
+  const initialschema = schema;
 
-  handleTabChange(selectedTab) {
-    this.setState({selectedTab});
-  }
+  const [hasInitialized, setHasInitialized] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
+  const [generateCode, setGenerateCode] = useState(false);
 
-  render() {
-    const {schema, dark} = this.props;
-    const {selectedTab} = this.state;
-    return (
-      <div className={`json-schema-react-editor ${dark && 'bp3-dark'}`}>
-        <Tabs
-          className="react-tabs"
-          selectedTabClassName="selected-tab bg-gray-700"
-          selectedTabPanelClassName="block"
-          selectedIndex={selectedTab}
-          onSelect={this.handleTabChange}>
-          <TabList className="bp3-simple-tab-list">
-            <Tab className="bp3-simple-tab">Schema</Tab>
-            {schema.examples &&
-              Object.keys(schema.examples).map((example, i) => (
-                <Tab className="bp3-simple-tab" key={i}>
-                  {example}
-                </Tab>
-              ))}
-            <Button
-              icon="small-plus"
-              minimal
-              small
-              className="ml-2 mb-1/2"
-              onClick={() => this.addExample()}>
-              Example
-            </Button>
-          </TabList>
-          <TabPanel className="bp3-simple-tab-panel">
-            <div className="border border-gray-600">{this.renderSchema()}</div>
-          </TabPanel>
+  useEffect(() => {
+    if (initialschema && !isEqual(initialschema, schema)) {
+      //props.changeEditorSchema({value: initialschema});
+      store.changeEditorSchema({value: initialschema});
+      setHasInitialized(true);
+      setSelectedTab(0);
+    }
+  }, [initialschema]);
+
+  useEffect(() => {
+    if (hasInitialized) {
+      onChange(schema);
+    }
+  }, [schema]);
+
+  return (
+    <div className={classnames('json-schema-react-editor bp3-dark', className)}>
+      <Tabs
+        className="react-tabs"
+        selectedTabClassName="selected-tab bg-gray-700"
+        selectedTabPanelClassName="block"
+        selectedIndex={selectedTab}
+        onSelect={(tab) => setSelectedTab(tab)}>
+        <TabList className="bp3-simple-tab-list">
+          <Tab className="bp3-simple-tab">Schema</Tab>
           {schema.examples &&
             Object.keys(schema.examples).map((example, i) => (
-              <TabPanel className="bp3-simple-tab-panel" key={i}>
-                <div className="border border-gray-600">
-                  {this.renderExample(example, schema.examples[example])}
-                </div>
-              </TabPanel>
+              <Tab className="bp3-simple-tab" key={i}>
+                {example}
+              </Tab>
             ))}
-        </Tabs>
-      </div>
-    );
-  }
-}
+          <AddExampleBtn onAdd={() => store.generateExampleFromSchema()} />
+        </TabList>
+        <TabPanel className="bp3-simple-tab-panel">
+          <div className="border border-gray-600">
+            {generateCode ? (
+              <Code
+                onGenerateSchema={(value) => {
+                  store.generateSchema(value);
+                  setGenerateCode(false);
+                }}
+                onCancel={() => {
+                  setGenerateCode(false);
+                }}
+              />
+            ) : (
+              <>
+                <Button
+                  outlined
+                  icon="clean"
+                  className="mt-3 ml-4 mb-2"
+                  onClick={() => {
+                    setGenerateCode(true);
+                  }}>
+                  Generate from JSON
+                </Button>
+
+                <SchemaElement store={store} stores={stores} />
+              </>
+            )}
+          </div>
+        </TabPanel>
+        {schema.examples &&
+          Object.keys(schema.examples).map((example, i) => (
+            <TabPanel className="bp3-simple-tab-panel" key={i}>
+              <div className="border border-gray-600">
+                <ExampleRenderer
+                  title={example}
+                  content={schema.examples[example]}
+                  onTitleChange={(oldTitle, newTitle) => {
+                    store.renameExample(oldTitle, newTitle);
+                  }}
+                  onChange={(key, value) => {
+                    store.addExample({key, value});
+                  }}
+                  onDelete={(key) => {
+                    store.deleteExample(key);
+                    setSelectedTab(0);
+                  }}
+                />
+              </div>
+            </TabPanel>
+          ))}
+      </Tabs>
+    </div>
+  );
+});
 
 RootSchema.propTypes = {
-  initschema: PropTypes.object,
-  schema: PropTypes.object,
-  open: PropTypes.object,
-  dark: PropTypes.bool,
-  onChange: PropTypes.func,
-  changeEditorSchema: PropTypes.func,
-  changeName: PropTypes.func,
-  changeValue: PropTypes.func,
-  changeType: PropTypes.func,
-  enableRequire: PropTypes.func,
-  deleteItem: PropTypes.func,
-  addField: PropTypes.func,
-  addChildField: PropTypes.func,
-  addExample: PropTypes.func,
-  deleteExample: PropTypes.func,
-  setOpenDropdownPath: PropTypes.func,
-  generateExampleFromSchema: PropTypes.func,
-  renameExample: PropTypes.func,
-  generateSchema: PropTypes.func,
+  store: PropTypes.object,
+  className: PropTypes.string,
 };
 
-const mapStateToProps = (state, {namespace}) => {
-  let schema = state[namespace];
-  return {schema, open: state.dropdown};
-};
-
-const mapDispatchToProps = (dispatch, {namespace}) => {
-  const schema = bindActionCreators(
-    {...schemaSlice(namespace).actions, generateExampleFromSchema},
-    dispatch,
-  );
-  const dropdown = bindActionCreators(dropdownSlice.actions, dispatch);
-  return {
-    changeEditorSchema: schema.changeEditorSchema,
-    changeName: schema.changeName,
-    changeValue: schema.changeValue,
-    changeType: schema.changeType,
-    enableRequire: schema.enableRequire,
-    deleteItem: schema.deleteItem,
-    addField: schema.addField,
-    addChildField: schema.addChildField,
-    addExample: schema.addExample,
-    deleteExample: schema.deleteExample,
-    setOpenDropdownPath: dropdown.setOpenDropdownPath,
-    generateExampleFromSchema: schema.generateExampleFromSchema,
-    renameExample: schema.renameExample,
-    generateSchema: schema.generateSchema,
-  };
-};
-
-export default connect(mapStateToProps, mapDispatchToProps)(RootSchema);
+export default RootSchema;

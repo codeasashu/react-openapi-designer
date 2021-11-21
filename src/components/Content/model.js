@@ -5,7 +5,7 @@ import {observer} from 'mobx-react-lite';
 import SchemaDesigner from '../Editor/oasSchema';
 import {TitleEditor, MarkdownEditor} from '../Editor';
 import {usePatchOperation, getValueFromStore} from '../../utils/selectors';
-import {nodeOperations} from '../../utils/tree';
+import {nodeOperations} from '../../datasets/tree';
 
 const ModelContent = observer(({relativeJsonPath, node}) => {
   const handlePatch = usePatchOperation();

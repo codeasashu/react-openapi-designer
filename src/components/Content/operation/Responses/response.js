@@ -10,21 +10,21 @@ import {
   usePatchOperation,
 } from '../../../../utils/selectors';
 import {Button, ControlGroup, HTMLSelect, Icon} from '@blueprintjs/core';
-import {nodeOperations} from '../../../../utils/tree';
-import {contentTypes as allContentTypes} from '../../../../model';
+import {nodeOperations} from '../../../../datasets/tree';
+import {contentTypes as allContentTypes} from '../../../../datasets/http';
 import ContentTypeSuggest from '../../../Pickers/ContentTypeSuggest';
-import {MarkdownEditor} from '../../../Editor';
+//import {MarkdownEditor} from '../../../Editor';
 //import SchemaDesigner from '../../../Designer/Schema';
 import SchemaDesigner from '../../../Editor/oasSchema';
 
-const Response = observer(({className, contentPath, descriptionPath}) => {
+const Response = observer(({className, contentPath}) => {
   const handlePatch = usePatchOperation();
   const contentTypes = getValueFromStore(contentPath, false);
   let mediaTypes = [];
-  let relativeJsonPaths = [];
+  //let relativeJsonPaths = [];
   if (contentTypes) {
     mediaTypes = keys(contentTypes);
-    relativeJsonPaths = mediaTypes.map((i) => contentPath.concat(i));
+    //relativeJsonPaths = mediaTypes.map((i) => contentPath.concat(i));
   }
 
   const hasMediaType = mediaTypes && mediaTypes.length > 0;

@@ -486,7 +486,7 @@ describe('Content tests', () => {
         asserts.oas('components.parameters.abc').toStrictEqual({
           in: 'query',
           name: 'defg',
-          description: '',
+          required: false,
           schema: {type: 'string'},
         });
       });
@@ -514,6 +514,7 @@ describe('Content tests', () => {
           name: 'abc',
           description: 'defg',
           schema: {type: 'string'},
+          required: false,
         });
       });
 
@@ -534,12 +535,12 @@ describe('Content tests', () => {
         asserts.oas('components.parameters.abc').toStrictEqual({
           in: 'query',
           name: 'abc',
-          description: '',
+          required: false,
           schema: {type: 'number'},
         });
       });
 
-      it('cannot change required property', async () => {
+      it('can change required property', async () => {
         const {stores, creator, asserts} = StoreCreator();
         const queryparam = creator.createParameter('abc', 'query');
         stores.uiStore.setActiveNode(queryparam);
@@ -547,7 +548,7 @@ describe('Content tests', () => {
           providerProps: {value: stores},
         });
         const checkbox = screen.getByTitle(/required/);
-        expect(checkbox).toBeDisabled();
+        expect(checkbox).not.toBeDisabled();
         expect(screen.getByLabelText(/name/)).toHaveValue('abc');
         expect(screen.getByPlaceholderText(/Description/)).toHaveValue('');
         expect(screen.getByRole(/combobox/)).toHaveValue('string');

@@ -6,21 +6,18 @@ import {keys, difference, uniq, sortBy} from 'lodash';
 //import Parameters from './parameters';
 import {getValueFromStore, usePatchOperation} from '../../../utils/selectors';
 import {Button, ControlGroup, HTMLSelect, Icon} from '@blueprintjs/core';
-import {nodeOperations} from '../../../utils/tree';
-import {contentTypes as allContentTypes} from '../../../model';
+import {nodeOperations} from '../../../datasets/tree';
+import {contentTypes as allContentTypes} from '../../../datasets/http';
 import ContentTypeSuggest from '../../Pickers/ContentTypeSuggest';
 import {MarkdownEditor} from '../../Editor';
-//import SchemaDesigner from '../../Designer/Schema';
 import SchemaDesigner from '../../Editor/oasSchema';
 
 const RequestBody = observer(({className, contentPath, descriptionPath}) => {
   const handlePatch = usePatchOperation();
   const contentTypes = getValueFromStore(contentPath, false);
   let mediaTypes = [];
-  let relativeJsonPaths = [];
   if (contentTypes) {
     mediaTypes = keys(contentTypes);
-    relativeJsonPaths = mediaTypes.map((i) => contentPath.concat(i));
   }
 
   const hasMediaType = mediaTypes && mediaTypes.length > 0;
@@ -29,15 +26,6 @@ const RequestBody = observer(({className, contentPath, descriptionPath}) => {
     hasMediaType ? mediaTypes[0] : undefined,
   );
   const mediaRef = React.useRef(null);
-
-  //const stores = React.useContext(StoresContext);
-  //const parameterJsonPath = mapParametersJsonPaths(relativeJsonPath);
-
-  //const {
-  //activeSourceNode,
-  //} = stores.uiStore;
-
-  //const handlePatch = usePatchOperation();
 
   return (
     <div className={className} aria-label="request-body">

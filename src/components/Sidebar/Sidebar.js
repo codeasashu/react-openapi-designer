@@ -2,10 +2,10 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
 import TreeList from '../Tree/List';
-import {StoresContext} from '../Tree/context';
+import {StoresContext} from '../Context';
 import Item from './Item';
 import PathItem from './PathItem';
-import {NodeTypes} from '../../utils/tree';
+import {NodeTypes} from '../../datasets/tree';
 
 const Sidebar = observer((props) => {
   const stores = React.useContext(StoresContext);

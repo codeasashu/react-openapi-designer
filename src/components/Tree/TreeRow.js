@@ -5,8 +5,9 @@ import {observer} from 'mobx-react-lite';
 import {Menu, MenuDivider, MenuItem} from '@blueprintjs/core';
 import {ContextMenu2} from '@blueprintjs/popover2';
 import Tree from '../../Tree/Tree';
-import {DesignContext, StoreContext} from './context';
-import {eventTypes, isParentNode} from '../../utils/tree';
+import {DesignContext, StoreContext} from '../Context';
+import {isParentNode} from '../../utils/tree';
+import {eventTypes} from '../../datasets/tree';
 
 const getItems = (items) =>
   items.map((item, index) => {

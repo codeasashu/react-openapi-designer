@@ -8,9 +8,9 @@ import PathNode from './src/Stores/nodes/pathNode';
 // Import your own reducer
 //import schemaReducer from './src/redux/modules/schema';
 //import dropdownReducer from './src/redux/modules/dropdown';
-import {NodeTypes} from './src/utils/tree';
+import {NodeTypes} from './src/datasets/tree';
 import Stores from './src/Stores';
-import {StoresContext} from './src/components/Tree/context';
+import {StoresContext} from './src/components/Context';
 
 //const schemaStoreObject = {
 //reducer: {

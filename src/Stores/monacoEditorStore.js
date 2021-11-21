@@ -10,7 +10,7 @@ import * as monaco from 'monaco-editor';
 import MonacoCodeStore from './monacoCodeStore';
 //import * as yaml from 'yaml';
 import yaml from 'js-yaml';
-import {nodeOperations} from '../utils/tree';
+import {nodeOperations} from '../datasets/tree';
 //
 const DiagnosticSeverityClassNameMap = {
   ERROR: 'MonacoGlyphDecoration--error',

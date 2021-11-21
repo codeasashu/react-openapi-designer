@@ -3,9 +3,9 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {set} from 'lodash';
 import {observer} from 'mobx-react-lite';
-import {StoresContext} from '../../Tree/context';
+import {StoresContext} from '../../Context';
 import {usePatchOperation} from '../../../utils/selectors';
-import {nodeOperations} from '../../../utils/tree';
+import {nodeOperations} from '../../../datasets/tree';
 import {ButtonGroup, Button} from '@blueprintjs/core';
 import Parameters from '../../Common/Parameters/parameters';
 

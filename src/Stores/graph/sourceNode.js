@@ -1,6 +1,7 @@
 import {startsWith} from 'lodash';
 import Node from './node';
-import {pointerToPath, NodeCategories} from '../../utils/tree';
+import {pointerToPath} from '../../utils/tree';
+import {NodeCategories} from '../../datasets/tree';
 import SourceMapNodeData from './sourceNodeData';
 import {computed, makeObservable} from 'mobx';
 

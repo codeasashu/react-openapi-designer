@@ -1,18 +1,6 @@
 import {action} from 'mobx';
 import {debounce, get} from 'lodash';
-import {eventTypes, nodeOperations} from '../utils/tree';
-
-const isUrl = (string) => {
-  let url;
-
-  try {
-    url = new URL(string);
-  } catch (_) {
-    return false;
-  }
-
-  return url.protocol === 'http:' || url.protocol === 'https:';
-};
+import {eventTypes, nodeOperations} from '../datasets/tree';
 
 class JsonSchemaStore {
   constructor(node, options) {

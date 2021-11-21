@@ -1,5 +1,5 @@
 //import PathNodeData from './pathNodeData';
-import {NodeCategories, nodeOperations} from '../../utils/tree';
+import {NodeCategories, nodeOperations} from '../../datasets/tree';
 import {trim, set} from 'lodash';
 import {generateOperationId, pathToPointer} from '../../utils';
 

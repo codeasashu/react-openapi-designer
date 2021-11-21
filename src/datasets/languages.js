@@ -1,6 +1,6 @@
-export const lang = 'en_US';
+export const primary = 'en_US';
 
-const langs = {
+export const languages = {
   en_US: {
     title: 'Title',
     import_json: 'Import JSON',
@@ -38,6 +38,4 @@ const langs = {
   },
 };
 
-export default (message) => {
-  return langs[lang][message];
-};
+export default languages;

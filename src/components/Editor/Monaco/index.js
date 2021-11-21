@@ -1,7 +1,7 @@
 import React from 'react';
 import {observer} from 'mobx-react-lite';
 //import {capitalize} from 'lodash';
-import {StoresContext} from '../../Tree/context';
+import {StoresContext} from '../../Context';
 import MonacoCodeEditor from './editor';
 
 const OasEditor = observer(function () {

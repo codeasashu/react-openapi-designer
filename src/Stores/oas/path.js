@@ -7,12 +7,8 @@ import {
   when,
 } from 'mobx';
 import {last, get, filter} from 'lodash';
-import {
-  isOperationNode,
-  isPathNode,
-  NodeCategories,
-  nodeOperations,
-} from '../../utils/tree';
+import {isOperationNode, isPathNode} from '../../utils/tree';
+import {NodeCategories, nodeOperations} from '../../datasets/tree';
 import {
   decodeUriFragment,
   getParametersFromPath,

@@ -7,14 +7,14 @@ import {
   usePatchOperation,
   usePrevious,
 } from '../../../../utils/selectors';
-import {nodeOperations} from '../../../../utils/tree';
+import {nodeOperations} from '../../../../datasets/tree';
 import {
-  sortedStatusCodes,
-  primaryStatusCodes,
-  allStausCodes,
+  statusCodes as allStausCodes,
   statusCodesColor,
-} from '../../../../model';
-import {StoresContext} from '../../../Tree/context';
+  primaryStatusCodes,
+  sortedStatusCodes,
+} from '../../../../datasets/http';
+import {StoresContext} from '../../../Context';
 import {ButtonGroup, Button, Icon, ControlGroup} from '@blueprintjs/core';
 import StatusCodeSuggest from '../../../Pickers/StatusCodeSuggest';
 import Headers from './headers';

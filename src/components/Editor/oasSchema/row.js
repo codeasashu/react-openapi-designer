@@ -10,7 +10,7 @@ import LocaleProvider from '../../../utils/locale';
 import {isRefSchema} from '../../../utils/schema';
 import {SchemaDropdown, AdvancedProperties} from '../../Pickers';
 import SchemaTitleEditor from '../../Editor/schemaTitle';
-import {eventTypes} from '../../../utils/tree';
+import {eventTypes} from '../../../datasets/tree';
 
 const displayArrayItemEntity = (schema) =>
   schema.type === 'array' &&

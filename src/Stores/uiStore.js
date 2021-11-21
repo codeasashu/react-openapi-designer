@@ -1,6 +1,7 @@
 import {observable, computed, reaction, action, makeObservable} from 'mobx';
 import HistoryTree from '../Tree/HistoryTree';
-import {NodeCategories, eventTypes, NodeTypes} from '../utils/tree';
+import {NodeCategories, eventTypes} from '../datasets/tree';
+import {NodeTypes} from '../datasets/tree';
 import {startsWith} from '../utils';
 
 class UiStore {

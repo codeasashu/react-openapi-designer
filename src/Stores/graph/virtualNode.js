@@ -1,5 +1,5 @@
 import Node from './node';
-import {NodeCategories} from '../../utils/tree';
+import {NodeCategories} from '../../datasets/tree';
 
 class VirtualNode extends Node {
   constructor(e, t) {

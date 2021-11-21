@@ -2,9 +2,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classNames from 'classnames';
-import Sidebar from '../Sidebar';
-import {Gutter} from '../Common';
-import Content from '../Content';
+import {Sidebar, Gutter, Content, Context} from './components';
+import Stores from './Stores';
 
 const getDarkModeClasses = (dark) =>
   classNames({
@@ -12,7 +11,7 @@ const getDarkModeClasses = (dark) =>
     'bp3-dark': !!dark,
   });
 
-function OasDesigner() {
+function Designer() {
   return (
     <div className={getDarkModeClasses(true)}>
       <div className={'OasContainer h-screen w-full'}>
@@ -35,9 +34,17 @@ function OasDesigner() {
   );
 }
 
-OasDesigner.propTypes = {
+Designer.propTypes = {
   dark: PropTypes.bool,
   openapi: PropTypes.object,
 };
 
-export default OasDesigner;
+const App = (props) => {
+  return (
+    <Context.StoresContext.Provider value={new Stores()}>
+      <Designer {...props} />
+    </Context.StoresContext.Provider>
+  );
+};
+
+export default App;

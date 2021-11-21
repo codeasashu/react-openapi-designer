@@ -3,8 +3,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
 import {getValueFromStore} from '../../utils/selectors';
-import Parameter from '../Designer/ParameterGroup/parameter';
-import {StoresContext} from '../Tree/context';
+import Parameter from '../Common/Parameters/parameter';
+import {StoresContext} from '../Context';
 
 const ParameterContent = observer(({relativeJsonPath, node}) => {
   const stores = React.useContext(StoresContext);

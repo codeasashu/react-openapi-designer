@@ -1,12 +1,12 @@
-import {validPathMethods} from '../utils';
+import {pathMethods} from '../datasets/http';
 
 function sortOperations(nodes, path) {
   return [...nodes].sort((a, b) => methodOrder(a[path], b[path]));
 }
 
 function methodOrder(method, newMethod) {
-  const oldIndex = Object.keys(validPathMethods).indexOf(method);
-  const newIndex = Object.keys(validPathMethods).indexOf(newMethod);
+  const oldIndex = Object.keys(pathMethods).indexOf(method);
+  const newIndex = Object.keys(pathMethods).indexOf(newMethod);
 
   if (newIndex === -1 && oldIndex !== -1) {
     return 1;

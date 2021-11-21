@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {StoresContext} from '../../Tree/context';
-import RootSchema from './root2';
+import {StoresContext} from '../../Context';
+import RootSchema from './root';
 
 const Schema = ({relativeJsonPath}) => {
   const stores = React.useContext(StoresContext);
