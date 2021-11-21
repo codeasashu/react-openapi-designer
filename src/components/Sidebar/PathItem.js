@@ -4,6 +4,7 @@ import classnames from 'classnames';
 import {observer} from 'mobx-react';
 import {StoresContext} from '../Tree/context';
 import EditableText from './EditableText';
+import {reverseString} from '../../utils/schema';
 
 const methodColors = {
   get: 'success',
@@ -22,7 +23,6 @@ const methodColors = {
   trace: 'gray',
 };
 const parsePath = (e) => e.replace(/[{}]/g, (e) => (e === '}' ? '{' : '}'));
-const normaliseName = (e) => e.split('').reverse().join('');
 const getMethodTagColor = (methodName) => {
   if (methodName in methodColors) {
     return methodColors[methodName];
@@ -103,7 +103,7 @@ const PathItem = observer(({isEdited, node}) => {
         ) : (
           <>
             <span className="truncate text-left direction-rtl unicode-bidi">
-              {parsePath(normaliseName(node.name))
+              {parsePath(reverseString(node.name))
                 .split('/')
                 .map((name, index, items) => {
                   return name.startsWith('{') && name.endsWith('}') ? (

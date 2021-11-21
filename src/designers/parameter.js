@@ -9,7 +9,7 @@ import {
   ControlGroup,
   InputGroup,
 } from '@blueprintjs/core';
-import AdvancedProperties from '../elements/advanced-properties';
+import AdvancedProperties from '../components/Pickers/advanced-properties';
 import LocaleProvider from '../locale';
 
 const Parameter = ({schema, name, description, ...props}) => {
@@ -25,6 +25,10 @@ const Parameter = ({schema, name, description, ...props}) => {
     }
   }, [name, description]);
 
+  const updateName = (e) => {
+    setName(e.target.value);
+  };
+
   const handleChange = (changes) => {
     props.onChange({name: title, description: content, schema, ...changes});
   };
@@ -34,13 +38,14 @@ const Parameter = ({schema, name, description, ...props}) => {
       <InputGroup
         aria-label="name"
         value={title}
-        onChange={(e) => setName(e.target.value)}
+        onChange={(e) => updateName(e)}
         onBlur={() => handleChange({name: title})}
         className="flex-auto border border-r-0"
         placeholder={props.placeholder}
       />
       <div className="bp3-select flex-shrink border border-l-0 border-r-0">
         <select
+          aria-label="schema"
           onChange={(e) =>
             handleChange({
               schema: {type: e.target.value},
@@ -69,6 +74,7 @@ const Parameter = ({schema, name, description, ...props}) => {
           <Button
             disabled={props.disableRequired || false}
             icon="issue"
+            title="required"
             onClick={() => handleChange({required: !props.required})}
             intent={props.required === true ? Intent.DANGER : null}
           />
@@ -82,7 +88,7 @@ const Parameter = ({schema, name, description, ...props}) => {
           }
           placement="right">
           <Tooltip2 content={<span>{LocaleProvider('adv_setting')}</span>}>
-            <Button icon="property" />
+            <Button icon="property" title="advanced properties" />
           </Tooltip2>
         </Popover2>
         <Tooltip2 content="Delete field">

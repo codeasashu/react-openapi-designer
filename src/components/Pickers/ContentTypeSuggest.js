@@ -76,6 +76,7 @@ const ContentTypeSuggest = ({
         <MenuItem
           active={modifiers.active}
           key={e}
+          data-testid={e}
           onClick={handleClick}
           shouldDismissPopover={false}
           text={ah(e, query)}

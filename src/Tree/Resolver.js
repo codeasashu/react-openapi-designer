@@ -306,7 +306,7 @@ function _resolveParameters(treeNode) {
   if (node && NodeCategories.SourceMap === node.category) {
     return node.children
       .filter(isParameterNode)
-      .map((child) => getChildNode(child, node));
+      .map((child) => getChildNode(child, node, {subtype: child.subtype}));
   } else {
     return [];
   }

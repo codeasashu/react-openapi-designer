@@ -34,6 +34,7 @@ const Url = (props) => {
       <Button text="http://localhost" />
       <InputGroup
         className="flex-1"
+        aria-label="path"
         value={value}
         onChange={(e) => setValue(e.target.value)}
         onBlur={() => props.onChange(value)}

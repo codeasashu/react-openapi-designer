@@ -81,9 +81,11 @@ const Responses = observer(({responsesPath}) => {
   }, [selectedCode]);
 
   return (
-    <>
+    <div role="responses">
       <div className="flex items-center">
-        <ButtonGroup className="flex-1 flex-no-wrap overflow-x-auto pb-4 -mb-4">
+        <ButtonGroup
+          className="flex-1 flex-no-wrap overflow-x-auto pb-4 -mb-4"
+          aria-label="response-statuscode">
           <Button
             key="add"
             icon="plus"
@@ -190,7 +192,7 @@ const Responses = observer(({responsesPath}) => {
           <Response contentPath={contentPath.concat(['content'])} />
         </>
       </div>
-    </>
+    </div>
   );
 });
 

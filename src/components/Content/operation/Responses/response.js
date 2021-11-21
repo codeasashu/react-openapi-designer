@@ -111,7 +111,7 @@ const Response = observer(({className, contentPath, descriptionPath}) => {
                 if (otherMediaType) {
                   handlePatch(
                     nodeOperations.Remove,
-                    contentPath.concat(otherMediaType),
+                    contentPath.concat(mediaType),
                   );
                   setMediaType(otherMediaType);
                 } else {
@@ -123,14 +123,6 @@ const Response = observer(({className, contentPath, descriptionPath}) => {
           </ControlGroup>
         )}
       </div>
-      {mediaType && descriptionPath && (
-        <MarkdownEditor
-          language="md"
-          className="mt-6 -mx-1"
-          placeholder="Request Body description..."
-          relativeJsonPath={descriptionPath}
-        />
-      )}
       {mediaType && hasMediaType && (
         <SchemaDesigner
           className="mt-6"

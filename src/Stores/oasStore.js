@@ -116,7 +116,7 @@ class OasStore {
           path: itemPath,
 
           value: {
-            description: 'Example response',
+            description: '',
 
             content: {
               'application/json': {

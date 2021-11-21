@@ -1,7 +1,7 @@
 import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import Headers from './headers';
-import BodySelector from 'components/Pickers/ContentType';
+import BodySelector from '../../Pickers/ContentType';
 import SchemaDesigner from '../Schema';
 import {defaultSchema, sortContentTypes, ContentTypes} from '../../../utils';
 import {nodeOperations} from '../../../utils/tree';

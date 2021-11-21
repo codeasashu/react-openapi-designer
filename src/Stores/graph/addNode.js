@@ -130,7 +130,7 @@ function getMatcherForKey(key, value, matchers) {
     }
 
     if (matcher.match) {
-      matched = !key || (typeof key == 'string' && key.match(matcher.match));
+      matched = !i || (typeof i == 'string' && i.match(matcher.match));
     } else {
       if (matcher.notMatch) {
         matched = !i || typeof i != 'string' || !i.match(matcher.notMatch);

@@ -8,8 +8,8 @@ import {Button, Icon, Intent, TextArea} from '@blueprintjs/core';
 import {Popover2, Tooltip2} from '@blueprintjs/popover2';
 import LocaleProvider from '../../../utils/locale';
 import {isRefSchema} from '../../../utils/schema';
-import {SchemaDropdown, AdvancedProperties} from 'components/Pickers';
-import SchemaTitleEditor from 'components/Editor/schemaTitle';
+import {SchemaDropdown, AdvancedProperties} from '../../Pickers';
+import SchemaTitleEditor from '../../Editor/schemaTitle';
 import {eventTypes} from '../../../utils/tree';
 
 const displayArrayItemEntity = (schema) =>

@@ -91,7 +91,10 @@ const ContentType = ({selected, contentTypes, ...props}) => {
           itemsEqual={areContentTypesEqual}
           onItemSelect={(e) => props.onAdd(e)}
           selectedItem={selected}
-          inputProps={{inputRef}}
+          inputProps={{
+            placeholder: 'Create or choose existing',
+            inputRef,
+          }}
           popoverProps={{
             shouldReturnFocusOnClose: false,
           }}

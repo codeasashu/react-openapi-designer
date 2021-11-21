@@ -40,7 +40,7 @@ const RequestBody = observer(({className, contentPath, descriptionPath}) => {
   //const handlePatch = usePatchOperation();
 
   return (
-    <div className={className}>
+    <div className={className} aria-label="request-body">
       <div className="flex items-center">
         <ControlGroup className="flex-1">
           <Button
@@ -107,7 +107,7 @@ const RequestBody = observer(({className, contentPath, descriptionPath}) => {
                 if (otherMediaType) {
                   handlePatch(
                     nodeOperations.Remove,
-                    contentPath.concat(otherMediaType),
+                    contentPath.concat(mediaType),
                   );
                   setMediaType(otherMediaType);
                 } else {

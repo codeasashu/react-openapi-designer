@@ -375,7 +375,7 @@ class DesignTreeStore extends ApiTreeStore {
     this.stores.oasStore.addSharedParameter({
       sourceNodeId: sourceNode.id,
       name,
-      parameterType,
+      parameterType: parameterType.toLowerCase(),
     });
   }
 

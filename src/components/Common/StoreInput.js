@@ -45,6 +45,10 @@ const StoreInput = observer(
       [setDraft],
     );
 
+    React.useEffect(() => {
+      setDraft(value === undefined ? '' : value);
+    }, [value]);
+
     return (
       <InputGroup
         errors={errors}

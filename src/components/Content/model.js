@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
-import SchemaDesigner from '../Designer/Schema';
+import SchemaDesigner from '../Editor/oasSchema';
 import {TitleEditor, MarkdownEditor} from '../Editor';
 import {usePatchOperation, getValueFromStore} from '../../utils/selectors';
 import {nodeOperations} from '../../utils/tree';
@@ -18,6 +18,7 @@ const ModelContent = observer(({relativeJsonPath, node}) => {
           <div className="flex pl-2 justify-between">
             <TitleEditor
               xl
+              role="title"
               value={schema?.title || node.path}
               onChange={(e) => {
                 handlePatch(
@@ -44,16 +45,10 @@ const ModelContent = observer(({relativeJsonPath, node}) => {
               />
             </div>
           </div>
-          <div className="mt-10">
-            <SchemaDesigner
-              dark
-              initschema={schema}
-              namespace="model"
-              onChange={(e) => {
-                handlePatch(nodeOperations.Replace, relativeJsonPath, e);
-              }}
-            />
-          </div>
+          <SchemaDesigner
+            relativeJsonPath={relativeJsonPath}
+            className="mt-6"
+          />
         </div>
       </div>
     </div>

@@ -11,11 +11,7 @@ const getSchema = (title, tags) => {
     schema['x-tags'] = tags;
   }
 
-  schema.properties = {
-    id: {
-      type: 'string',
-    },
-  };
+  schema.properties = {};
 
   return schema;
 };

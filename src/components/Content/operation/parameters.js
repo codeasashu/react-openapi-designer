@@ -27,6 +27,7 @@ const OperationParameters = observer(({parametersPath}) => {
       <ButtonGroup>
         <Button
           text="Security"
+          role="security"
           icon="plus"
           onClick={() => {
             paramRef.current = 'security';
@@ -39,6 +40,7 @@ const OperationParameters = observer(({parametersPath}) => {
         />
         <Button
           text="Header"
+          role="header"
           icon="plus"
           onClick={() => {
             paramRef.current = 'header';
@@ -52,6 +54,7 @@ const OperationParameters = observer(({parametersPath}) => {
         <Button
           text="Query Param"
           icon="plus"
+          role="query-param"
           onClick={() => {
             paramRef.current = 'query';
             handlePatch(
@@ -64,6 +67,7 @@ const OperationParameters = observer(({parametersPath}) => {
         <Button
           text="Cookie"
           icon="plus"
+          role="cookie-param"
           onClick={() => {
             paramRef.current = 'cookie';
             handlePatch(

@@ -17,24 +17,22 @@ const Operation = observer(({relativeJsonPath}) => {
   //const handlePatch = usePatchOperation();
 
   return (
-    <div className="relative">
-      <div className="w-full p-10 pb-16 max-w-6xl">
-        <Description relativeJsonPath={relativeJsonPath} />
-        <div className="my-8 -mx-1 border-t dark:border-darken-4"></div>
-        <Parameters parametersPath={[...relativeJsonPath, 'parameters']} />
-        <div className="my-8 -mx-1 border-t dark:border-darken-4"></div>
-        <div>
-          <RequestBody
-            contentPath={relativeJsonPath.concat(['requestBody', 'content'])}
-            descriptionPath={relativeJsonPath.concat([
-              'requestBody',
-              'description',
-            ])}
-          />
-        </div>
-        <div className="my-8 -mx-1 border-t dark:border-darken-4"></div>
-        <Responses responsesPath={relativeJsonPath.concat('responses')} />
+    <div className="w-full p-10 pb-16 max-w-6xl">
+      <Description relativeJsonPath={relativeJsonPath} />
+      <div className="my-8 -mx-1 border-t dark:border-darken-4"></div>
+      <Parameters parametersPath={[...relativeJsonPath, 'parameters']} />
+      <div className="my-8 -mx-1 border-t dark:border-darken-4"></div>
+      <div>
+        <RequestBody
+          contentPath={relativeJsonPath.concat(['requestBody', 'content'])}
+          descriptionPath={relativeJsonPath.concat([
+            'requestBody',
+            'description',
+          ])}
+        />
       </div>
+      <div className="my-8 -mx-1 border-t dark:border-darken-4"></div>
+      <Responses responsesPath={relativeJsonPath.concat('responses')} />
     </div>
   );
 });

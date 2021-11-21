@@ -28,12 +28,13 @@ const Parameters = observer(
     }
 
     return relativeJsonPaths.length ? (
-      <div className="mt-2">
+      <div className="mt-2" aria-label={parameterIn}>
         <div className="font-semibold ml-1 mb-2 text-gray-6 dark:text-gray-4">
           {title}
         </div>
         {relativeJsonPaths.map((parameter, index) => (
           <Parameter
+            className={`parameters ${parameterIn}`}
             key={parameter.join('/')}
             parameterPath={parameter}
             parameterIn={parameterIn}

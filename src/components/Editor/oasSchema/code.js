@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import PropTypes from 'prop-types';
 import {isEmpty} from 'lodash';
 import {Button, Callout} from '@blueprintjs/core';
-import {JsonEditor} from 'components/Editor';
+import {JsonEditor} from '../../Editor';
 
 const Code = ({onGenerateSchema, onCancel}) => {
   const [userCode, setUserCode] = useState('{}');

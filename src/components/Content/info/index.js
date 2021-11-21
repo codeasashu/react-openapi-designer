@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
 import AutosizeInput from 'react-input-autosize';
 import {InputGroup} from '@blueprintjs/core';
-import {MarkdownEditor} from 'components/Editor';
+import {MarkdownEditor} from '../../Editor';
 import Servers from './servers';
 import SecuritySchemes from './security';
 import Contact from './contact';

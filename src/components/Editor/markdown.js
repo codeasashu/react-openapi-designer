@@ -42,7 +42,6 @@ const Markdown = ({value: initValue, onChange, ...props}) => {
         onValueChange={(e) => _handleChange(e)}
         onBlur={(e) => _handleBlur(e.target.value)}
         padding={10}
-        autoFocus={true}
         style={{
           fontFamily: '"Fira code", "Fira Mono", monospace',
           fontSize: 12,
