@@ -1,5 +1,5 @@
 import React from 'react';
-import * as utils from '../utils';
+import * as utils from '../../utils';
 
 test('highlight works on matched strings', () => {
   let highlighted = utils.highlightText('abc', 'ab');

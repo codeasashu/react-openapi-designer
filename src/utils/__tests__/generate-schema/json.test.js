@@ -1,5 +1,5 @@
 /* eslint-disable */
-var GenerateSchema = require('../index');
+import GenerateSchema from '../../generate-schema';
 var simple = require('./fixtures/simple');
 var advanced = require('./fixtures/advanced');
 
@@ -12,11 +12,11 @@ describe('JSON', function () {
     });
 
     it('.$schema should exist', function () {
-      schema.should.have.property('$schema');
+      expect(schema).toHaveProperty('$schema');
     });
 
     it('.type should exist', function () {
-      schema.should.have.property('type');
+      expect(schema).toHaveProperty('type');
     });
   });
 
@@ -28,12 +28,12 @@ describe('JSON', function () {
     });
 
     it('.items should be an object', function () {
-      schema.items.should.be.type('object');
+      expect(schema.items).toBeObject();
     });
 
     it('.items.required should be an array', function () {
-      schema.items.required.should.be.an.Array;
-      schema.items.required.should.eql([
+      expect(schema.items.required).toBeArray();
+      expect(schema.items.required).toStrictEqual([
         'id',
         'name',
         'price',
@@ -43,22 +43,21 @@ describe('JSON', function () {
     });
 
     it('.items.properties.tags should be an object', function () {
-      schema.items.properties.tags.should.be.type('object');
+      expect(schema.items.properties.tags).toBeObject();
     });
 
     it('.items.properties.id should be of type [integer]', function () {
-      schema.items.properties.id.type.should.equal('integer');
+      expect(schema.items.properties.id.type).toBe('integer');
     });
 
     it('.items.properties.price should be of type [number]', function () {
-      schema.items.properties.price.type.should.equal('number');
+      expect(schema.items.properties.price.type).toBe('number');
     });
 
     it('.items.properties.dimensions.properties.length should be of type [integer, number]', function () {
-      schema.items.properties.dimensions.properties.length.type.should.eql([
-        'integer',
-        'number',
-      ]);
+      expect(
+        schema.items.properties.dimensions.properties.length.type,
+      ).toStrictEqual(['integer', 'number']);
     });
   });
 
@@ -70,69 +69,69 @@ describe('JSON', function () {
     });
 
     it('.properties should exist', function () {
-      schema.should.have.property('properties');
+      expect(schema).toHaveProperty('properties');
     });
 
     it('.properties should be an object', function () {
-      schema.properties.should.be.type('object');
+      expect(schema.properties).toBeObject();
     });
 
     it('.properties.id should be of type [integer]', function () {
-      schema.properties.id.type.should.equal('integer');
+      expect(schema.properties.id.type).toBe('integer');
     });
 
     it('.properties.slug should be of type [string]', function () {
-      schema.properties.slug.type.should.equal('string');
+      expect(schema.properties.slug.type).toBe('string');
     });
 
     it('.properties.admin should be of type [boolean]', function () {
-      schema.properties.admin.type.should.equal('boolean');
+      expect(schema.properties.admin.type).toBe('boolean');
     });
 
     it('.properties.avatar should be of type [null]', function () {
-      schema.properties.avatar.type.should.equal('null');
+      expect(schema.properties.avatar.type).toBe('null');
     });
 
     it('.properties.date should be of type [string]', function () {
-      schema.properties.date.type.should.equal('string');
-      schema.properties.date.format.should.equal('date-time');
+      expect(schema.properties.date.type).toBe('string');
+      expect(schema.properties.date.format).toBe('date-time');
     });
 
     it('.properties.article should be of type [object]', function () {
-      schema.properties.article.type.should.equal('object');
+      expect(schema.properties.article.type).toBe('object');
     });
 
     it('.properties.article.properties should be of type [object]', function () {
-      schema.properties.article.properties.should.be.type('object');
+      expect(schema.properties.article.properties).toBeObject();
     });
 
     it('.properties.article.properties.title should be of type [string]', function () {
-      schema.properties.article.properties.title.type.should.equal('string');
+      expect(schema.properties.article.properties.title.type).toBe('string');
     });
 
     it('.properties.article.properties.description should be of type [string]', function () {
-      schema.properties.article.properties.description.type.should.equal(
+      expect(schema.properties.article.properties.description.type).toBe(
         'string',
       );
     });
 
     it('.properties.article.properties.body should be of type [string]', function () {
-      schema.properties.article.properties.body.type.should.equal('string');
+      expect(schema.properties.article.properties.body.type).toBe('string');
     });
 
     it('.properties.comments should be of type [array]', function () {
-      schema.properties.comments.type.should.equal('array');
+      expect(schema.properties.comments.type).toBe('array');
     });
 
     it('.properties.comments.items should be of type [object]', function () {
-      schema.properties.comments.items.should.be.type('object');
+      expect(schema.properties.comments.items).toBeObject();
     });
 
     it('.properties.comments.items.properties.body should be of type [string, null]', function () {
-      schema.properties.comments.items.properties.body.type[0].should.equal(
+      expect(schema.properties.comments.items.properties.body.type[0]).toBe(
         'string',
       );
-      schema.properties.comments.items.properties.body.type[1].should.equal(
+      expect(schema.properties.comments.items.properties.body.type[1]).toBe(
         'null',
       );
     });

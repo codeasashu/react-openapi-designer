@@ -1,4 +1,4 @@
-import {fillSchema} from '../../utils/schema';
+import {fillSchema} from '../../schema';
 
 describe('Schema builder tests', () => {
   it('gives string schema by default', () => {

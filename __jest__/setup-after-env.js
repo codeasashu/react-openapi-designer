@@ -1,4 +1,6 @@
 import '@testing-library/jest-dom/extend-expect';
+import * as matchers from 'jest-extended';
+expect.extend(matchers);
 //import {createSerializer} from 'enzyme-to-json';
 
 //import {configure} from 'enzyme';
