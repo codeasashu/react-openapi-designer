@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import classNames from 'classnames';
 import {Sidebar, Gutter, Content, Context} from './components';
 import Stores from './Stores';
+import {observer} from 'mobx-react-lite';
 
 const getDarkModeClasses = (dark) =>
   classNames({
@@ -11,20 +12,24 @@ const getDarkModeClasses = (dark) =>
     'bp3-dark': !!dark,
   });
 
-function Designer() {
+const Designer = observer(() => {
+  const stores = React.useContext(Context.StoresContext);
   return (
     <div className={getDarkModeClasses(true)}>
       <div className={'OasContainer h-screen w-full'}>
         <div className={'Studio h-full flex flex-1 flex-col'}>
           <div className={'flex flex-1'}>
-            <Sidebar
-              style={{
-                width: 'calc(18% - 2px)',
-                maxWidth: '375px',
-                minWidth: '290px',
-              }}
-              className={'flex flex-col bg-white dark:bg-gray-900 border-r'}
-            />
+            {stores.uiStore.fullscreen === false && (
+              <Sidebar
+                fullscreen={stores.uiStore.fullscreen}
+                style={{
+                  width: 'calc(18% - 2px)',
+                  maxWidth: '375px',
+                  minWidth: '290px',
+                }}
+                className={'flex flex-col bg-white dark:bg-gray-900 border-r'}
+              />
+            )}
             <Gutter layout="horizontal" />
             <Content />
           </div>
@@ -32,7 +37,7 @@ function Designer() {
       </div>
     </div>
   );
-}
+});
 
 Designer.propTypes = {
   dark: PropTypes.bool,

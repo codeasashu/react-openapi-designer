@@ -6,9 +6,7 @@ import {StoreContext} from '../Context';
 import {eventTypes} from '../../datasets/tree';
 
 const EditableText = ({node, placeholder = ''}) => {
-  console.log('stoec', StoreContext);
   const store = React.useContext(StoreContext);
-  console.log('stoec2', store);
 
   const inputRef = React.useRef();
   const [error, setError] = React.useState(null);

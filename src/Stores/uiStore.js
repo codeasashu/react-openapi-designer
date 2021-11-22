@@ -10,6 +10,7 @@ class UiStore {
 
   activeSourceNode;
   activeSymbolNode;
+  fullscreen;
 
   constructor(stores) {
     makeObservable(this, {
@@ -23,6 +24,7 @@ class UiStore {
       activeSourceNodeId: computed,
       activeSourceNode: observable.ref,
       assignMatchingSourceNode: action,
+      fullscreen: observable,
 
       _chosenSymbolNodeUri: observable,
       chosenSymbolNodeUri: computed,

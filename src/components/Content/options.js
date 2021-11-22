@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import {observer} from 'mobx-react-lite';
 import {Button, ButtonGroup, Icon} from '@blueprintjs/core';
 import {StoresContext} from '../Context';
 import {NodeCategories} from '../../datasets/tree';
 
-const Options = (props) => {
+const Options = observer((props) => {
   const stores = React.useContext(StoresContext);
   const {activeNode} = stores.uiStore;
   const [confirmDelete, setConfirmDelete] = React.useState(false);
@@ -52,11 +53,21 @@ const Options = (props) => {
         </ButtonGroup>
       </div>
       <div className="ml-3">
-        <Button small text="Preview" icon="eye-on" />
+        <Button
+          small
+          aria-label="toggle fullscreen"
+          icon={
+            <Icon
+              size={14}
+              icon={stores.uiStore.fullscreen === true ? 'minimize' : 'move'}
+            />
+          }
+          onClick={() => stores.uiStore.toggleFullscreen()}
+        />
       </div>
     </div>
   );
-};
+});
 
 Options.propTypes = {
   view: PropTypes.string,
