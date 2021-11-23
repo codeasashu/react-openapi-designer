@@ -21,4 +21,4 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - run: npm ci
-    - run: npm test
+    - run: npm run test
