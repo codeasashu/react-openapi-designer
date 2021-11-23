@@ -7,7 +7,7 @@ delete common.externals;
 
 module.exports = merge(common, {
   context: __dirname,
-  entry: '../demo/index',
+  entry: '../src/index',
   output: {
     publicPath: '/',
   },
@@ -26,8 +26,6 @@ module.exports = merge(common, {
   plugins: [
     new HtmlWebpackPlugin({
       template: path.resolve('demo', 'index.html'),
-      title: 'Development',
-      inject: 'body',
     }),
   ],
 });

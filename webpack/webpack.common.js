@@ -9,8 +9,9 @@ module.exports = {
   },
   target: 'web',
   output: {
-    filename: 'main.js',
-    sourceMapFilename: 'main.js.map',
+    filename: '[name].js',
+    chunkFilename: '[id].[chunkhash].js',
+    //sourceMapFilename: 'main.js.map',
     path: path.join(__dirname, '../dist'),
     libraryTarget: 'umd',
     clean: true,
@@ -56,9 +57,6 @@ module.exports = {
         type: 'asset/resource',
       },
     ],
-  },
-  externals: {
-    react: 'react',
   },
   plugins: [
     new webpack.DefinePlugin({
