@@ -1,13 +1,14 @@
 import React from 'react';
 import {Classes, ContextMenu, Menu, Popover} from '@blueprintjs/core';
 import {Classes as PopoverClasses} from '@blueprintjs/popover2';
-import {act, render, screen, within, Stores} from '../../../../test-utils';
+import {act, render, screen, within, fireEvent, Stores} from '../../../../test-utils';
 import userEvent from '@testing-library/user-event';
 import Sidebar from '../Sidebar';
 import {wait} from '@testing-library/user-event/dist/utils';
 import {NodeTypes} from '../../../datasets/tree';
 import {isArray, cloneDeep} from 'lodash';
 import {toJS} from 'mobx';
+import {prettyDOM} from '@testing-library/dom';
 
 describe('Sidebar tests', () => {
   const assertIcon = (elem, icon) => {
@@ -20,7 +21,7 @@ describe('Sidebar tests', () => {
     expect(popover).toBeNull();
   });
 
-  it.skip('Renders all sidebar items', () => {
+  it('Renders all sidebar items', () => {
     render(<Sidebar />);
     const items = screen.getAllByRole(/menuitem/);
     expect(items).toHaveLength(7);
@@ -34,122 +35,128 @@ describe('Sidebar tests', () => {
     expect(items[6]).toHaveTextContent(/Examples/);
 
     // Assert icons
-    assertIcon(getIconElement(items[0]), 'star');
-    assertIcon(getIconElement(items[1]), 'folder-open');
-    assertIcon(getIconElement(items[2]), 'folder-open');
-    assertIcon(getIconElement(items[3]), 'folder-open');
-    assertIcon(getIconElement(items[4]), 'folder-open');
-    assertIcon(getIconElement(items[5]), 'folder-open');
-    assertIcon(getIconElement(items[6]), 'folder-open');
+    expect(getIconElement(items[0])).toHaveAttribute('icon', 'star');
+    expect(getIconElement(items[1])).toHaveAttribute('icon',  'folder-open');
+    expect(getIconElement(items[2])).toHaveAttribute('icon',  'folder-open');
+    expect(getIconElement(items[3])).toHaveAttribute('icon',  'folder-open');
+    expect(getIconElement(items[4])).toHaveAttribute('icon',  'folder-open');
+    expect(getIconElement(items[5])).toHaveAttribute('icon',  'folder-open');
+    expect(getIconElement(items[6])).toHaveAttribute('icon', 'folder-open');
 
     // Asserting that sidebar have 7 list items automatically means it doesn't
     // have any child items (or else they would appear as additional list items
   });
 
-  it.skip('right click on model option', async () => {
+  it('right click on model option', async () => {
     render(<Sidebar />);
 
-    const items = await screen.queryAllByRole(/menuitem/);
+    const items = screen.queryAllByRole(/menuitem/);
     const modelContainer = items[2];
     await act(async () => {
-      await rightClick(modelContainer);
+      await fireEvent.contextMenu(modelContainer);
     });
-    const popover = getPopover();
-    const menuItems = getContextMenuItems();
-
     assertContextMenuWasRendered(1);
+    const menuItems = getContextMenuItems();
     expect(menuItems[0]).toHaveTextContent(/New Model/);
   });
 
-  it.skip('Prompts for new item when right click menu is clicked', async () => {
+  it('Prompts for new item when right click menu is clicked', async () => {
     render(<Sidebar />);
 
-    let sidebarItems = await screen.queryAllByRole(/menuitem/);
+    let sidebarItems = screen.queryAllByRole(/menuitem/);
     expect(sidebarItems).toHaveLength(7);
     await act(async () => {
-      await rightClick(sidebarItems[2]);
+      await fireEvent.contextMenu(sidebarItems[2]);
     });
 
     const menuItems = getContextMenuItems();
-    const createModelButton = await within(menuItems[0]).getByText(/New Model/);
+    const createModelButton = within(menuItems[0]).getByText(/New Model/);
     expect(createModelButton).toBeDefined();
-    await userEvent.click(createModelButton);
+    await fireEvent.click(createModelButton);
 
     // Clicking on "New Model" should add an editable row in the sidebar tree
-    const editableItems = await screen.queryAllByRole(/edititem/);
+    const editableItems = screen.queryAllByRole(/edititem/);
     expect(editableItems).toHaveLength(1);
 
     // The new item is just next to the current "right-clicked" item
-    const editableInput = getEditableInput(editableItems[0], true);
+    const editableInput = within(editableItems[0]).getByRole(/textbox/)
     expect(editableInput).toBeInTheDocument();
     expect(editableInput).toHaveValue('');
 
     // No editable text is present inside other sidebar items
-    const _editableInput = getEditableInput(sidebarItems[4]);
+    const _editableInput = within(sidebarItems[4]).queryByRole(/textbox/)
     expect(_editableInput).toBeNull();
   });
 
-  it.skip('Does not have context menu in API Overview', async () => {
+  it('Does not have context menu in API Overview', async () => {
     render(<Sidebar />);
     let overviewItem = getNodeFromSidebar(NodeTypes.Overview);
     await act(async () => {
-      await rightClick(overviewItem);
+      fireEvent.contextMenu(overviewItem);
     });
 
     const popover = getPopover();
     expect(popover).toBeNull();
   });
 
-  it.skip('Adds new item when entered in editable text', async (done) => {
-    render(<Sidebar />);
+  it('Adds new item when entered in editable text', async () => {
+    const {getByRole, getAllByRole} = render(<Sidebar />);
     const assertNewItem = async (nodeType, menuItemName, newItemName) => {
       const sidebarItem = getNodeFromSidebar(nodeType);
-      const addNewBtnLabel = getAddButtonLabel(nodeType);
       await clickAddNewItem(sidebarItem, menuItemName);
-
-      // Find editable text
-      const editableItem = await screen.getAllByRole(/edititem/);
-      expect(editableItem).toHaveLength(1);
-      const editableInput = getEditableInput(editableItem[0]);
       await act(async () => {
-        // Enter the new item name and press enter
-        try {
-          userEvent.type(editableInput, `${newItemName}`);
-          userEvent.keyboard('{Enter}');
-        } catch (err) {
-          done(err);
-        }
+        userEvent.type(
+          within(getByRole(/edititem/)).getByRole(/textbox/),
+          `${newItemName}{Enter}`
+        );
       });
       // Assert that item is in the menu
-      const newSidebarItems = await screen.queryAllByText(newItemName);
-      expect(newSidebarItems).toHaveLength(1);
-      //done()
+      expect(screen.queryByText(newItemName)).toBeDefined();
+      expect(screen.queryByText(newItemName)).toBeInTheDocument();
     };
 
-    expect(screen.getAllByRole(/menuitem/)).toHaveLength(7);
+    expect(getAllByRole(/menuitem/)).toHaveLength(7);
     await assertNewItem(NodeTypes.Models, 'New Model', 'xyzd');
-    expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
+    expect(getAllByRole(/menuitem/)).toHaveLength(8);
     await assertNewItem(
       NodeTypes.RequestBodies,
       'New Request Body',
       'requestBody123',
     );
-    expect(screen.getAllByRole(/menuitem/)).toHaveLength(9);
+    expect(getAllByRole(/menuitem/)).toHaveLength(9);
     await assertNewItem(NodeTypes.Responses, 'New Response', 'UserResponse');
-    expect(screen.getAllByRole(/menuitem/)).toHaveLength(10);
-    done();
+    expect(getAllByRole(/menuitem/)).toHaveLength(10);
   });
 
-  it.skip('Set clicked menuitem as active ui node', async () => {
+  it('Set clicked menuitem as active ui node', async () => {
     const stores = new Stores();
     render(<Sidebar />, {providerProps: {value: stores}});
     expect(stores.uiStore.activeSymbolNode).toBeUndefined();
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(7);
-    const childNode = await addChildNode(NodeTypes.Models, 'UserModel');
+
+    // Right click models
+    await act(async () => {
+      fireEvent.contextMenu(screen.getByLabelText(NodeTypes.Models));
+    });
+    // Click first item in context menu
+    const contextMenus = getContextMenuItems();
+    await act(async () => {
+      fireEvent.click(within(contextMenus[0]).getByText(/New Model/));
+    });
+
+    // Enter new Model name
+    await act(async () => {
+      userEvent.type(
+        within(screen.getByRole(/edititem/)).getByRole(/textbox/),
+        'UserModel{Enter}'
+      );
+    });
+
+    const childNode = screen.getByLabelText(NodeTypes.Model)
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
     expect(childNode).toHaveTextContent(/UserModel/);
     await act(async () => {
-      await userEvent.click(childNode);
+      userEvent.click(childNode);
     });
     expect(stores.uiStore.activeSymbolNode.type).toBe(NodeTypes.Model);
     expect(stores.uiStore.activeSymbolNode.uri).toBe(
@@ -157,33 +164,68 @@ describe('Sidebar tests', () => {
     );
   });
 
-  it.skip('Allows renaming and deleting node', async () => {
+  it('Allows renaming and deleting node', async () => {
     render(<Sidebar />);
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(7);
-    const childNode = await addChildNode(NodeTypes.Models, 'UserModel');
+
+    // Right click models
+    await act(async () => {
+      fireEvent.contextMenu(screen.getByLabelText(NodeTypes.Models));
+    });
+    // Click first item in context menu
+    const contextMenus = getContextMenuItems();
+    await act(async () => {
+      fireEvent.click(within(contextMenus[0]).getByText(/New Model/));
+    });
+
+    // Enter new Model name
+    await act(async () => {
+      userEvent.type(
+        within(screen.getByRole(/edititem/)).getByRole(/textbox/),
+        'UserModel{Enter}'
+      );
+    });
+
+    const childNode = screen.getByLabelText(NodeTypes.Model)
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
     expect(childNode).toHaveTextContent(/UserModel/);
     await act(async () => {
-      await rightClick(childNode);
+       fireEvent.contextMenu(childNode);
     });
-    assertContextMenuWasRendered(2);
     const menuItems = getContextMenuItems();
     expect(menuItems[0]).toHaveTextContent(/Rename/);
     expect(menuItems[1]).toHaveTextContent(/Delete model/);
   });
 
-  it.skip('Has operation and context menu in path node', async () => {
+  it('Has operation and context menu in path node', async () => {
     render(<Sidebar />);
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(7);
-    const childNode = await addChildNode(NodeTypes.Paths, '/users');
+
+    // Right click models
+    await act(async () => {
+      fireEvent.contextMenu(screen.getByLabelText(NodeTypes.Paths));
+    });
+    // Click first item in context menu
+    const contextMenus = getContextMenuItems();
+    await act(async () => {
+      fireEvent.click(within(contextMenus[0]).getByText(/New Path/));
+    });
+
+    // Enter new Model name
+    await act(async () => {
+      userEvent.type(
+        within(screen.getByRole(/edititem/)).getByRole(/textbox/),
+        '/users{Enter}'
+      );
+    });
+
+    const childNode = screen.getByLabelText(NodeTypes.Path);
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
     expect(childNode).toHaveTextContent('sresu/get');
-    expect(within(childNode).getAllByRole('button')).toHaveLength(1);
     expect(within(childNode).getByRole('button')).toHaveTextContent('get');
     await act(async () => {
-      await rightClick(childNode);
+       fireEvent.contextMenu(childNode);
     });
-    assertContextMenuWasRendered(3);
     const menuItems = getContextMenuItems();
     expect(menuItems[0]).toHaveTextContent(/Rename/);
     expect(menuItems[1]).toHaveTextContent(/Delete path/);
@@ -199,7 +241,7 @@ describe('Sidebar tests', () => {
       const newSidebarItems = await screen.queryAllByText(childName);
       expect(newSidebarItems).toHaveLength(1);
       await act(async () => {
-        await rightClick(childNode);
+        await fireEvent.contextMenu(childNode);
       });
       const menuItems = getContextMenuItems();
       await act(async () => {
@@ -213,7 +255,7 @@ describe('Sidebar tests', () => {
         await userEvent.type(editItem, `${renamedChildName}{Enter}`);
       });
       expect(screen.queryByText(childName)).toBeNull();
-      expect(screen.queryByText(renamedChildName)).toBeInTheDOM();
+      expect(screen.queryByText(renamedChildName)).toBeInTheDocument();
     };
 
     await assertRename(NodeTypes.Models);
@@ -234,7 +276,7 @@ describe('Sidebar tests', () => {
       expect(newSidebarItems).toHaveLength(1);
       expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
       await act(async () => {
-        await rightClick(childNode);
+        await fireEvent.contextMenu(childNode);
       });
       const menuItems = getContextMenuItems();
       await act(async () => {
@@ -248,13 +290,31 @@ describe('Sidebar tests', () => {
     await assertDelete(NodeTypes.Responses);
   });
 
-  it.skip('Can rename path', async () => {
+  it('Can rename path', async () => {
     render(<Sidebar />);
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(7);
-    const childNode = await addChildNode(NodeTypes.Paths, '/users');
+    // Right click models
+    await act(async () => {
+      fireEvent.contextMenu(screen.getByLabelText(NodeTypes.Paths));
+    });
+    // Click first item in context menu
+    const contextMenus = getContextMenuItems();
+    await act(async () => {
+      fireEvent.click(within(contextMenus[0]).getByText(/New Path/));
+    });
+
+    // Enter new path name
+    await act(async () => {
+      userEvent.type(
+        within(screen.getByRole(/edititem/)).getByRole(/textbox/),
+        '/users{Enter}'
+      );
+    });
+
+    const childNode = screen.getByLabelText(NodeTypes.Path);
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
     await act(async () => {
-      await rightClick(childNode);
+      fireEvent.contextMenu(childNode);
     });
     const menuItems = getContextMenuItems();
     // Delete path
@@ -267,20 +327,36 @@ describe('Sidebar tests', () => {
     await act(async () => {
       await userEvent.type(editItem, `/abc{Enter}`);
     });
-    const pathnode = getNodeFromSidebar(NodeTypes.Path);
     expect(screen.queryByText('/users')).toBeNull();
-    expect(screen.queryByText('cba/')).toBeInTheDOM();
-
+    expect(screen.queryByText('cba/')).toBeInTheDocument();
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
   });
 
-  it.skip('Can delete path', async () => {
+  it('Can delete path', async () => {
     render(<Sidebar />);
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(7);
-    const childNode = await addChildNode(NodeTypes.Paths, '/users');
+    // Right click models
+    await act(async () => {
+      fireEvent.contextMenu(screen.getByLabelText(NodeTypes.Paths));
+    });
+    // Click first item in context menu
+    const contextMenus = getContextMenuItems();
+    await act(async () => {
+      fireEvent.click(within(contextMenus[0]).getByText(/New Path/));
+    });
+
+    // Enter new path name
+    await act(async () => {
+      userEvent.type(
+        within(screen.getByRole(/edititem/)).getByRole(/textbox/),
+        '/users{Enter}'
+      );
+    });
+
+    const childNode = screen.getByLabelText(NodeTypes.Path);
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
     await act(async () => {
-      await rightClick(childNode);
+      await fireEvent.contextMenu(childNode);
     });
     const menuItems = getContextMenuItems();
     // Delete path
@@ -290,13 +366,31 @@ describe('Sidebar tests', () => {
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(7);
   });
 
-  it.skip('Can delete operation', async () => {
+  it('Can delete operation', async () => {
     render(<Sidebar />);
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(7);
-    const childNode = await addChildNode(NodeTypes.Paths, '/users');
+    // Right click paths
+    await act(async () => {
+      fireEvent.contextMenu(screen.getByLabelText(NodeTypes.Paths));
+    });
+    // Click first item in context menu
+    const contextMenus = getContextMenuItems();
+    await act(async () => {
+      fireEvent.click(within(contextMenus[0]).getByText(/New Path/));
+    });
+
+    // Enter new path name
+    await act(async () => {
+      userEvent.type(
+        within(screen.getByRole(/edititem/)).getByRole(/textbox/),
+        '/users{Enter}'
+      );
+    });
+
+    const childNode = screen.getByLabelText(NodeTypes.Path)
     expect(screen.getAllByRole(/menuitem/)).toHaveLength(8);
     await act(async () => {
-      await rightClick(childNode);
+      await fireEvent.contextMenu(childNode);
     });
     const menuItems = getContextMenuItems();
     // Delete operation
@@ -316,10 +410,6 @@ function generateRandomName(length = 4) {
   for (let i = length; i > 0; --i)
     result += chars[Math.floor(Math.random() * chars.length)];
   return result;
-}
-
-async function rightClick(element) {
-  await userEvent.click(element, {buttons: 2});
 }
 
 function getAddButtonLabel(nodeType) {
@@ -371,7 +461,7 @@ async function addChildNode(nodeType, name) {
 
 async function clickAddNewItem(menuItem, addBtnLabel) {
   await act(async () => {
-    await rightClick(menuItem);
+    await fireEvent.contextMenu(menuItem);
   });
 
   const popover = getPopover();
