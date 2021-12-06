@@ -1,23 +1,32 @@
 //@flow
 import React from 'react';
 import PropTypes from 'prop-types';
-import classNames from 'classnames';
+import pjson from '../package.json';
 import {Sidebar, Gutter, Content, Context} from './components';
 import Stores from './Stores';
 import {observer} from 'mobx-react-lite';
-
-const getDarkModeClasses = (dark) =>
-  classNames({
-    dark: !!dark,
-    'bp3-dark': !!dark,
-  });
+import {Tag} from '@blueprintjs/core';
 
 const Designer = observer(() => {
   const stores = React.useContext(Context.StoresContext);
   return (
-    <div className={getDarkModeClasses(true)}>
+    <div className="dark bp3-dark">
       <div className={'OasContainer h-screen w-full'}>
         <div className={'Studio h-full flex flex-1 flex-col'}>
+          {stores.uiStore.fullscreen === false && (
+            <div
+              className="grid py-4 px-5 w-100 bg-canvas border-b"
+              style={{gridTemplateColumns: '1fr auto 1fr'}}>
+              <div className="flex justify-start items-center">
+                <Tag>Ver: {pjson.version}</Tag>
+              </div>
+              <div className="flex items-center">
+                <div className="text-base overflow-hidden mx-2">
+                  Openapi Designer
+                </div>
+              </div>
+            </div>
+          )}
           <div className={'flex flex-1'}>
             {stores.uiStore.fullscreen === false && (
               <Sidebar

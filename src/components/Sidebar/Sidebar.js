@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import {observer} from 'mobx-react-lite';
 import TreeList from '../Tree/List';
 import {StoresContext} from '../Context';
@@ -46,7 +47,7 @@ const Sidebar = observer((props) => {
       generateContextMenu={stores.designTreeStore.generateContextMenu}
       rowRenderer={rowRenderer}
       itemClassName="DesignTreeListItem"
-      className="SidebarTreeList"
+      className={classnames('SidebarTreeList', props.className)}
       innerPadding={15}
       initialScrollOffset={0}
       onScroll={handleScroll}
