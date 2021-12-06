@@ -5,7 +5,7 @@ import pjson from '../package.json';
 import {Sidebar, Gutter, Content, Context} from './components';
 import Stores from './Stores';
 import {observer} from 'mobx-react-lite';
-import {Tag} from '@blueprintjs/core';
+import {AnchorButton, Icon, Tag} from '@blueprintjs/core';
 
 const Designer = observer(() => {
   const stores = React.useContext(Context.StoresContext);
@@ -18,12 +18,27 @@ const Designer = observer(() => {
               className="grid py-4 px-5 w-100 bg-canvas border-b"
               style={{gridTemplateColumns: '1fr auto 1fr'}}>
               <div className="flex justify-start items-center">
-                <Tag>Ver: {pjson.version}</Tag>
+                <Tag large minimal icon="git-commit">
+                  {pjson.version}
+                </Tag>
               </div>
               <div className="flex items-center">
                 <div className="text-base overflow-hidden mx-2">
-                  Openapi Designer
+                  <a
+                    href={pjson.repository.url}
+                    target="_blank"
+                    rel="noreferrer">
+                    Openapi Designer
+                  </a>
                 </div>
+              </div>
+              <div className="flex justify-end items-center">
+                <AnchorButton
+                  icon={<Icon size={12} icon="git-repo" />}
+                  href={pjson.repository.url}
+                  target="_blank"
+                  text="View on Github"
+                />
               </div>
             </div>
           )}
@@ -36,7 +51,7 @@ const Designer = observer(() => {
                   maxWidth: '375px',
                   minWidth: '290px',
                 }}
-                className={'flex flex-col bg-white dark:bg-gray-900 border-r'}
+                className={'flex flex-col border-r'}
               />
             )}
             <Gutter layout="horizontal" />

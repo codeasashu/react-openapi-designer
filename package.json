@@ -2,6 +2,11 @@
   "name": "react-openapi-designer",
   "version": "0.1.2",
   "main": "dist/main.js",
+  "homepage": "https://codeasashu.github.io/react-openapi-designer/",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/codeasashu/react-openapi-designer"
+  },
   "scripts": {
     "typecheck": "flow check",
     "lint": "eslint --ignore-path .gitignore .",
@@ -14,7 +19,9 @@
     "build": "NODE_ENV=production webpack --config webpack/webpack.prod.js --progress",
     "watch": "webpack --config webpack/webpack.common.js --watch  --progress",
     "dev": "webpack serve -c webpack/webpack.dev.js --hot --open",
-    "validate": "npm-run-all --parallel format:check lint && npm run build"
+    "validate": "npm-run-all --parallel format:check lint && npm run build",
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d dist"
   },
   "dependencies": {
     "@blueprintjs/core": "^3.50.1",
@@ -117,6 +124,7 @@
     "file-loader": "^6.2.0",
     "flow-bin": "^0.152.0",
     "flow-typed": "^3.3.1",
+    "gh-pages": "^3.2.3",
     "html-webpack-plugin": "^5.2.0",
     "https-browserify": "^1.0.0",
     "husky": "^6.0.0",

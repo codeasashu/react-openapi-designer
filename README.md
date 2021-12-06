@@ -1,56 +1,43 @@
 # React openapi designer
 
-React openapi designer is a React component library of UI elements needed to build [Openapi specifications](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md)
+React openapi designer is a react based openapi designer that conforms to [Openapi specifications](https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.3.md)
 
-## Usage
+## Live Preview
 
-Import the application and start using it in any React basded application
+To quickly get started, you can go to [https://codeasashu.github.io/react-openapi-designer/](https://codeasashu.github.io/react-openapi-designer/)
 
-```js
-// ...
-import ReactOpenapiDesigner from 'react-openapi-designer';
+You can create a new openapi spec from scratch, or you can just paste any
+existing yaml to import the spec and edit from the UI.
 
-const handleChange = (schema) => {
-    console.log('Changed Schema', schema)
-}
 
-export const MyApp = (props) => {
-    const initSchema = {
-        type: 'object',
-        properties: {
-            status: {type: 'string'}
-        },
-        required: ['status'],
-        examples: {}
-    };
-    return  (<ReactOpenapiDesigner
-                dark
-                schema={schema}
-                onChange={handleChange} 
-            />);
-}
+## Hosting
+
+You can also build and host the repo as a static website. To do so, first build
+the project.
+
+```sh
+npm run build
 ```
 
-## Supported props
-
-Following props are supported:
-
-
-| name |  default | description |
-| ---  |    ---   |   ---   |
-| dark |  false   | Enable `dark` mode
-| schema | `{type: "object"}` | The default schema to start with |
-| onChange | None | This props is triggered on any change in the schema. You'll get a javascript object of schema |
+This will put the compiled files in `dist/` directory. Upload everything in that
+directory to a static hosting.
 
 ## Local development
 
-To start local development, clone this repo and run `npm run dev`.
+To start local development, clone this repo.
 
+```sh
+git clone https://github.com/codeasashu/react-openapi-designer
+```
 
-If you wish to use this repo in some other project, while quickly making changes,
-you should try using `npm run watch`, which starts this project in watch mode and is
-a **lot** faster.
+Then, install npm modules
 
-## TODO
+```sh
+npm install
+```
 
-- Add https://github.com/suren-atoyan/monaco-react editor in schema
+and finally start dev server:
+
+```sh
+npm run dev
+```
