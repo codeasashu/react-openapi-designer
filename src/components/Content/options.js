@@ -41,14 +41,21 @@ const Options = observer((props) => {
             small
             icon={<Icon size={14} icon="form" />}
             text="Form"
-            onClick={props.onToggleView}
+            onClick={() => props.onToggleView('form')}
           />
           <Button
             active={props.view === 'code'}
             small
             icon={<Icon size={14} icon="code" />}
             text="Code"
-            onClick={props.onToggleView}
+            onClick={() => props.onToggleView('code')}
+          />
+          <Button
+            active={props.view === 'docs'}
+            small
+            icon={<Icon size={14} icon="book" />}
+            text="Preview"
+            onClick={() => props.onToggleView('preview')}
           />
         </ButtonGroup>
       </div>

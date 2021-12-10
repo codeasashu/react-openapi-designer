@@ -1,5 +1,11 @@
 import React from 'react';
 import {render} from 'react-dom';
+import Prism from 'prismjs';
+require('prismjs/components/prism-markup');
+require('prismjs/components/prism-json');
+
+Prism.manual = true;
+Prism.highlightAll();
 
 import App from './app';
 

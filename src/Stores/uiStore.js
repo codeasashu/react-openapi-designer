@@ -11,6 +11,12 @@ class UiStore {
   activeSourceNode;
   activeSymbolNode;
   fullscreen;
+  activeView;
+  views = {
+    code: 'code',
+    form: 'form',
+    preview: 'preview',
+  };
 
   constructor(stores) {
     makeObservable(this, {
@@ -34,6 +40,8 @@ class UiStore {
 
       activeNode: computed,
       activeNodeId: computed,
+      activeView: observable,
+      setActiveView: action,
     });
 
     this.stores = stores;
@@ -43,6 +51,7 @@ class UiStore {
     this._smallLayout = false;
     this._chosenSourceNodeUri = undefined;
     this._chosenSymbolNodeUri = undefined;
+    this.activeView = this.views.form;
     this._preferences = observable.object(
       {
         activeSidebarTree: 'design',
@@ -265,6 +274,12 @@ class UiStore {
         }
       },
     );
+  }
+
+  setActiveView(view) {
+    if (Object.keys(this.views).indexOf(view) >= 0) {
+      this.activeView = view;
+    }
   }
 
   get _storageKey() {

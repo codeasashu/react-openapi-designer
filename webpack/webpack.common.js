@@ -25,6 +25,9 @@ module.exports = {
       https: require.resolve('https-browserify'),
       vm: require.resolve('vm-browserify'),
       buffer: require.resolve('buffer'),
+      path: require.resolve('path-browserify'),
+      os: require.resolve('os-browserify/browser'),
+      stream: require.resolve('stream-browserify'),
     },
     alias: {
       components: path.resolve(__dirname, '..', 'src', 'components'),
@@ -67,6 +70,7 @@ module.exports = {
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
+      process: ['process/browser.js'],
     }),
     new MonacoWebpackPlugin({
       languages: ['json', 'yaml'],

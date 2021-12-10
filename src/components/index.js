@@ -1,6 +1,6 @@
 import Sidebar from './Sidebar';
-import {Gutter} from './Common';
+import {Gutter, Header} from './Common';
 import Content from './Content';
 import * as Context from './Context';
 
-export {Sidebar, Gutter, Content, Context};
+export {Sidebar, Gutter, Header, Content, Context};
