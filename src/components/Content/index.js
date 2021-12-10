@@ -1,7 +1,9 @@
-import React, {useState} from 'react';
+import React from 'react';
 import PropTypes from 'prop-types';
 import styled from 'styled-components';
 import {observer} from 'mobx-react-lite';
+import {cloneDeep} from 'lodash';
+import Redoc from '../Docs';
 import Options from './options';
 import Info from './info';
 import PathContent from './path';
@@ -51,27 +53,28 @@ SubContent.propTypes = {
 
 const Content = observer(() => {
   const stores = React.useContext(StoresContext);
-  const {activeNode} = stores.uiStore;
+  const {activeNode, activeView, views} = stores.uiStore;
   const sourceNode = stores.graphStore.rootNode;
-  const [currentView, setCurrentView] = useState('form');
 
-  const toggleView = () =>
-    setCurrentView(currentView === 'form' ? 'code' : 'form');
+  const toggleView = (view) => stores.uiStore.setActiveView(view);
 
   return (
     <StyledContent className={'flex flex-col flex-1'}>
       <div className="bp3-dark relative flex flex-1 flex-col bg-canvas">
         <Options
-          view={currentView}
+          view={activeView}
           onToggleView={toggleView}
           onDelete={() => {
             stores.graphStore.removeNode(activeNode.id);
           }}
         />
-        {currentView === 'form' && (
+        {activeView === views.form && (
           <SubContent node={activeNode || sourceNode} />
         )}
-        {currentView === 'code' && <MonacoEditor />}
+        {activeView === views.code && <MonacoEditor />}
+        {activeView === views.preview && (
+          <Redoc spec={cloneDeep(sourceNode.data.parsed)} />
+        )}
       </div>
     </StyledContent>
   );
