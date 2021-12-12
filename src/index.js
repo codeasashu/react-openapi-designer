@@ -1,12 +1,6 @@
 import React from 'react';
 import {render} from 'react-dom';
-import Prism from 'prismjs';
-require('prismjs/components/prism-markup');
-require('prismjs/components/prism-json');
-
-Prism.manual = true;
-Prism.highlightAll();
-
+import 'highlight.js/styles/monokai.css';
 import App from './app';
 
 import './css/overrides.scss';

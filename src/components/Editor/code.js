@@ -2,7 +2,7 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import Editor from 'react-simple-code-editor';
-import Prism from 'prismjs';
+import hljs from 'highlight.js';
 
 class Code extends PureComponent {
   constructor(props) {
@@ -43,7 +43,7 @@ class Code extends PureComponent {
           preClassName=""
           value={value}
           highlight={(code) =>
-            code && Prism.highlight(code, Prism.languages.markup, 'markup')
+            code && hljs.highlight(code, {language: 'markup'}).value
           }
           onValueChange={(e) => this._handleChange(e)}
           onBlur={(e) => this._handleBlur(e.target.value)}
