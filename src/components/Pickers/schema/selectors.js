@@ -46,12 +46,18 @@ const SubSchema = ({schema, onClick}) => {
               <div
                 className={`flex items-center justify-center mr-2 px-2 py-1 rounded cursor-pointer 
                   ${
-                    schema.type === type
-                      ? 'bg-green-600 text-white'
+                    schema.type === type ||
+                    (isRefSchema(schema) && type === '$ref')
+                      ? 'bg-green-600 text-white schema-literal-selected'
                       : 'hover:bg-gray-300 dark:hover:bg-gray-600'
                   }`}
                 key={index}
-                onClick={() => onClick(type, ['items', 'type'])}
+                onClick={() =>
+                  onClick(type === '$ref' ? '' : type, [
+                    'items',
+                    type === '$ref' ? '$ref' : 'type',
+                  ])
+                }
                 selected={schema.type === type}>
                 {type}
               </div>
@@ -59,6 +65,13 @@ const SubSchema = ({schema, onClick}) => {
           })}
         </div>
       </div>
+      {isRefSchema(schema) && (
+        <RefSchema
+          schemaRef={schema['$ref']}
+          onClick={(e) => onClick(e, ['items', '$ref'])}
+          onBlur={(e) => onClick(e, ['items', '$ref'])}
+        />
+      )}
     </div>
   );
 };
