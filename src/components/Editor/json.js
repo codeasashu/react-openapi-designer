@@ -2,7 +2,7 @@
 import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import Editor from 'react-simple-code-editor';
-import Prism from 'prismjs';
+import hljs from 'highlight.js';
 import {isObject} from 'lodash';
 
 class Json extends PureComponent {
@@ -65,7 +65,7 @@ class Json extends PureComponent {
           preClassName=""
           value={value}
           highlight={(code) =>
-            code && Prism.highlight(code, Prism.languages.json, 'json')
+            code && hljs.highlight(code, {language: 'json'}).value
           }
           onValueChange={(e) => this._handleChange(e)}
           onBlur={(e) => this._handleBlur(e.target.value)}

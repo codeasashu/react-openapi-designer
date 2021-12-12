@@ -3,7 +3,7 @@ import React, {useState, useEffect} from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import Editor from 'react-simple-code-editor';
-import Prism from 'prismjs';
+import hljs from 'highlight.js';
 
 const Markdown = ({value: initValue, onChange, ...props}) => {
   const [value, setValue] = useState(initValue || '');
@@ -37,7 +37,7 @@ const Markdown = ({value: initValue, onChange, ...props}) => {
         placeholder={props.placeholder || ''}
         value={value}
         highlight={(code) =>
-          code && Prism.highlight(code, Prism.languages.markup, 'markup')
+          code && hljs.highlight(code, {language: 'markdown'}).value
         }
         onValueChange={(e) => _handleChange(e)}
         onBlur={(e) => _handleBlur(e.target.value)}
