@@ -16,6 +16,8 @@ const displayArrayItemEntity = (schema) =>
   schema.type === 'array' &&
   Object.prototype.hasOwnProperty.call(schema.items, 'type')
     ? `${schema.type} [${schema.items.type}]`
+    : isRefSchema(schema.items)
+    ? `${schema.type} [${displayRefItemEntity(schema.items)}]`
     : null;
 
 const displayRefItemEntity = (schema) =>
