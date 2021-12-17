@@ -1,4 +1,4 @@
-import {observable, action, makeObservable, runInAction} from 'mobx';
+import {observable, action, makeObservable, runInAction, reaction} from 'mobx';
 import {join} from 'lodash';
 import Graph from './graph';
 import {recomputeGraphNodes} from './graph/addNode';
@@ -81,6 +81,13 @@ class GraphStore {
         },
       ]);
     };
+
+    reaction(
+      () => this.rootNode && this.rootNode.data.parsed,
+      (spec) => {
+        this.props.lintStore.lint(spec);
+      },
+    );
 
     this.removeNode = (nodeId) => {
       //e

@@ -48,21 +48,6 @@ const Info = observer(() => {
               }
             />
           </div>
-          <div className="font-semibold text-gray-6 dark:text-lighten-8 ml-1 mb-2">
-            Summary
-          </div>
-          <InputGroup
-            className="mx-1 -mb-2 StudioInput"
-            placeholder="summary"
-            value={getValueFromStore(['info', 'summary']) || ''}
-            onChange={(e) =>
-              handlePatch(
-                nodeOperations.Replace,
-                ['info', 'summary'],
-                e.target.value,
-              )
-            }
-          />
           <div className="font-semibold text-gray-6 dark:text-lighten-8 ml-1 mt-8 mb-2">
             Description
           </div>

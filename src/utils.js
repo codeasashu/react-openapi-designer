@@ -7,6 +7,20 @@ function escapeRegExpChars(text: string) {
   return text.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
 }
 
+export const basicSearch = (items, key) => {
+  return function (query) {
+    var words = query.toLowerCase().split(' ');
+
+    return items.filter(function (item) {
+      var normalizedTerm = item[key].toLowerCase();
+
+      return words.every(function (word) {
+        return normalizedTerm.indexOf(word) > -1;
+      });
+    });
+  };
+};
+
 export const highlightText = (text: string, query: string) => {
   if (!text || typeof text != 'string') {
     return [];
