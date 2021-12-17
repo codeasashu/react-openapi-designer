@@ -12,10 +12,16 @@ class UiStore {
   activeSymbolNode;
   fullscreen;
   activeView;
+  activeWidget;
+
   views = {
     code: 'code',
     form: 'form',
     preview: 'preview',
+  };
+
+  widgets = {
+    lint: 'lint',
   };
 
   constructor(stores) {
@@ -41,7 +47,10 @@ class UiStore {
       activeNode: computed,
       activeNodeId: computed,
       activeView: observable,
+      activeWidget: observable,
       setActiveView: action,
+      setActiveWidget: action,
+      toggleWidget: action,
     });
 
     this.stores = stores;
@@ -52,6 +61,7 @@ class UiStore {
     this._chosenSourceNodeUri = undefined;
     this._chosenSymbolNodeUri = undefined;
     this.activeView = this.views.form;
+    this.activeWidget = null;
     this._preferences = observable.object(
       {
         activeSidebarTree: 'design',
@@ -279,6 +289,22 @@ class UiStore {
   setActiveView(view) {
     if (Object.keys(this.views).indexOf(view) >= 0) {
       this.activeView = view;
+    }
+  }
+
+  setActiveWidget(widget) {
+    if (Object.keys(this.widgets).indexOf(widget) >= 0) {
+      this.activeWidget = widget;
+    }
+  }
+
+  toggleWidget(widget) {
+    if (Object.keys(this.widgets).indexOf(widget) >= 0) {
+      if (widget === this.activeWidget) {
+        this.activeWidget = null;
+      } else {
+        this.activeWidget = widget;
+      }
     }
   }
 

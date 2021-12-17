@@ -3,13 +3,6 @@ export const spec = {
   info: {
     title: '',
     version: '1.0',
-    summary: '',
-    description: '',
-    contact: {
-      name: '',
-      url: '',
-      email: '',
-    },
   },
   paths: {},
   components: {

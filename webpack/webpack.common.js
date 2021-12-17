@@ -10,7 +10,7 @@ module.exports = {
   target: 'web',
   output: {
     filename: '[name].js',
-    chunkFilename: '[id].[chunkhash].js',
+    //chunkFilename: '[id].[chunkhash].js',
     //sourceMapFilename: 'main.js.map',
     path: path.join(__dirname, '../dist'),
     libraryTarget: 'umd',
@@ -28,6 +28,7 @@ module.exports = {
       path: require.resolve('path-browserify'),
       os: require.resolve('os-browserify/browser'),
       stream: require.resolve('stream-browserify'),
+      fs: false,
     },
     alias: {
       components: path.resolve(__dirname, '..', 'src', 'components'),

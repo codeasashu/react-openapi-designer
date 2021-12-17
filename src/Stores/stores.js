@@ -7,6 +7,7 @@ import JsonSchemaStore from './jsonSchemaStore';
 import OasSchemaStore from './oasSchemaStore';
 import BrowserStore from './browserStore';
 import EventEmitter from '../EventEmitter';
+import LintStore from './lintStore';
 
 class Stores {
   constructor() {
@@ -19,6 +20,7 @@ class Stores {
     this.jsonSchemaCollection = this.generateJsonSchemaCollection(this);
     this.oasSchemaCollection = this.generateOasSchemaCollection(this);
     this.editorStore = new EditorStore(this);
+    this.lintStore = new LintStore(this);
 
     this.registerEventListeners();
     this.activate();
@@ -120,6 +122,7 @@ class Stores {
     this.oasStore.activate();
     this.designTreeStore.activate();
     this.editorStore.doActivate();
+    this.lintStore.activate();
   }
 }
 

@@ -12,6 +12,7 @@ import Parameter from './parameter';
 import Response from './response';
 import RequestBody from './RequestBody';
 import MonacoEditor from '../Editor/Monaco';
+import LintWidget from '../Widgets/Lint';
 import {StoresContext} from '../Context';
 import {NodeCategories, NodeTypes} from '../../datasets/tree';
 
@@ -39,12 +40,23 @@ const getComponentForNode = (node) => {
 };
 
 const SubContent = observer(({node}) => {
+  const stores = React.useContext(StoresContext);
+  const {activeWidget, widgets} = stores.uiStore;
   let relativeJsonPath = [];
   if (node.category === NodeCategories.SourceMap) {
     relativeJsonPath = node.relativeJsonPath;
   }
   const RenderSubContent = getComponentForNode(node);
-  return <RenderSubContent relativeJsonPath={relativeJsonPath} node={node} />;
+  return activeWidget ? (
+    <div className="flex-1 relative flex">
+      <RenderSubContent relativeJsonPath={relativeJsonPath} node={node} />
+      <div className="relative flex-1 border-l">
+        {activeWidget === widgets.lint && <LintWidget />}
+      </div>
+    </div>
+  ) : (
+    <RenderSubContent relativeJsonPath={relativeJsonPath} node={node} />
+  );
 });
 
 SubContent.propTypes = {
@@ -56,14 +68,13 @@ const Content = observer(() => {
   const {activeNode, activeView, views} = stores.uiStore;
   const sourceNode = stores.graphStore.rootNode;
 
-  const toggleView = (view) => stores.uiStore.setActiveView(view);
-
   return (
     <StyledContent className={'flex flex-col flex-1'}>
       <div className="bp3-dark relative flex flex-1 flex-col bg-canvas">
         <Options
           view={activeView}
-          onToggleView={toggleView}
+          onToggleView={(v) => stores.uiStore.setActiveView(v)}
+          onToggleWidget={(w) => stores.uiStore.setActiveWidget(w)}
           onDelete={() => {
             stores.graphStore.removeNode(activeNode.id);
           }}
