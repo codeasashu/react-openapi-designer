@@ -1,5 +1,11 @@
 import '@testing-library/jest-dom/extend-expect';
 import * as matchers from 'jest-extended';
+import Worker from './workerStub';
+
+window.Worker = Worker;
+
+jest.mock('../src/Stores/lintStore', () => require('../__mocks__/lintStore'));
+
 expect.extend(matchers);
 //import {createSerializer} from 'enzyme-to-json';
 

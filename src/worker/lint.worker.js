@@ -2,8 +2,10 @@ const {Spectral} = require('@stoplight/spectral-core');
 const {oas} = require('@stoplight/spectral-rulesets');
 
 self.onmessage = async ({data}) => {
-  const results = await lintSpec(data.spec);
-  self.postMessage({msg: 'worker', spec: data.spec, results});
+  if (Object.prototype.hasOwnProperty.call(data, 'spec') && data.spec) {
+    const results = await lintSpec(data.spec);
+    self.postMessage({msg: 'worker', spec: data.spec, results});
+  }
 };
 
 const lintSpec = (spec) => {
@@ -11,5 +13,6 @@ const lintSpec = (spec) => {
   spectral.setRuleset({
     extends: oas,
   });
+  console.log('worker11', spec);
   return spectral.run(spec);
 };

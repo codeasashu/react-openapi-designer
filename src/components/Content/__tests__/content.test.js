@@ -1,6 +1,5 @@
 import React from 'react';
 import userEvent from '@testing-library/user-event';
-import {Classes} from '@blueprintjs/core';
 import {Classes as PopoverClasses} from '@blueprintjs/popover2';
 import {
   act,
@@ -10,7 +9,7 @@ import {
   within,
 } from '../../../../test-utils';
 import Content from '../index';
-import {fireEvent, prettyDOM} from '@testing-library/dom';
+import {fireEvent} from '@testing-library/dom';
 
 describe('Content tests', () => {
   describe('Schema tests', () => {
