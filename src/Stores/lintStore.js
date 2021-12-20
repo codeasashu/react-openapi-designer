@@ -36,15 +36,19 @@ class LintStore {
   }
 
   handleWorkerMessage({data}) {
-    const results = data.results;
-    this.errors = results.filter(
-      (r) => r.severity === DiagnosticSeverity.Error,
-    );
-    this.warning = results.filter(
-      (r) => r.severity === DiagnosticSeverity.Warning,
-    );
-    this.hints = results.filter((r) => r.severity === DiagnosticSeverity.Hint);
-    this.info = results.filter((r) => r.severity === DiagnosticSeverity.Info);
+    if (data && Object.prototype.hasOwnProperty.call(data, 'results')) {
+      const results = data.results;
+      this.errors = results.filter(
+        (r) => r.severity === DiagnosticSeverity.Error,
+      );
+      this.warning = results.filter(
+        (r) => r.severity === DiagnosticSeverity.Warning,
+      );
+      this.hints = results.filter(
+        (r) => r.severity === DiagnosticSeverity.Hint,
+      );
+      this.info = results.filter((r) => r.severity === DiagnosticSeverity.Info);
+    }
   }
 }
 

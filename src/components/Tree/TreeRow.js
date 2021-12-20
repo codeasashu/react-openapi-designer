@@ -24,8 +24,8 @@ const getItems = (items) =>
     }
   });
 
-const SidebarContextMenu = ({items}) => {
-  return <Menu>{getItems(items)}</Menu>;
+const SidebarContextMenu = ({items, ...props}) => {
+  return <Menu {...props}>{getItems(items)}</Menu>;
 };
 
 SidebarContextMenu.propTypes = {
@@ -108,7 +108,13 @@ const TreeRow = observer((props) => {
     const menuItems = node ? generateContextMenu(node) : undefined;
     if (menuItems !== undefined && menuItems.length > 0) {
       return (
-        <ContextMenu2 content={<SidebarContextMenu items={menuItems} />}>
+        <ContextMenu2
+          content={
+            <SidebarContextMenu
+              items={menuItems}
+              data-testid={`tree-ctxmenu-${node.name}`}
+            />
+          }>
           <div
             key={node.id}
             data-testid={`tree-row-${node.id}`}

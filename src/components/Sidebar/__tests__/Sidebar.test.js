@@ -24,6 +24,7 @@ describe('Sidebar tests', () => {
   };
 
   beforeEach(() => {
+    console.warn = jest.fn();
     const popover = getPopover();
     expect(popover).toBeNull();
   });
@@ -271,7 +272,7 @@ describe('Sidebar tests', () => {
       await act(async () => {
         await fireEvent.contextMenu(childNode);
       });
-      const menuItems = getContextMenuItems();
+      const menuItems = getContextMenuItems(`tree-ctxmenu-${childName}`);
       await act(async () => {
         await userEvent.click(menuItems[0].querySelector('a'));
       });
@@ -368,13 +369,15 @@ describe('Sidebar tests', () => {
     await act(async () => {
       fireEvent.contextMenu(childNode);
     });
-    const menuItems = getContextMenuItems();
+    const menuItems = getContextMenuItems(`tree-ctxmenu-/users`);
     // Delete path
     act(() => {
       userEvent.click(menuItems[0].querySelector('a'));
     });
 
-    const editItem = getNodeFromSidebar(NodeTypes.Path).querySelector('input');
+    const editItem = screen
+      .getByLabelText(NodeTypes.Path)
+      .querySelector('input');
     expect(editItem).toHaveValue(`/users`);
     await act(async () => {
       await userEvent.type(editItem, `/abc{Enter}`);
@@ -444,7 +447,7 @@ describe('Sidebar tests', () => {
     await act(async () => {
       await fireEvent.contextMenu(childNode);
     });
-    const menuItems = getContextMenuItems();
+    const menuItems = getContextMenuItems(`tree-ctxmenu-/users`);
     // Delete operation
     act(() => {
       userEvent.click(menuItems[2].querySelector('a'));
@@ -496,21 +499,6 @@ function getChildNodeType(parentNodeType) {
   }
 }
 
-async function addChildNode(nodeType, name) {
-  const parentNode = await getNodeFromSidebar(nodeType);
-  const addNewBtnLabel = getAddButtonLabel(nodeType);
-  await clickAddNewItem(parentNode, addNewBtnLabel);
-
-  const editableItem = await screen.getAllByRole(/edititem/);
-  expect(editableItem).toHaveLength(1);
-  const editableInput = getEditableInput(editableItem[0]);
-  await act(async () => {
-    // Enter the new item name and press enter
-    await userEvent.type(editableInput, `${name}{Enter}`);
-  });
-  return getNodeFromSidebar(getChildNodeType(nodeType));
-}
-
 async function clickAddNewItem(menuItem, addBtnLabel) {
   await act(async () => {
     await fireEvent.contextMenu(menuItem);
@@ -529,8 +517,8 @@ function getNodeFromSidebar(nodeType) {
   return screen.getByLabelText(nodeType);
 }
 
-function getContextMenuItems() {
-  const popover = getPopover();
+function getContextMenuItems(name) {
+  const popover = getPopover(name);
   return within(popover).queryAllByRole('listitem');
 }
 
@@ -541,7 +529,10 @@ function getEditableInput(containerElem, shouldRaiseException = false) {
     : within(containerElem).queryByRole(/textbox/);
 }
 
-function getPopover() {
+function getPopover(name) {
+  if (name) {
+    return document.querySelector(`ul[data-testid="${name}"]`);
+  }
   return document.querySelector(
     `.${PopoverClasses.POPOVER2}.${Classes.MINIMAL}`,
   );
