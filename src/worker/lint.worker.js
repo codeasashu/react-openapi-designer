@@ -13,6 +13,5 @@ const lintSpec = (spec) => {
   spectral.setRuleset({
     extends: oas,
   });
-  console.log('worker11', spec);
   return spectral.run(spec);
 };
