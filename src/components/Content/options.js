@@ -5,10 +5,11 @@ import classnames from 'classnames';
 import {Button, ButtonGroup, Icon, Intent} from '@blueprintjs/core';
 import {StoresContext} from '../Context';
 import {NodeCategories} from '../../datasets/tree';
+import Tags from './tags';
 
-const Options = observer((props) => {
+const Options = observer(({relativeJsonPath, node, ...props}) => {
   const stores = React.useContext(StoresContext);
-  const {activeNode, activeWidget, widgets} = stores.uiStore;
+  const {activeWidget, widgets} = stores.uiStore;
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const {errors, hints, info, warning} = stores.lintStore;
 
@@ -28,8 +29,9 @@ const Options = observer((props) => {
           'border-transparent': !activeWidget,
         },
       )}>
-      {activeNode && activeNode.category === NodeCategories.SourceMap && (
-        <div className="flex items-center">
+      <div className="flex items-center">
+        <Tags relativeJsonPath={relativeJsonPath} node={node} />
+        {node && node.category === NodeCategories.SourceMap && (
           <Button
             small
             icon={<Icon size={14} icon="trash" />}
@@ -47,8 +49,8 @@ const Options = observer((props) => {
               }
             }}
           />
-        </div>
-      )}
+        )}
+      </div>
       <div className="flex-1" />
       <div>
         <ButtonGroup>

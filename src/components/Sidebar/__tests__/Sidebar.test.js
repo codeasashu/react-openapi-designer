@@ -109,9 +109,25 @@ describe('Sidebar tests', () => {
 
   it('Adds new item when entered in editable text', async () => {
     const {getByRole, getAllByRole} = render(<Sidebar />);
-    const assertNewItem = async (nodeType, menuItemName, newItemName) => {
+    const assertNewItem = async (
+      nodeType,
+      menuItemName,
+      newItemName,
+      currentNodeName,
+    ) => {
       const sidebarItem = getNodeFromSidebar(nodeType);
-      await clickAddNewItem(sidebarItem, menuItemName);
+      //await clickAddNewItem(sidebarItem, menuItemName);
+      await act(async () => {
+        await fireEvent.contextMenu(sidebarItem);
+      });
+
+      const menuItems = getContextMenuItems(`tree-ctxmenu-${currentNodeName}`);
+      expect(menuItems).toHaveLength(1);
+      const addNewBtn = within(menuItems[0]).getByText(menuItemName);
+      await act(async () => {
+        await userEvent.click(addNewBtn);
+      });
+
       await act(async () => {
         userEvent.type(
           within(getByRole(/edititem/)).getByRole(/textbox/),
@@ -124,15 +140,21 @@ describe('Sidebar tests', () => {
     };
 
     expect(getAllByRole(/menuitem/)).toHaveLength(7);
-    await assertNewItem(NodeTypes.Models, 'New Model', 'xyzd');
+    await assertNewItem(NodeTypes.Models, 'New Model', 'xyzd', 'Models');
     expect(getAllByRole(/menuitem/)).toHaveLength(8);
     await assertNewItem(
       NodeTypes.RequestBodies,
       'New Request Body',
       'requestBody123',
+      'Request Bodies',
     );
     expect(getAllByRole(/menuitem/)).toHaveLength(9);
-    await assertNewItem(NodeTypes.Responses, 'New Response', 'UserResponse');
+    await assertNewItem(
+      NodeTypes.Responses,
+      'New Response',
+      'UserResponse',
+      'Responses',
+    );
     expect(getAllByRole(/menuitem/)).toHaveLength(10);
   });
 
@@ -200,7 +222,7 @@ describe('Sidebar tests', () => {
     await act(async () => {
       fireEvent.contextMenu(childNode);
     });
-    const menuItems = getContextMenuItems();
+    const menuItems = getContextMenuItems(`tree-ctxmenu-UserModel`);
     expect(menuItems[0]).toHaveTextContent(/Rename/);
     expect(menuItems[1]).toHaveTextContent(/Delete model/);
   });
@@ -234,7 +256,7 @@ describe('Sidebar tests', () => {
     await act(async () => {
       fireEvent.contextMenu(childNode);
     });
-    const menuItems = getContextMenuItems();
+    const menuItems = getContextMenuItems(`tree-ctxmenu-/users`);
     expect(menuItems[0]).toHaveTextContent(/Rename/);
     expect(menuItems[1]).toHaveTextContent(/Delete path/);
     expect(menuItems[2]).toHaveTextContent(/Delete Operation/);
@@ -331,7 +353,7 @@ describe('Sidebar tests', () => {
       await act(async () => {
         await fireEvent.contextMenu(childNode);
       });
-      const menuItems = getContextMenuItems();
+      const menuItems = getContextMenuItems(`tree-ctxmenu-${childName}`);
       await act(async () => {
         await userEvent.click(menuItems[1].querySelector('a'));
       });
@@ -395,7 +417,7 @@ describe('Sidebar tests', () => {
       fireEvent.contextMenu(screen.getByLabelText(NodeTypes.Paths));
     });
     // Click first item in context menu
-    const contextMenus = getContextMenuItems();
+    const contextMenus = getContextMenuItems(`tree-ctxmenu-Paths`);
     await act(async () => {
       fireEvent.click(within(contextMenus[0]).getByText(/New Path/));
     });
@@ -413,7 +435,7 @@ describe('Sidebar tests', () => {
     await act(async () => {
       await fireEvent.contextMenu(childNode);
     });
-    const menuItems = getContextMenuItems();
+    const menuItems = getContextMenuItems(`tree-ctxmenu-/users`);
     // Delete path
     act(() => {
       userEvent.click(menuItems[1].querySelector('a'));

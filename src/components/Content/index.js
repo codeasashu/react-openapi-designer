@@ -39,13 +39,9 @@ const getComponentForNode = (node) => {
   }
 };
 
-const SubContent = observer(({node}) => {
+const SubContent = observer(({node, relativeJsonPath}) => {
   const stores = React.useContext(StoresContext);
   const {activeWidget, widgets} = stores.uiStore;
-  let relativeJsonPath = [];
-  if (node.category === NodeCategories.SourceMap) {
-    relativeJsonPath = node.relativeJsonPath;
-  }
   const RenderSubContent = getComponentForNode(node);
   return activeWidget ? (
     <div className="flex-1 relative flex">
@@ -67,11 +63,16 @@ const Content = observer(() => {
   const stores = React.useContext(StoresContext);
   const {activeNode, activeView, views} = stores.uiStore;
   const sourceNode = stores.graphStore.rootNode;
+  const node = activeNode || sourceNode;
+  const relativeJsonPath =
+    node.category === NodeCategories.SourceMap ? node.relativeJsonPath : [];
 
   return (
     <StyledContent className={'flex flex-col flex-1'}>
       <div className="bp3-dark relative flex flex-1 flex-col bg-canvas">
         <Options
+          relativeJsonPath={relativeJsonPath}
+          node={node}
           view={activeView}
           onToggleView={(v) => stores.uiStore.setActiveView(v)}
           onToggleWidget={(w) => stores.uiStore.setActiveWidget(w)}
@@ -80,7 +81,7 @@ const Content = observer(() => {
           }}
         />
         {activeView === views.form && (
-          <SubContent node={activeNode || sourceNode} />
+          <SubContent node={node} relativeJsonPath={relativeJsonPath} />
         )}
         {activeView === views.code && <MonacoEditor />}
         {activeView === views.preview && (
