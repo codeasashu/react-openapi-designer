@@ -16,8 +16,6 @@ const PathItem = observer(({isEdited, node}) => {
 
   const handleMethodClick = (e, id) => {
     e.stopPropagation();
-    //const t = e.currentTarget.dataset.id;
-    console.log('clicked', id);
     stores.designTreeStore.setActiveNode(stores.graphStore.getNodeById(id));
   };
 

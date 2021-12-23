@@ -34,7 +34,7 @@ export const highlightText = (text: string, query: string) => {
     return [text];
   }
   const regexp = new RegExp(words.join('|'), 'gi');
-  const tokens: React.ReactNode[] = [];
+  const tokens = [];
   // eslint-disable-next-line no-constant-condition
   while (true) {
     const match = regexp.exec(text);
