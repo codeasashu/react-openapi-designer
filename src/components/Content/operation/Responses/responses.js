@@ -178,20 +178,24 @@ const Responses = observer(({responsesPath}) => {
           </ControlGroup>
         </div>
       </div>
-      <div className="border-l-2 border-gray-3 dark:border-darken-4 mt-8 py-1 pl-6">
-        <>
-          <MarkdownEditor
-            language="md"
-            placeholder="Response description..."
-            relativeJsonPath={contentPath.concat(['description'])}
-          />
-          <Headers
-            className="mt-6"
-            headersPath={contentPath.concat(['headers'])}
-          />
-          <Response contentPath={contentPath.concat(['content'])} />
-        </>
-      </div>
+      {statusCodes.length > 0 && (
+        <div
+          className="border-l-2 border-gray-3 dark:border-darken-4 mt-8 py-1 pl-6 response"
+          data-testid={`response-${selectedCode}`}>
+          <>
+            <MarkdownEditor
+              language="md"
+              placeholder="Response description..."
+              relativeJsonPath={contentPath.concat(['description'])}
+            />
+            <Headers
+              className="mt-6"
+              headersPath={contentPath.concat(['headers'])}
+            />
+            <Response contentPath={contentPath.concat(['content'])} />
+          </>
+        </div>
+      )}
     </div>
   );
 });
