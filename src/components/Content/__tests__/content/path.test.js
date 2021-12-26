@@ -1,8 +1,5 @@
 import React from 'react';
-import {get} from 'lodash';
 import userEvent from '@testing-library/user-event';
-import {Button, Classes} from '@blueprintjs/core';
-import {Classes as PopoverClasses} from '@blueprintjs/popover2';
 import {fireEvent, prettyDOM} from '@testing-library/dom';
 import {
   act,
@@ -12,15 +9,8 @@ import {
   within,
 } from '../../../../../test-utils';
 import Content from '../../index';
-import PathNode from '../../../../Stores/nodes/pathNode';
 
 describe('Path content test', () => {
-  let methodTabNodes,
-    pathNameNode,
-    activeOperationNode,
-    requestBodyNode,
-    responseStatusCodeNode;
-
   const getTitleNode = () => screen.getByPlaceholderText(/Operation Name/);
   const getMethodTabs = () => screen.getAllByRole(/tab/);
   const getPathNameNode = () => screen.getByLabelText(/path/);
@@ -121,7 +111,7 @@ describe('Path content test', () => {
     assertParameterLength('get', 'security', 0);
     assertParameterLength('get', 'cookie', 0);
     assertResponseStatusCode([]);
-    expect(screen.getByPlaceholderText(/Response description/)).toHaveValue('');
+    expect(screen.queryByPlaceholderText(/Response description/)).toBeNull();
     const doc = asserts.oas(path.relativeJsonPath, true);
     expect(doc).toStrictEqual({
       operationId: 'get-user-abc',
@@ -262,6 +252,21 @@ describe('Path content test', () => {
   });
 
   describe('Responses', () => {
+    it('does not have responses node by default', () => {
+      const {stores, creator, asserts} = StoreCreator();
+      const path = creator.createPath('/user/abc');
+      stores.uiStore.setActiveNode(path);
+      render(<Content />, {providerProps: {value: stores}});
+      const responseStatusNode = getResponseStatusNode();
+      const responsesNode = screen.getByRole(/responses/);
+      expect(responsesNode.querySelectorAll('.response').length).toBe(0);
+      expect(
+        within(responseStatusNode).queryByRole(/button/, {
+          name: /200/,
+        }),
+      ).toBeNull();
+    });
+
     it('can add responses', async () => {
       const {stores, creator, asserts} = StoreCreator();
       const path = creator.createPath('/user/abc');
