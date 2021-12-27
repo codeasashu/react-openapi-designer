@@ -6,7 +6,6 @@ describe('Schema builder tests', () => {
     expect(schema).toStrictEqual({
       type: 'string',
       title: '',
-      examples: {},
     });
   });
 
@@ -19,7 +18,6 @@ describe('Schema builder tests', () => {
       type: 'object',
       properties: {},
       title: '',
-      examples: {},
     });
   });
 
@@ -36,7 +34,6 @@ describe('Schema builder tests', () => {
         a: {type: 'string'},
       },
       title: '',
-      examples: {},
     });
   });
 });

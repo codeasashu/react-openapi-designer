@@ -3,8 +3,6 @@
 import Type from 'type-of-is';
 
 // Constants
-const DRAFT = 'http://json-schema.org/draft-04/schema#';
-
 function getPropertyFormat(value) {
   const type = Type.string(value).toLowerCase();
   return type === 'date' ? 'date-time' : null;
@@ -217,9 +215,7 @@ function processObject(object, output, nested) {
 
 const convert = (title, object) => {
   var processOutput;
-  var output = {
-    $schema: DRAFT,
-  };
+  var output = {};
 
   // Determine title exists
   if (typeof title !== 'string') {

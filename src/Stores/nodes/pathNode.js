@@ -68,7 +68,7 @@ class PathNode {
           value: {
             summary,
             tags: tags.slice(),
-            responses: {},
+            responses: {default: {description: ''}},
             operationId: generateOperationId(path, method),
           },
         });
