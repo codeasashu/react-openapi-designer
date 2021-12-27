@@ -16,8 +16,6 @@ const hasType = (schema) =>
 
 const hasTitle = (schema) =>
   Object.prototype.hasOwnProperty.call(schema, 'title');
-const hasExamples = (schema) =>
-  Object.prototype.hasOwnProperty.call(schema, 'examples');
 
 const isObjectSchema = (schema) => hasType(schema) && schema.type === 'object';
 
@@ -34,8 +32,6 @@ export const fillType = (schema) => {
 
 const fillTitle = (schema) =>
   !hasTitle(schema) ? Object.assign({}, {title: ''}, schema) : schema;
-const fillExamples = (schema) =>
-  !hasExamples(schema) ? Object.assign({}, {examples: {}}, schema) : schema;
 
 export const fillSchema = (schema) => {
   let _schema = fillType(schema);
@@ -47,7 +43,6 @@ export const fillSchema = (schema) => {
     _schema.items = fillSchema(_schema.items);
   }
   _schema = fillTitle(_schema);
-  _schema = fillExamples(_schema);
   return _schema;
 };
 

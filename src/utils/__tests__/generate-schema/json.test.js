@@ -11,8 +11,8 @@ describe('JSON', function () {
       schema = GenerateSchema(simple);
     });
 
-    it('.$schema should exist', function () {
-      expect(schema).toHaveProperty('$schema');
+    it('.$schema should not exist', function () {
+      expect(schema).not.toHaveProperty('$schema');
     });
 
     it('.type should exist', function () {

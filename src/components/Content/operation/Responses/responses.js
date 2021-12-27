@@ -26,10 +26,9 @@ const Responses = observer(({responsesPath}) => {
   const responses = getValueFromStore(responsesPath, false);
 
   let codes = [];
-  //let relativeJsonPaths = [];
   if (responses) {
-    codes = keys(responses);
-    //relativeJsonPaths = codes.map((i) => responsesPath.concat(i));
+    // Don't parse default as a valid status code
+    codes = keys(responses).filter((c) => c !== 'default');
   }
 
   const stores = React.useContext(StoresContext);

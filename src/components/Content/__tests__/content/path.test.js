@@ -115,7 +115,7 @@ describe('Path content test', () => {
     const doc = asserts.oas(path.relativeJsonPath, true);
     expect(doc).toStrictEqual({
       operationId: 'get-user-abc',
-      responses: {},
+      responses: {default: {description: ''}},
       summary: 'Your GET endpoint',
       tags: [],
     });
@@ -136,7 +136,7 @@ describe('Path content test', () => {
     const doc = asserts.oas(path.relativeJsonPath, true);
     expect(doc).toStrictEqual({
       operationId: 'get-user-abc',
-      responses: {},
+      responses: {default: {description: ''}},
       summary: 'Abcd',
       tags: [],
     });
@@ -166,7 +166,7 @@ describe('Path content test', () => {
           },
         },
       ],
-      responses: {},
+      responses: {default: {description: ''}},
       summary: 'Your GET endpoint',
       tags: [],
     });

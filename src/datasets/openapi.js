@@ -27,7 +27,7 @@ export const schema = {
   number: {type: 'number'},
   integer: {type: 'integer'},
   array: {type: 'array', items: {type: 'string'}},
-  object: {type: 'object', properties: {}, required: [], examples: {}},
+  object: {type: 'object', properties: {}, required: []},
 };
 
 export default spec;
