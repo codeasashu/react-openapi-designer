@@ -14,10 +14,25 @@ import {
 import OrderedDict from '../utils/ordered-dict';
 import {generateExampleName} from '../utils';
 import GenerateSchema from '../utils/generate-schema';
-import {nodeOperations} from '../datasets/tree';
+import {nodeOperations, NodeTypes} from '../datasets/tree';
 import {schema as defaultSchema} from '../datasets/openapi';
 import {fillSchema} from '../utils/schema';
-const jsf = require('json-schema-faker');
+import {schemaWalk} from '@cloudflare/json-schema-walker';
+import jsf from 'json-schema-faker';
+
+jsf.define('fixedValue', (value, schema) => {
+  switch (schema?.type) {
+    case 'string':
+      return 'string';
+    case 'integer':
+    case 'number':
+      return 0;
+    case 'boolean':
+      return true;
+    default:
+      return value;
+  }
+});
 
 const getParentKey = (keys) => (keys.length === 1 ? [] : dropRight(keys, 1));
 
@@ -63,6 +78,11 @@ class OasSchemaStore {
         fireImmediately: true,
       },
     );
+  }
+
+  get isModelNode() {
+    const {activeNode} = this.stores.uiStore;
+    return activeNode && activeNode.type === NodeTypes.Model;
   }
 
   generateSchema(code) {
@@ -174,25 +194,56 @@ class OasSchemaStore {
 
   generateExampleFromSchema() {
     const schema = cloneDeep(this._schema);
-    const key = generateExampleName(schema.examples || {});
+    const key = generateExampleName(this.examples || {});
+    schemaWalk(
+      schema,
+      (_schema) => {
+        if (Object.prototype.hasOwnProperty.call(_schema, 'type')) {
+          switch (_schema.type.toLowerCase()) {
+            case 'string':
+            case 'integer':
+            case 'boolean':
+            case 'number':
+              _schema['fixedValue'] = true;
+          }
+        }
+      },
+      null,
+    );
     const value = jsf.generate(
       cloneDeep({...schema, additionalProperties: false}),
     );
     this.addExample(key, value);
   }
 
-  addExample(key, value) {
-    const schema = cloneDeep(this._schema);
-    this.schema = set(schema, ['examples', key], value);
+  get isXExample() {
+    const path = this.examplesPath;
+    return path && path[path.length - 1] === 'x-examples';
+  }
+
+  get examplesPath() {
+    if (this.isModelNode) {
+      return this.relativeJsonPath.concat(['x-examples']);
+    }
+    return this.relativeJsonPath.slice(0, -1).concat(['examples']);
+  }
+
+  get examples() {
+    return get(this.sourceNodeData, this.examplesPath);
+  }
+
+  addExample(name, value) {
+    const toAppend = this.isModelNode ? [name] : [name, 'value'];
+    this.updateSpec(this.examplesPath.concat([...toAppend]), value);
   }
 
   renameExample(oldTitle, newTitle) {
-    const schema = cloneDeep(this._schema);
+    const examples = cloneDeep(this.examples);
     if (oldTitle === newTitle) {
-      return schema;
+      return;
     }
-    const oldValue = schema.examples[oldTitle];
-    let orderDict = new OrderedDict(schema.examples);
+    const oldValue = this.examples[oldTitle];
+    let orderDict = new OrderedDict(examples);
     const newKeyIndex = orderDict.findIndex(newTitle);
     if (newKeyIndex >= 0) {
       return this.deleteExample(oldTitle);
@@ -200,7 +251,7 @@ class OasSchemaStore {
     const keyIndex = orderDict.findIndex(oldTitle);
     const inserted = orderDict.insert(keyIndex, newTitle, oldValue);
     if (inserted) orderDict.remove(oldTitle);
-    this.schema = set(schema, ['examples'], orderDict.toDict());
+    this.updateSpec(this.examplesPath, orderDict.toDict());
   }
 
   deleteExample(key) {
@@ -245,6 +296,14 @@ class OasSchemaStore {
   }
 
   getSchema() {
+    if (this.relativeJsonPath && this.relativeJsonPath.length > 0) {
+      return get(this.sourceNodeData, this.relativeJsonPath);
+    } else {
+      return this.sourceNodeData;
+    }
+  }
+
+  get sourceNodeData() {
     const node = this.sourceNode;
 
     if (!node) {
@@ -252,12 +311,22 @@ class OasSchemaStore {
       return null;
     }
 
-    const nodeData = node.data.parsed;
+    return node.data.parsed;
+  }
 
-    if (this.relativeJsonPath && this.relativeJsonPath.length > 0) {
-      return get(nodeData, this.relativeJsonPath);
-    } else {
-      return nodeData;
+  updateSpec(path, value) {
+    if (path) {
+      this.stores.graphStore.graph.patchSourceNodeProp(
+        this.sourceNodeId,
+        'data.parsed',
+        [
+          {
+            op: nodeOperations.Replace,
+            path,
+            value,
+          },
+        ],
+      );
     }
   }
 

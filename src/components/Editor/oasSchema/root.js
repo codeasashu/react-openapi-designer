@@ -136,8 +136,8 @@ const RootSchema = observer(({store, stores, className, onChange}) => {
         onSelect={(tab) => setSelectedTab(tab)}>
         <TabList className="bp3-simple-tab-list">
           <Tab className="bp3-simple-tab">Schema</Tab>
-          {schema.examples &&
-            Object.keys(schema.examples).map((example, i) => (
+          {store.examples &&
+            Object.keys(store.examples).map((example, i) => (
               <Tab className="bp3-simple-tab" key={i}>
                 {example}
               </Tab>
@@ -173,18 +173,22 @@ const RootSchema = observer(({store, stores, className, onChange}) => {
             )}
           </div>
         </TabPanel>
-        {schema.examples &&
-          Object.keys(schema.examples).map((example, i) => (
+        {store.examples &&
+          Object.keys(store.examples).map((example, i) => (
             <TabPanel className="bp3-simple-tab-panel" key={i}>
               <div className="border border-gray-600">
                 <ExampleRenderer
                   title={example}
-                  content={schema.examples[example]}
+                  content={
+                    store.isXExample
+                      ? store.examples[example]
+                      : store.examples[example].value
+                  }
                   onTitleChange={(oldTitle, newTitle) => {
                     store.renameExample(oldTitle, newTitle);
                   }}
                   onChange={(key, value) => {
-                    store.addExample({key, value});
+                    store.addExample(key, value);
                   }}
                   onDelete={(key) => {
                     store.deleteExample(key);
