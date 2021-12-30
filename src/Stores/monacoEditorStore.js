@@ -6,6 +6,7 @@ import {
   observable,
   computed,
 } from 'mobx';
+import {isEqual} from 'lodash';
 import * as monaco from 'monaco-editor';
 import MonacoCodeStore from './monacoCodeStore';
 //import * as yaml from 'yaml';
@@ -81,7 +82,7 @@ class MonacoEditorStore {
 
         this.monacoStore.onDidUpdateValue((e) => {
           const data = yaml.load(e);
-          if (this.monacoCodeStore.value !== e) {
+          if (!isEqual(this.node.data.parsed, data)) {
             this.stores.graphStore.graph.patchSourceNodeProp(
               this.node.id,
               'data.parsed',
