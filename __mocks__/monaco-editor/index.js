@@ -5,11 +5,10 @@ const editor = {
     LF: '\n',
   },
   create: () => {
-    return {
-      dispose: () => {},
-    };
+    return this;
   },
   defineTheme: () => {},
+  setTheme: () => {},
   createModel: () => {
     return {
       updateOptions: () => {},

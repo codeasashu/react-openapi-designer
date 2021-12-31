@@ -7,7 +7,8 @@ import {
   computed,
 } from 'mobx';
 import {isEqual} from 'lodash';
-import * as monaco from 'monaco-editor';
+import {editor, Range, KeyMod, KeyCode, Uri} from 'monaco-editor';
+//import * as monaco from 'monaco-editor';
 import MonacoCodeStore from './monacoCodeStore';
 //import * as yaml from 'yaml';
 import yaml from 'js-yaml';
@@ -53,7 +54,7 @@ class MonacoEditorStore {
           const {language} = this.node;
 
           if (language !== undefined) {
-            monaco.editor.setModelLanguage(this.monacoCodeStore.model, 'yaml');
+            editor.setModelLanguage(this.monacoCodeStore.model, 'yaml');
             //this.language = this.node.language;
             this.language = 'yaml';
           }
@@ -127,9 +128,9 @@ class MonacoEditorStore {
         reaction(
           () => this.monacoCodeStoreEditor,
           (e) => {
-            const {CtrlCmd: t, Shift: n} = monaco.KeyMod;
+            const {CtrlCmd: t, Shift: n} = KeyMod;
 
-            const {KEY_Z: r, KEY_Y: i} = monaco.KeyCode;
+            const {KEY_Z: r, KEY_Y: i} = KeyCode;
 
             const o = () => {};
 
@@ -332,7 +333,7 @@ class MonacoEditorStore {
     const {uri: e, spec: t = ''} = this.node;
 
     try {
-      return monaco.Uri.from({
+      return Uri.from({
         scheme: 'file',
         path: e,
         query: 'oas3.1',
@@ -354,7 +355,7 @@ class MonacoEditorStore {
     const n = e.range ? e.range.start.character + 1 : 0;
 
     return {
-      range: new monaco.Range(t, n, t, n),
+      range: new Range(t, n, t, n),
 
       options: {
         glyphMarginClassName:
@@ -374,7 +375,7 @@ class MonacoEditorStore {
     const i = e ? e.end.character + 1 : 0;
 
     return {
-      range: new monaco.Range(t, n, r, i),
+      range: new Range(t, n, r, i),
 
       options: {
         isWholeLine: true,
@@ -419,7 +420,7 @@ class MonacoEditorStore {
       this.monacoCodeStore.model.setValue(value || '');
     }
 
-    this.monacoCodeStore.model.setEOL(monaco.editor.EndOfLineSequence.LF);
+    this.monacoCodeStore.model.setEOL(editor.EndOfLineSequence.LF);
   }
 
   undo() {

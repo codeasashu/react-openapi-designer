@@ -23,7 +23,7 @@ class Stores {
     this.lintStore = new LintStore(this);
 
     this.registerEventListeners();
-    this.activate();
+    //this.activate();
   }
 
   generateOasSchemaCollection(currentInstance) {
@@ -116,12 +116,12 @@ class Stores {
     //this.editorStore.registerEventListeners();
   }
 
-  activate() {
+  async activate() {
     this.graphStore.activate();
     this.uiStore.activate();
     this.oasStore.activate();
     this.designTreeStore.activate();
-    this.editorStore.doActivate();
+    await this.editorStore.doActivate();
     this.lintStore.activate();
   }
 }

@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "allowJs": false,
+    "noEmit": true,
+    "esModuleInterop": true
+  },
+  "compileOnSave": false,
+  "exclude": [ "./src" ],
+  "include": [ "file.ts" ]
+}
