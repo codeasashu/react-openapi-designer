@@ -1,57 +1,40 @@
 //@flow
 import React from 'react';
-import PropTypes from 'prop-types';
-import {Sidebar, Gutter, Header, Content, Context} from './components';
-import pjson from '../package.json';
+import {Context} from './components';
 import Stores from './Stores';
-import {observer} from 'mobx-react-lite';
+import Designer from './designer';
+import PropTypes from 'prop-types';
 
-const Designer = observer(() => {
-  const stores = React.useContext(Context.StoresContext);
-  const {activeView, views, fullscreen} = stores.uiStore;
-  const shouldShowSidebar =
-    fullscreen === false && activeView !== views.preview;
-  return (
-    <div className="dark bp3-dark">
-      <div className={'OasContainer h-screen w-full'}>
-        <div className={'Studio h-full flex flex-1 flex-col'}>
-          {stores.uiStore.fullscreen === false && (
-            <Header repoUrl={pjson.repository.url} version={pjson.version}>
-              Openapi Designer
-            </Header>
-          )}
-          <div className={'flex flex-1'}>
-            {shouldShowSidebar && (
-              <Sidebar
-                fullscreen={stores.uiStore.fullscreen}
-                style={{
-                  width: 'calc(18% - 2px)',
-                  maxWidth: '375px',
-                  minWidth: '290px',
-                }}
-                className={'flex flex-col border-r'}
-              />
-            )}
-            <Gutter layout="horizontal" />
-            <Content />
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-});
+class App extends React.Component {
+  constructor(props) {
+    super();
+    this.state = {
+      spec: props.spec,
+    };
+  }
 
-Designer.propTypes = {
-  dark: PropTypes.bool,
-  openapi: PropTypes.object,
-};
+  say(callback) {
+    console.log('Hello', this.state.spec);
+    callback(this.state.spec);
+  }
 
-const App = (props) => {
-  return (
-    <Context.StoresContext.Provider value={new Stores()}>
-      <Designer {...props} />
-    </Context.StoresContext.Provider>
-  );
+  setSpec(spec) {
+    console.log('setting spec', spec);
+    this.setState({spec});
+  }
+
+  render() {
+    const {spec, ...props} = this.props;
+    return (
+      <Context.StoresContext.Provider value={new Stores(spec)}>
+        <Designer {...props} onChange={(spec) => this.setSpec(spec)} />
+      </Context.StoresContext.Provider>
+    );
+  }
+}
+
+App.propTypes = {
+  spec: PropTypes.object,
 };
 
 export default App;

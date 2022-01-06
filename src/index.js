@@ -14,7 +14,15 @@ function autoInit() {
   if (!element) {
     return;
   }
-  render(<App />, element);
+
+  render(
+    <App
+      ref={(elem) => {
+        window.ReactOpenapiDesigner = elem;
+      }}
+    />,
+    element,
+  );
 }
 
 autoInit();

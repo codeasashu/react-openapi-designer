@@ -10,6 +10,7 @@ module.exports = merge(common, {
   entry: '../src/index',
   output: {
     publicPath: '/',
+    libraryTarget: 'umd',
   },
   mode: 'development',
   devtool: 'inline-source-map',

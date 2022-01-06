@@ -5,6 +5,13 @@
     <title>React openapi designer</title>
 </head>
 <body style="background:black">
+    <button id="parentBtn">Click</button>
     <react-openapi-designer />
+    <script type="text/javascript">
+const parentBtn = document.getElementById("parentBtn");
+parentBtn.addEventListener("click", event => {
+window.ReactOpenapiDesigner.say();
+});
+    </script>
 </body>
 </html>
