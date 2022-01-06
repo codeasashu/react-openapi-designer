@@ -15,13 +15,14 @@ class GraphStore {
   eventEmitter = {};
   graph;
 
-  constructor(e) {
+  constructor(e, spec = null) {
     makeObservable(this, {
       rootNode: observable.ref,
       graph: observable,
       setRootNode: action,
     });
     this.props = e;
+    this.initspec = spec;
 
     this._parserOptions = {
       lineWidth: -1,
@@ -183,9 +184,13 @@ class GraphStore {
           this.graph.setSourceNodeProp(
             node.id,
             'data.original',
-            JSON.stringify(defaultSpec),
+            JSON.stringify(this.initspec || defaultSpec),
           );
-          this.graph.setSourceNodeProp(node.id, 'data.parsed', defaultSpec);
+          this.graph.setSourceNodeProp(
+            node.id,
+            'data.parsed',
+            this.initspec || defaultSpec,
+          );
 
           recomputeGraphNodes(node, this.graph);
           this.props.uiStore.setActiveNode(node);

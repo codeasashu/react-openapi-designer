@@ -10,10 +10,10 @@ import EventEmitter from '../EventEmitter';
 import LintStore from './lintStore';
 
 class Stores {
-  constructor() {
+  constructor(initspec) {
     this.eventEmitter = new EventEmitter();
     this.browserStore = new BrowserStore(this);
-    this.graphStore = new GraphStore(this);
+    this.graphStore = new GraphStore(this, initspec);
     this.uiStore = new UiStore(this);
     this.oasStore = new OasStore(this);
     this.designTreeStore = new DesignTreeStore(this);
