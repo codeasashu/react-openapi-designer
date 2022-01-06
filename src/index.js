@@ -6,6 +6,16 @@ import App from './app';
 import './css/overrides.scss';
 import './css/app.css';
 
+function parseSpec(rawspec) {
+  let spec = null;
+  try {
+    spec = JSON.parse(rawspec);
+  } catch (err) {
+    console.error('[ParseError]: Error parsing spec');
+  }
+  return spec;
+}
+
 function autoInit() {
   if (document == null) {
     return null;
@@ -14,27 +24,8 @@ function autoInit() {
   if (!element) {
     return;
   }
-  const spec = {
-    openapi: '3.0.0',
-    info: {
-      title: 'Lolwa',
-      version: '1.0.2',
-    },
-    paths: {},
-    components: {
-      schemas: {},
-      responses: {},
-      parameters: {},
-      examples: {},
-      requestBodies: {},
-      headers: {},
-      securitySchemes: {},
-      links: {},
-      callbacks: {},
-    },
-    tags: [],
-    servers: [],
-  };
+
+  const spec = parseSpec(element.getAttribute('spec'));
   render(
     <App
       ref={(elem) => {
