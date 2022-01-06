@@ -7,27 +7,25 @@ import PropTypes from 'prop-types';
 
 class App extends React.Component {
   constructor(props) {
-    super();
-    this.state = {
-      spec: props.spec,
-    };
+    super(props);
+    this.listener = null;
   }
-
-  say(callback) {
-    console.log('Hello', this.state.spec);
-    callback(this.state.spec);
+  setListener(listener) {
+    this.listener = listener;
   }
 
   setSpec(spec) {
     console.log('setting spec', spec);
-    this.setState({spec});
+    if (this.listener) {
+      this.listener(spec);
+    }
   }
 
   render() {
     const {spec, ...props} = this.props;
     return (
       <Context.StoresContext.Provider value={new Stores(spec)}>
-        <Designer {...props} onChange={(spec) => this.setSpec(spec)} />
+        <Designer {...props} onChange={this.setSpec.bind(this)} />
       </Context.StoresContext.Provider>
     );
   }

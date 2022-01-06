@@ -7,6 +7,13 @@ const TerserPlugin = require('terser-webpack-plugin');
 module.exports = merge(common, {
   mode: 'production',
   devtool: 'source-map',
+  output: {
+    filename: 'app.standalone.js',
+    path: path.join(__dirname, '../dist'),
+    library: 'ReactOpenapiDesigner',
+    libraryTarget: 'umd',
+    globalObject: 'this',
+  },
   optimization: {
     minimize: true,
     minimizer: [new TerserPlugin()],

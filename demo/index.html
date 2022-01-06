@@ -8,10 +8,12 @@
     <button id="parentBtn">Click</button>
     <react-openapi-designer />
     <script type="text/javascript">
-const parentBtn = document.getElementById("parentBtn");
-parentBtn.addEventListener("click", event => {
-window.ReactOpenapiDesigner.say();
-});
+        const listener = function(spec) {
+            console.log('Got spec', spec);
+        }
+        document.addEventListener("DOMContentLoaded", function(event) {
+            window.ReactOpenapiDesigner.setListener(listener);
+        });
     </script>
 </body>
 </html>
