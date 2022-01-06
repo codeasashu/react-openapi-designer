@@ -14,12 +14,33 @@ function autoInit() {
   if (!element) {
     return;
   }
-
+  const spec = {
+    openapi: '3.0.0',
+    info: {
+      title: 'Lolwa',
+      version: '1.0.2',
+    },
+    paths: {},
+    components: {
+      schemas: {},
+      responses: {},
+      parameters: {},
+      examples: {},
+      requestBodies: {},
+      headers: {},
+      securitySchemes: {},
+      links: {},
+      callbacks: {},
+    },
+    tags: [],
+    servers: [],
+  };
   render(
     <App
       ref={(elem) => {
         window.ReactOpenapiDesigner = elem;
       }}
+      spec={spec}
     />,
     element,
   );
