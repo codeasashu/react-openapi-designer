@@ -203,5 +203,3 @@ PERFORMANCE OF THIS SOFTWARE.
  */
 
 //!(
-
-//!(function (draftSpec, operation) {
