@@ -1,5 +1,5 @@
 import React from 'react';
-import {isEqual, get, has} from 'lodash';
+import {isEqual, get, has, compact} from 'lodash';
 import {NodeCategories, nodeOperations, NodeTypes} from '../datasets/tree';
 import {StoresContext} from '../components/Context';
 import {replaceHash} from './schema';
@@ -96,7 +96,13 @@ export const getValue = (
 const getValueFromStore = (relativeJsonPath, valueInPath, dataProp) => {
   const stores = React.useContext(StoresContext);
   const {activeSourceNode} = stores.uiStore;
-  return getValue(activeSourceNode, relativeJsonPath, valueInPath, dataProp);
+  const values = getValue(
+    activeSourceNode,
+    relativeJsonPath,
+    valueInPath,
+    dataProp,
+  );
+  return Array.isArray(values) ? compact(values) : values;
 };
 
 const usePrevious = (value) => {

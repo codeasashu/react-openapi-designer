@@ -16,17 +16,18 @@ describe('Path content test', () => {
   const getPathNameNode = () => screen.getByLabelText(/path/);
   const getOperationNode = (method) => screen.getByRole(`operation-${method}`);
   const getParameters = (method, paramType) => {
-    return (
-      within(getOperationNode(method)).queryAllByLabelText(paramType) || []
-    );
+    let params = within(getOperationNode(method)).queryAllByRole(/listitem/);
+    return params.filter((p) => p.classList.contains(paramType));
   };
 
-  const getParamInput = (method, paramType) => {
-    const inpContainer = within(
-      within(getOperationNode(method)).getByLabelText(paramType),
-    );
+  const getParamInput = (method, paramType, index = 0) => {
+    const params = getParameters(method, paramType);
+    const param = params && params.length >= index ? params[index] : null;
+    if (!param) {
+      throw Error('Parameter input not found');
+    }
     return {
-      name: inpContainer.getByPlaceholderText(/Name/),
+      name: within(param).getByPlaceholderText(/Name/),
     };
   };
 
@@ -148,7 +149,7 @@ describe('Path content test', () => {
     stores.uiStore.setActiveNode(path);
     const {container} = render(<Content />, {providerProps: {value: stores}});
     act(() => {
-      fireEvent.click(screen.getByRole(/header/, {text: 'Header'}));
+      fireEvent.click(screen.getByRole(/button/, {name: 'header'}));
     });
 
     assertParameterLength('get', 'header', 1);

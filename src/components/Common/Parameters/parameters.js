@@ -21,7 +21,7 @@ const Parameters = observer(
       pathParameters.forEach((value, index) => {
         if (value.in === parameterIn) {
           values.push(value);
-          relativeJsonPaths.push(parametersPath.concat(index));
+          relativeJsonPaths.push(parametersPath.concat('' + index));
         }
       });
     }
