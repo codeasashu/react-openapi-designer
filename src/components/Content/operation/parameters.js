@@ -40,7 +40,7 @@ const OperationParameters = observer(({parametersPath}) => {
         />
         <Button
           text="Header"
-          role="header"
+          aria-label="header"
           icon="plus"
           onClick={() => {
             paramRef.current = 'header';

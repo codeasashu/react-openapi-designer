@@ -1,6 +1,6 @@
 // @flow
 import React from 'react';
-import {get, compact} from 'lodash';
+import {get, compact, unset, update} from 'lodash';
 import {pathMethods, methodColors} from './datasets/http';
 
 function escapeRegExpChars(text: string) {
@@ -19,6 +19,14 @@ export const basicSearch = (items, key) => {
       });
     });
   };
+};
+
+export const unsetCompact = (object, path) => {
+  const parentPath = path.slice(0, path.lastIndexOf('.'));
+  unset(object, path);
+  if (Array.isArray(get(object, parentPath))) {
+    update(object, parentPath, compact);
+  }
 };
 
 export const highlightText = (text: string, query: string) => {

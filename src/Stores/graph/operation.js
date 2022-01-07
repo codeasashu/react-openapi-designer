@@ -1,4 +1,4 @@
-import {get, set, isEqual, isObject, pull, remove, unset} from 'lodash';
+import {get, set, isEqual, isObject, pull, remove} from 'lodash';
 import produce from 'immer';
 import SourceMapNode from './sourceNode';
 import VirtualNode from './virtualNode';
@@ -6,7 +6,7 @@ import GraphNode from './graphNode';
 import {isHyphenOnly} from '../../utils/tree';
 
 import {nodeOperations, NodeCategories, eventTypes} from '../../datasets/tree';
-import {decodeUriFragment, renameObjectKey} from '../../utils';
+import {decodeUriFragment, renameObjectKey, unsetCompact} from '../../utils';
 import {observe} from 'mobx';
 
 function getNodeWithException(dom, nodeid) {
@@ -242,30 +242,11 @@ function patchNodeProp(spec, operation) {
             ),
       );
     }
-
-    //return hn(e || {}, (e) =>
-    //t.path.length > 1
-    //? (Object(xe.set)(
-    //e,
-    //n,
-    //Object(te.renameObjectKey)(
-    //Object(xe.get)(e, n),
-    //String(t.from[t.from.length - 1]),
-    //String(t.path[t.path.length - 1]),
-    //),
-    //),
-    //e)
-    //: Object(te.renameObjectKey)(
-    //e,
-    //String(t.from[t.from.length - 1]),
-    //String(t.path[t.path.length - 1]),
-    //),
-    //);
   }
 
   if (nodeOperations.Remove === operation.op) {
     return produce(spec || {}, (draftSpec) => {
-      unset(draftSpec, operation.path);
+      unsetCompact(draftSpec, operation.path);
     });
   }
 
@@ -274,7 +255,6 @@ function patchNodeProp(spec, operation) {
     nodeOperations.Replace === operation.op
   ) {
     return produce(spec || {}, (draftSpec) => {
-      //!(function (draftSpec, operation) {
       const {path, value, op} = operation;
       if (!isObject(draftSpec)) {
         return draftSpec;
