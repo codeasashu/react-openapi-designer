@@ -131,6 +131,22 @@ function StoreCreator(stores) {
     },
   };
 
+  const storeActions = {
+    patchSourceNodeProp: (op, path, value) => {
+      const sourceNode = stores.uiStore.activeSourceNode;
+      const operation = {
+        op,
+        path,
+        value,
+      };
+      stores.graphStore.graph.patchSourceNodeProp(
+        sourceNode.id,
+        'data.parsed',
+        [operation],
+      );
+    },
+  };
+
   const asserts = {
     oas: (relativeJsonPath, noexpect = false) => {
       const oasDoc = getParsedOasData(stores, relativeJsonPath);
@@ -139,7 +155,7 @@ function StoreCreator(stores) {
     },
   };
 
-  return {stores, creator, asserts};
+  return {stores, creator, asserts, storeActions};
 }
 
 function render(ui, {providerProps = null, ...renderOptions} = {}) {
