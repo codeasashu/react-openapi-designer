@@ -21,8 +21,10 @@ export const basicSearch = (items, key) => {
   };
 };
 
+export const getParentPath = (path) => path.slice(0, path.lastIndexOf('.'));
+
 export const unsetCompact = (object, path) => {
-  const parentPath = path.slice(0, path.lastIndexOf('.'));
+  const parentPath = getParentPath(path);
   unset(object, path);
   if (Array.isArray(get(object, parentPath))) {
     update(object, parentPath, compact);
