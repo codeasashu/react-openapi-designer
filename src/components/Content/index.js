@@ -13,6 +13,7 @@ import Response from './response';
 import RequestBody from './RequestBody';
 import MonacoEditor from '../Editor/Monaco';
 import LintWidget from '../Widgets/Lint';
+import SamplesWidget from '../Widgets/Samples';
 import {StoresContext} from '../Context';
 import {NodeCategories, NodeTypes} from '../../datasets/tree';
 
@@ -48,6 +49,7 @@ const SubContent = observer(({node, relativeJsonPath}) => {
       <RenderSubContent relativeJsonPath={relativeJsonPath} node={node} />
       <div className="relative flex-1 border-l">
         {activeWidget === widgets.lint && <LintWidget />}
+        {activeWidget === widgets.samples && <SamplesWidget />}
       </div>
     </div>
   ) : (
@@ -73,9 +75,6 @@ const Content = observer(() => {
         <Options
           relativeJsonPath={relativeJsonPath}
           node={node}
-          view={activeView}
-          onToggleView={(v) => stores.uiStore.setActiveView(v)}
-          onToggleWidget={(w) => stores.uiStore.setActiveWidget(w)}
           onDelete={() => {
             stores.graphStore.removeNode(activeNode.id);
           }}

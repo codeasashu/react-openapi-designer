@@ -4,12 +4,12 @@ import {observer} from 'mobx-react-lite';
 import classnames from 'classnames';
 import {Button, ButtonGroup, Icon, Intent} from '@blueprintjs/core';
 import {StoresContext} from '../Context';
-import {NodeCategories} from '../../datasets/tree';
+import {NodeCategories, NodeTypes} from '../../datasets/tree';
 import Tags from './tags';
 
-const Options = observer(({relativeJsonPath, node, ...props}) => {
+const Options = observer(({relativeJsonPath, node, onDelete}) => {
   const stores = React.useContext(StoresContext);
-  const {activeWidget, widgets} = stores.uiStore;
+  const {activeWidget, activeView, widgets, views} = stores.uiStore;
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const {errors, hints, info, warning} = stores.lintStore;
 
@@ -41,8 +41,8 @@ const Options = observer(({relativeJsonPath, node, ...props}) => {
             }}
             onClick={() => {
               if (confirmDelete) {
-                if (props.onDelete) {
-                  props.onDelete();
+                if (onDelete) {
+                  onDelete();
                 }
               } else {
                 setConfirmDelete(true);
@@ -55,32 +55,43 @@ const Options = observer(({relativeJsonPath, node, ...props}) => {
       <div>
         <ButtonGroup>
           <Button
-            active={props.view === 'form'}
+            active={activeView === views.form}
             small
             icon={<Icon size={14} icon="form" />}
             text="Form"
-            onClick={() => props.onToggleView('form')}
+            onClick={() => stores.uiStore.setActiveView(views.form)}
           />
           <Button
-            active={props.view === 'code'}
+            active={activeView === views.code}
             small
             icon={<Icon size={14} icon="code" />}
             text="Code"
-            onClick={() => props.onToggleView('code')}
+            onClick={() => stores.uiStore.setActiveView(views.code)}
           />
         </ButtonGroup>
       </div>
       <div className="ml-3">
+        <Button
+          active={activeView === views.preview}
+          small
+          icon={<Icon size={14} icon="document" />}
+          text="Preview"
+          onClick={() => stores.uiStore.setActiveView(views.preview)}
+        />
+      </div>
+      <div className="ml-3">
         <ButtonGroup>
+          {node && node.type === NodeTypes.Operation && (
+            <Button
+              active={activeWidget === widgets.samples}
+              small
+              icon={<Icon size={14} icon="code" />}
+              text="Samples"
+              onClick={() => stores.uiStore.toggleWidget(widgets.samples)}
+            />
+          )}
           <Button
-            active={props.view === 'docs'}
-            small
-            icon={<Icon size={14} icon="book" />}
-            text="Preview"
-            onClick={() => props.onToggleView('preview')}
-          />
-          <Button
-            active={stores.uiStore.activeWidget === stores.uiStore.widgets.lint}
+            active={activeWidget === widgets.lint}
             small
             text={
               <div className="flex justify-center">

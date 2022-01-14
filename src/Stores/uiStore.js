@@ -22,6 +22,7 @@ class UiStore {
 
   widgets = {
     lint: 'lint',
+    samples: 'samples',
   };
 
   constructor(stores) {
