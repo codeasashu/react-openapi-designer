@@ -5,6 +5,7 @@ import App from './app';
 
 import './css/overrides.scss';
 import './css/app.css';
+import './css/styles.min.css';
 
 function autoInit() {
   if (document == null) {
