@@ -1,5 +1,5 @@
 import React from 'react';
-import {Classes, ContextMenu, Menu, Popover} from '@blueprintjs/core';
+import {Classes} from '@blueprintjs/core';
 import {Classes as PopoverClasses} from '@blueprintjs/popover2';
 import {
   act,
@@ -11,22 +11,16 @@ import {
 } from '../../../../test-utils';
 import userEvent from '@testing-library/user-event';
 import Sidebar from '../Sidebar';
-import {wait} from '@testing-library/user-event/dist/utils';
 import {NodeTypes} from '../../../datasets/tree';
-import {isArray, cloneDeep} from 'lodash';
-import {toJS} from 'mobx';
-import {prettyDOM} from '@testing-library/dom';
+import {spec as defaultSpec} from '../../../datasets/openapi';
+import {LOCALSTORAGE_KEY} from '../../../Stores/storageStore';
 
 describe('Sidebar tests', () => {
-  const assertIcon = (elem, icon) => {
-    expect(elem).toBeDefined();
-    expect(elem).toHaveAttribute('icon', icon);
-  };
-
   beforeEach(() => {
     console.warn = jest.fn();
     const popover = getPopover();
     expect(popover).toBeNull();
+    window.localStorage.setItem(LOCALSTORAGE_KEY, defaultSpec);
   });
 
   it('Renders all sidebar items', () => {
