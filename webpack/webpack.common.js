@@ -67,7 +67,6 @@ module.exports = {
       'process.env': '{}',
       'process.platform': JSON.stringify('unix'),
       'process.browser': true,
-      global: {},
     }),
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],

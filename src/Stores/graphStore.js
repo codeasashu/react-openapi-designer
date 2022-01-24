@@ -2,7 +2,6 @@ import {observable, action, makeObservable, runInAction, reaction} from 'mobx';
 import {join} from 'lodash';
 import Graph from './graph';
 import {recomputeGraphNodes} from './graph/addNode';
-import {spec as defaultSpec} from '../datasets/openapi';
 import {
   NodeCategories,
   taskTypes,
@@ -87,6 +86,14 @@ class GraphStore {
       (spec) => {
         this.props.lintStore.lint(spec);
       },
+    );
+
+    reaction(
+      () => this.rootNode && this.rootNode.data.parsed,
+      (spec) => {
+        this.props.storageStore.save(spec);
+      },
+      {fireImmediately: false, delay: 1000},
     );
 
     this.removeNode = (nodeId) => {
@@ -180,12 +187,13 @@ class GraphStore {
     this.eventEmitter.on(eventTypes.GraphNodeAdd, ({task, node}) => {
       if (task === taskTypes.ReadSourceNode && node.parent == null) {
         runInAction(() => {
+          const spec = this.props.storageStore.spec;
           this.graph.setSourceNodeProp(
             node.id,
             'data.original',
-            JSON.stringify(defaultSpec),
+            JSON.stringify(spec),
           );
-          this.graph.setSourceNodeProp(node.id, 'data.parsed', defaultSpec);
+          this.graph.setSourceNodeProp(node.id, 'data.parsed', spec);
 
           recomputeGraphNodes(node, this.graph);
           this.props.uiStore.setActiveNode(node);

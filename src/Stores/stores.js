@@ -8,11 +8,13 @@ import OasSchemaStore from './oasSchemaStore';
 import BrowserStore from './browserStore';
 import EventEmitter from '../EventEmitter';
 import LintStore from './lintStore';
+import StorageStore from './storageStore';
 
 class Stores {
   constructor() {
     this.eventEmitter = new EventEmitter();
     this.browserStore = new BrowserStore(this);
+    this.storageStore = new StorageStore(this);
     this.graphStore = new GraphStore(this);
     this.uiStore = new UiStore(this);
     this.oasStore = new OasStore(this);
@@ -117,6 +119,7 @@ class Stores {
   }
 
   activate() {
+    this.storageStore.activate();
     this.graphStore.activate();
     this.uiStore.activate();
     this.oasStore.activate();

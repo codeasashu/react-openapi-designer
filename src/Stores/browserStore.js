@@ -3,6 +3,10 @@ class BrowserStore {
     this.stores = stores;
   }
 
+  reloadWindow() {
+    return window.location.reload();
+  }
+
   openUrlInBrowser(url) {
     const width = 500;
     const height = 600;
