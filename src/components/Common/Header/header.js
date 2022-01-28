@@ -6,6 +6,7 @@ import {
   Alert,
   Icon,
   Button,
+  FileInput,
   Menu,
   MenuItem,
 } from '@blueprintjs/core';
@@ -14,11 +15,25 @@ import {observer} from 'mobx-react';
 import {StoresContext} from '../../Context';
 
 const Header = observer(({repoUrl, version, ...props}) => {
+  const uploadFileRef = React.useRef();
   const stores = React.useContext(StoresContext);
   const [alertOpen, setAlertOpen] = React.useState(false);
   const clearLocalDoc = () => {
     stores.storageStore.clear();
     setAlertOpen(false);
+  };
+
+  const importPostmanCollection = () => {
+    if (uploadFileRef) {
+      uploadFileRef.current.click();
+    }
+  };
+
+  const handleImport = () => {
+    const fileList = uploadFileRef.current.files;
+    if (fileList.length) {
+      stores.importStore.convert(fileList[0]);
+    }
   };
 
   return (
@@ -35,12 +50,28 @@ const Header = observer(({repoUrl, version, ...props}) => {
                   text="Reset data"
                   onClick={() => setAlertOpen(true)}
                 />
+                <MenuItem text="Import From">
+                  <MenuItem
+                    text="Postman Collection"
+                    onClick={importPostmanCollection}
+                  />
+                </MenuItem>
                 <MenuItem text={`Version: ${version}`} />
               </Menu>
             }>
             <Button icon="menu" minimal small outlined />
           </Popover2>
         </div>
+        <FileInput
+          text="Choose file..."
+          inputProps={{
+            ref: uploadFileRef,
+            onChange: handleImport,
+          }}
+          style={{
+            display: 'None',
+          }}
+        />
         <div className="flex items-center">
           <div className="text-base overflow-hidden mx-2">
             <a href={repoUrl} target="_blank" rel="noreferrer">

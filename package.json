@@ -45,6 +45,7 @@
     "mobx-react": "^7.2.0",
     "monaco-editor": "^0.27.0",
     "openapi3-ts": "^2.0.1",
+    "postman-to-openapi": "github:codeasashu/postman-to-openapi#browser",
     "prop-types": "^15.7.2",
     "react": "^17.0.2",
     "react-dnd": "^14.0.3",

@@ -25,7 +25,8 @@ const OperationParameters = observer(({parametersPath}) => {
   const uiStore = stores.uiStore;
   const handlePatch = usePatchOperation();
   const paramRef = React.useRef(null);
-  const securitySchemes = getValueFromStore(['components', 'securitySchemes']);
+  const securitySchemes =
+    getValueFromStore(['components', 'securitySchemes']) || {};
   const securityPath = getParentPath(parametersPath).concat('security');
   const operationSecurities = getValueFromStore(securityPath);
   const {activeSourceNode} = uiStore;

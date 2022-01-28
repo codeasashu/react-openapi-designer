@@ -13,7 +13,7 @@ function getNodeWithException(dom, nodeid) {
   const node = dom.nodes[nodeid];
 
   if (!node) {
-    throw new Error(`Node with id ${node} does not exist.`);
+    throw new Error(`Node with id ${nodeid} does not exist.`);
   }
 
   return node;
