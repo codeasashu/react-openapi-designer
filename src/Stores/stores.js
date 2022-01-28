@@ -8,6 +8,7 @@ import OasSchemaStore from './oasSchemaStore';
 import BrowserStore from './browserStore';
 import EventEmitter from '../EventEmitter';
 import LintStore from './lintStore';
+import ImportStore from './importStore';
 import StorageStore from './storageStore';
 
 class Stores {
@@ -23,6 +24,7 @@ class Stores {
     this.oasSchemaCollection = this.generateOasSchemaCollection(this);
     this.editorStore = new EditorStore(this);
     this.lintStore = new LintStore(this);
+    this.importStore = new ImportStore(this);
 
     this.registerEventListeners();
     this.activate();
@@ -126,6 +128,7 @@ class Stores {
     this.designTreeStore.activate();
     this.editorStore.doActivate();
     this.lintStore.activate();
+    this.importStore.activate();
   }
 }
 

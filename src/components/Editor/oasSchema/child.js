@@ -151,19 +151,20 @@ class SchemaObject extends PureComponent {
     const {prefix, schema, stores, wrapperProps} = this.props;
     return (
       <>
-        {Object.keys(schema.properties).map((name, index) => {
-          return (
-            <SchemaItem
-              stores={stores}
-              key={index}
-              rowIndex={index}
-              name={name}
-              schema={schema}
-              prefix={prefix}
-              wrapperProps={wrapperProps}
-            />
-          );
-        })}
+        {schema.properties &&
+          Object.keys(schema.properties).map((name, index) => {
+            return (
+              <SchemaItem
+                stores={stores}
+                key={index}
+                rowIndex={index}
+                name={name}
+                schema={schema}
+                prefix={prefix}
+                wrapperProps={wrapperProps}
+              />
+            );
+          })}
       </>
     );
   }
