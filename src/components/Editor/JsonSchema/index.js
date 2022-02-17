@@ -1,32 +1,37 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {StoresContext} from '../../Context';
-import RootSchema from './root';
+import SchemaEditor from './editor';
 
 const Schema = ({relativeJsonPath}) => {
   const stores = React.useContext(StoresContext);
   const {activeSourceNodeId} = stores.uiStore;
-  //const schemaCollection = stores.oasSchemaCollection;
-  const jsonSchemaCollection = stores.jsonSchemaCollection;
   const storeId = relativeJsonPath
     ? [activeSourceNodeId, ...relativeJsonPath].join('/')
     : activeSourceNodeId;
-  //const store = schemaCollection.lookup(storeId, {
-  //id: storeId,
-  //relativeJsonPath,
-  //sourceNodeId: activeSourceNodeId,
-  //});
-
-  const schemaStore = jsonSchemaCollection.lookup(storeId, {
+  const store = stores.oasSchemaCollection.lookup(storeId, {
     id: storeId,
     relativeJsonPath,
     sourceNodeId: activeSourceNodeId,
   });
 
-  console.log('llp', storeId, schemaStore);
-
-  //return <RootSchema store={store} schemaStore={schemaStore} stores={stores} />;
-  return null;
+  return (
+    <SchemaEditor
+      store={store}
+      customRowActionRenderer={(e) => {
+        const {refPath} = e;
+        console.log(refPath);
+        return null;
+      }}
+      refSelector={({id, refPath, onChange}) => (
+        <mg id={id} refPath={refPath} onChange={onChange} />
+      )}
+      getRefLabel={(e) => e}
+      shouldRenderGoToRef={(e) => {
+        console.log('shud ren', e);
+      }}
+    />
+  );
 };
 
 Schema.propTypes = {

@@ -61,7 +61,6 @@ class ApiTreeStore {
     //this.registerTreeEvents();
 
     this.createNewNode = (node, parent, n) => {
-      // e,t,n
       try {
         let newNode = Object.assign(
           {
@@ -112,7 +111,6 @@ class ApiTreeStore {
         return this.activeGraphNode && this.activeGraphNode.id;
       },
       (nodeId) => {
-        console.log('I am here');
         this.setActiveTreeNode(nodeId);
       },
       {

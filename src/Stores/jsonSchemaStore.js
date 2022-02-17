@@ -1,6 +1,7 @@
 import {action} from 'mobx';
 import {debounce, get} from 'lodash';
 import {eventTypes, nodeOperations} from '../datasets/tree';
+import Schema from './oas/schema';
 
 class JsonSchemaStore {
   constructor(node, options) {
@@ -24,9 +25,10 @@ class JsonSchemaStore {
     this.sourceNodeId = sourceNodeId;
     this.relativeJsonPath = relativeJsonPath;
     const oasVersion = 'oas3_1';
-    this.store = new As(this.getSchema(), oasVersion);
+    console.log('schema', sourceNodeId, relativeJsonPath, this.getSchema());
+    //this.store = new Schema(this.getSchema(), oasVersion);
     //this._disposables.push(this.store);
-    this._registerListeners();
+    //this._registerListeners();
   }
 
   get sourceNode() {
@@ -39,6 +41,8 @@ class JsonSchemaStore {
     if (!node) {
       return;
     }
+
+    console.log('nodeData', node.data.parsed);
 
     const nodeData = node.data.parsed; //t
 
