@@ -11,7 +11,7 @@ const SchemaDropdown = ({schema, handleOnClick, children, ...props}) => {
     <Popover2
       {...props}
       className="schema-selector p-1 pt-0"
-      popoverClassName="bp3-dark"
+      popoverClassName="bp4-dark"
       inheritDarkTheme
       content={<SchemaSelectors schema={schema} onClick={handleOnClick} />}
       placement="right">

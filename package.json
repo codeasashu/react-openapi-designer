@@ -9,8 +9,8 @@
   },
   "scripts": {
     "typecheck": "flow check",
-    "lint": "eslint --ignore-path .gitignore .",
-    "prettier": "prettier --ignore-path .gitignore \"**/*.+(js|json)\"",
+    "lint": "eslint --ignore-path .gitignore  --ignore-path .prettierignore .",
+    "prettier": "prettier --ignore-path .gitignore --ignore-path .prettierignore \"**/*.+(js|json)\"",
     "format": "npm run prettier -- --write",
     "format:check": "npm run prettier -- --list-different",
     "test": "jest",
@@ -19,14 +19,15 @@
     "build": "NODE_ENV=production webpack --config webpack/webpack.prod.js --progress",
     "watch": "webpack --config webpack/webpack.common.js --watch  --progress",
     "dev": "webpack serve -c webpack/webpack.dev.js --hot",
-    "validate": "npm-run-all --parallel format:check lint && npm run build",
+    "validate": "npm-run-all --parallel format:check lint",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist"
   },
   "dependencies": {
-    "@blueprintjs/core": "^3.50.1",
-    "@blueprintjs/popover2": "^0.12.1",
-    "@blueprintjs/select": "^3.18.3",
+    "@apidevtools/swagger-parser": "^10.0.3",
+    "@blueprintjs/core": "^4.9.3",
+    "@blueprintjs/popover2": "^1.6.3",
+    "@blueprintjs/select": "^4.6.3",
     "@cloudflare/json-schema-walker": "^0.1.1",
     "@reduxjs/toolkit": "^1.6.1",
     "@stoplight/elements-core": "^7.5.6",
@@ -57,7 +58,7 @@
     "react-redux": "^7.0.1",
     "react-router": "^5.2.1",
     "react-router-dom": "^5.3.0",
-    "react-simple-code-editor": "^0.11.0",
+    "react-simple-code-editor": "^0.13.0",
     "react-tabs": "^3.2.2",
     "react-window": "^1.8.6",
     "redoc": "^2.0.0-rc.58",
@@ -67,9 +68,6 @@
     "swagger-schema-official": "^2.0.0-bab6bed",
     "type-of-is": "^3.5.1"
   },
-  "eslintIgnore": [
-    "*.test.js"
-  ],
   "jest": {
     "setupFilesAfterEnv": [
       "./__jest__/setup-after-env.js"
@@ -116,7 +114,7 @@
     "@testing-library/dom": "^8.11.0",
     "@testing-library/jest-dom": "^5.11.10",
     "@testing-library/react": "^12.1.0",
-    "@testing-library/user-event": "^13.5.0",
+    "@testing-library/user-event": "^14",
     "autoprefixer": "^10.2.5",
     "babel-loader": "^8.0.6",
     "babel-plugin-lodash": "^3.3.4",
@@ -126,7 +124,9 @@
     "eslint": "^7.23.0",
     "eslint-config-prettier": "^8.1.0",
     "eslint-plugin-jest": "^24.3.4",
+    "eslint-plugin-jest-dom": "^4.0.2",
     "eslint-plugin-react": "^7.23.1",
+    "eslint-plugin-testing-library": "^5.7.0",
     "file-loader": "^6.2.0",
     "flow-bin": "^0.152.0",
     "flow-typed": "^3.3.1",

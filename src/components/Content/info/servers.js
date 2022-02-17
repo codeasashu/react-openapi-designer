@@ -9,7 +9,14 @@ const Heading = ({onAdd}) => {
       <div className="font-semibold text-gray-6 dark:text-lighten-8">
         Servers
       </div>
-      <Button icon="plus" className="ml-1" small minimal onClick={onAdd} />
+      <Button
+        icon="plus"
+        className="ml-1"
+        aria-label="add server"
+        small
+        minimal
+        onClick={onAdd}
+      />
     </div>
   );
 };
@@ -56,21 +63,24 @@ const Servers = ({servers, onChange}) => {
         onAdd={() => onChange([...servers, {url: '', description: ''}])}
       />
       {servers.map((server, i) => (
-        <ControlGroup key={i}>
+        <ControlGroup key={i} data-testid={`server-row-${i}`}>
           <InputGroup
             className="StudioInput flex-1"
             placeholder="http://example.tld"
+            aria-label="server url"
             value={server?.url || ''}
             onChange={(e) => handleChange(i, {url: e.target.value})}
           />
           <InputGroup
             className="StudioInput"
             placeholder="Name (optional)"
+            aria-label="server name"
             value={server?.description || ''}
             onChange={(e) => handleChange(i, {description: e.target.value})}
           />
           <Button
             icon={<Icon size={12} icon="trash" />}
+            aria-label="remove"
             onClick={() => deleteServer(i)}
           />
         </ControlGroup>

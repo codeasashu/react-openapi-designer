@@ -19,6 +19,7 @@ import {schema as defaultSchema} from '../datasets/openapi';
 import {fillSchema} from '../utils/schema';
 import {schemaWalk} from '@cloudflare/json-schema-walker';
 import jsf from 'json-schema-faker';
+import Transformer from './oas/transformer';
 
 jsf.define('fixedValue', (value, schema) => {
   switch (schema?.type) {
@@ -97,6 +98,12 @@ class OasSchemaStore {
       const value = GenerateSchema(generatedJSON);
       this.schema = fillSchema(value);
     }
+  }
+
+  transformSchema(schema) {
+    const transformer = Transformer('oas3_1');
+    const transformed = transformer.toStoplightSchema(schema);
+    console.log('transformed', transformed);
   }
 
   setOpenDropdownPath(key, value) {

@@ -224,3 +224,93 @@ export function assertParentNode(e) {
     throw new TypeError('Parent node expected');
   }
 }
+
+export const basename = function (e, t) {
+  var n = (function (e) {
+    if (typeof e != 'string') {
+      e += '';
+    }
+
+    var t;
+    var n = 0;
+    var r = -1;
+    var o = true;
+
+    for (t = e.length - 1; t >= 0; --t) {
+      if (e.charCodeAt(t) === 47) {
+        if (!o) {
+          n = t + 1;
+          break;
+        }
+      } else {
+        if (r === -1) {
+          o = false;
+          r = t + 1;
+        }
+      }
+    }
+
+    if (r === -1) {
+      return '';
+    } else {
+      return e.slice(n, r);
+    }
+  })(e);
+
+  if (t && t === n.substr(t.length * -1)) {
+    n = n.substr(0, n.length - t.length);
+  }
+
+  return n;
+};
+
+export const extname = function (e) {
+  if (typeof e != 'string') {
+    e += '';
+  }
+
+  var t = -1;
+  var n = 0;
+  var r = -1;
+  var o = true;
+  var i = 0;
+
+  for (var a = e.length - 1; a >= 0; --a) {
+    var s = e.charCodeAt(a);
+
+    if (s !== 47) {
+      if (r === -1) {
+        o = false;
+        r = a + 1;
+      }
+
+      if (s === 46) {
+        if (t === -1) {
+          t = a;
+        } else {
+          if (i !== 1) {
+            i = 1;
+          }
+        }
+      } else {
+        if (t !== -1) {
+          i = -1;
+        }
+      }
+    } else if (!o) {
+      n = a + 1;
+      break;
+    }
+  }
+
+  if (
+    t === -1 ||
+    r === -1 ||
+    i === 0 ||
+    (i === 1 && r - 1 === t && n + 1 === t)
+  ) {
+    return '';
+  } else {
+    return e.slice(t, r);
+  }
+};

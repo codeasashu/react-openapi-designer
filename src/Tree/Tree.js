@@ -14,7 +14,7 @@ const countSymbol = Symbol('COUNT');
 
 class Tree {
   _versionCounter;
-  @observable _root = null;
+  _root = null;
   _count = 0;
   unwrapped = null;
 
@@ -31,7 +31,7 @@ class Tree {
       unwrapped: observable,
       unwrap: action,
       wrap: action,
-      _root: observable,
+      // _root: observable,
       invalidateLevel: action,
       processTreeFragment: action,
     });
@@ -133,7 +133,6 @@ class Tree {
     for (const _node of childNodes) {
       const parentNode = nodes[_node.level];
       const node = Tree.transformDeprecatedNode(_node, null);
-
       if (isParentNode(node)) {
         if (nodes.length <= _node.level) {
           nodes.push(node);

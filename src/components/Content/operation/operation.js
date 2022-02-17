@@ -20,7 +20,9 @@ const Operation = observer(({relativeJsonPath}) => {
     <div className="w-full p-10 pb-16 max-w-6xl">
       <Description relativeJsonPath={relativeJsonPath} />
       <div className="my-8 -mx-1 border-t dark:border-darken-4"></div>
-      <Parameters parametersPath={[...relativeJsonPath, 'parameters']} />
+      <div aria-label="request-parameters">
+        <Parameters parametersPath={[...relativeJsonPath, 'parameters']} />
+      </div>
       <div className="my-8 -mx-1 border-t dark:border-darken-4"></div>
       <div>
         <RequestBody

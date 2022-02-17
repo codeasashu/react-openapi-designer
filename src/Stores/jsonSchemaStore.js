@@ -1,6 +1,7 @@
 import {action} from 'mobx';
 import {debounce, get} from 'lodash';
-import {eventTypes, nodeOperations} from '../datasets/tree';
+import {eventTypes, NodeCategories, nodeOperations} from '../datasets/tree';
+import Schema from './oas/schema';
 
 class JsonSchemaStore {
   constructor(node, options) {
@@ -16,7 +17,50 @@ class JsonSchemaStore {
       this.setSchema.cancel();
     };
 
-    //this.goToRef = (e) => {};
+    this.goToRef = (e) => {
+      if (!this.sourceNode) {
+        return;
+      }
+
+      // if (A.isURL(e)) {
+      //   this.stores.browserStore.openUrlInBrowser(e);
+      //   return;
+      // }
+
+      let sourceNodeUri;
+      let nodeUri;
+
+      if (e.startsWith('#')) {
+        sourceNodeUri = this.sourceNode.uri;
+        nodeUri = e.slice(1);
+      }
+
+      const sourceNode = this.stores.graphStore.getNodeByUri(sourceNodeUri);
+
+      if (
+        sourceNode === undefined ||
+        NodeCategories.Source !== sourceNode.category
+      ) {
+        console.warn(
+          'Could not redirect to ref. Is the file missing? Diagnostics panel might contain more information.',
+        );
+      } else if (nodeUri === undefined) {
+        this.stores.uiStore.setActiveNode(sourceNode);
+      } else {
+        const node = this.stores.graphStore.getNodeByUri(
+          `${sourceNodeUri}${nodeUri}`,
+        );
+
+        if (node !== undefined && NodeCategories.SourceMap === node.category) {
+          this.stores.uiStore.setActiveNode(node);
+        } else {
+          this.stores.uiStore.setActiveNode(sourceNode);
+          console.warn(
+            'We redirected you to the file, but the ref could not be found.',
+          );
+        }
+      }
+    };
 
     const {relativeJsonPath, sourceNodeId} = node; // n, i
 
@@ -24,7 +68,7 @@ class JsonSchemaStore {
     this.sourceNodeId = sourceNodeId;
     this.relativeJsonPath = relativeJsonPath;
     const oasVersion = 'oas3_1';
-    this.store = new As(this.getSchema(), oasVersion);
+    this.store = new Schema(this.getSchema(), oasVersion, this.stores);
     //this._disposables.push(this.store);
     this._registerListeners();
   }
@@ -52,28 +96,22 @@ class JsonSchemaStore {
   _registerListeners() {
     const e = this;
 
-    this.stores.graphStore.notifier.on(eventTypes.DidRemoveNode, ({id}) => {
-      if (this.sourceNodeId === id) {
-        this.store.schema = undefined;
-      }
-    });
+    //this.stores.graphStore.eventEmitter.on(eventTypes.DidRemoveNode, ({id}) => {
+    //if (this.sourceNodeId === id) {
+    //this.store.schema = undefined;
+    //}
+    //});
 
-    this.stores.graphStore.notifier.on(
+    this.stores.graphStore.eventEmitter.on(
       eventTypes.DidChangeSourceNode,
-      action(
-        ({
-          node: {id: e},
-
-          change: {prop: t},
-        }) => {
-          if (this.sourceNodeId === e && t === 'data.parsed') {
-            this.setSchema();
-          }
-        },
-      ),
+      action(({node: {id: e}, change: {prop: t}}) => {
+        if (this.sourceNodeId === e && t === 'data.parsed') {
+          this.setSchema();
+        }
+      }),
     );
 
-    this.store.on(eventTypes.Change, (t) => {
+    this.store.eventEmitter.on(eventTypes.StoreEvents.Change, (t) => {
       e.stores.graphStore.graph.patchSourceNodeProp(
         e.sourceNodeId,
         'data.parsed',
@@ -87,7 +125,9 @@ class JsonSchemaStore {
       );
     });
 
-    //this._disposables.push(this.store.on(Za.GoToRef, this.goToRef))
+    this.store.eventEmitter.on(eventTypes.StoreEvents.GoToRef, (t) => {
+      this.goToRef(t);
+    });
   }
 }
 

@@ -173,7 +173,7 @@ class Row extends React.PureComponent {
               </div>
             )}
             <div
-              className="flex flex-1 bp3-control-group row-container"
+              className="flex flex-1 bp4-control-group row-container"
               style={styles}>
               {schema.type === 'object' && (
                 <div className="relative flex items-center justify-center cursor-pointer rounded hover:bg-darken-3 z-10 ml-3">

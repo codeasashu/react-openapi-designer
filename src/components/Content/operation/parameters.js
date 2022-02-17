@@ -34,11 +34,12 @@ const OperationParameters = observer(({parametersPath}) => {
     return null;
   }
 
+  // eslint-disable-next-line no-unused-vars
   const gotoOverview = (e) => {
     const overviewNode = stores.graphStore.getNodeByUri(
       '/p/reference.yaml/info',
     );
-    stores.designTreeStore.handleNodeClick(e, overviewNode);
+    stores.designTreeStore.handleNodeClick(overviewNode);
   };
 
   const addOperationSecurity = () => {
@@ -67,7 +68,7 @@ const OperationParameters = observer(({parametersPath}) => {
               <MenuItem
                 text="Edit global security"
                 icon={<Icon icon="globe" />}
-                onClick={(e) => gotoOverview(e)}
+                onClick={gotoOverview}
               />
               {Object.keys(securitySchemes).length > 0 && (
                 <MenuItem
@@ -92,11 +93,10 @@ const OperationParameters = observer(({parametersPath}) => {
             </Menu>
           }
           position={Position.RIGHT_TOP}>
-          <Button text="Security" aria-label="security" icon="plus" />
+          <Button text="Security" icon="plus" />
         </Popover2>
         <Button
           text="Header"
-          aria-label="header"
           icon="plus"
           onClick={() => {
             paramRef.current = 'header';
@@ -110,7 +110,6 @@ const OperationParameters = observer(({parametersPath}) => {
         <Button
           text="Query Param"
           icon="plus"
-          role="query-param"
           onClick={() => {
             paramRef.current = 'query';
             handlePatch(
@@ -123,7 +122,6 @@ const OperationParameters = observer(({parametersPath}) => {
         <Button
           text="Cookie"
           icon="plus"
-          role="cookie-param"
           onClick={() => {
             paramRef.current = 'cookie';
             handlePatch(

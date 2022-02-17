@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {escapeRegExp} from 'lodash';
 import {MenuItem} from '@blueprintjs/core';
-import {Suggest} from '@blueprintjs/select';
+import {Suggest2} from '@blueprintjs/select';
 
 function ah(e, t) {
   let n = 0;
@@ -99,7 +99,7 @@ const ContentTypeSuggest = ({
   );
 
   return (
-    <Suggest
+    <Suggest2
       className={className}
       activeItem={item}
       onActiveItemChange={setItem}
@@ -115,6 +115,7 @@ const ContentTypeSuggest = ({
       }}
       inputProps={{
         placeholder: 'Create or choose existing',
+        'data-testid': 'suggest-mediatype-input',
         inputRef: (e) => (inputRef ? (inputRef.current = e) : undefined),
       }}
       popoverProps={{
@@ -123,9 +124,9 @@ const ContentTypeSuggest = ({
         shouldReturnFocusOnClose: false,
       }}
       itemPredicate={filterContentType}
-      resetOnClose={false}
-      resetOnQuery={false}
-      resetOnSelect={false}
+      resetOnClose={true}
+      resetOnQuery={true}
+      resetOnSelect={true}
     />
   );
 };

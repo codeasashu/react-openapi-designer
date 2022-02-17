@@ -6,10 +6,7 @@ import {InputGroup, TextArea} from '@blueprintjs/core';
 
 const DEBOUNCE_MILLIS = 100;
 
-function keyedDebounce(
-  callback: Function,
-  millis: number = DEBOUNCE_MILLIS,
-): Function {
+function keyedDebounce(callback, millis = DEBOUNCE_MILLIS) {
   let timeout;
   let results = {};
 
@@ -28,10 +25,7 @@ function keyedDebounce(
   };
 }
 
-function debounce(
-  callback: Function,
-  millis: number = DEBOUNCE_MILLIS,
-): Function {
+function debounce(callback, millis = DEBOUNCE_MILLIS) {
   // For regular debounce, just use a keyed debounce with a fixed key
   return keyedDebounce((results) => {
     callback.apply(null, results.__key__);
@@ -156,6 +150,7 @@ class DebouncedEditor extends PureComponent {
   }
 
   render() {
+    // eslint-disable-next-line no-unused-vars
     const {textarea, value, ...props} = this.props;
     if (textarea) {
       return (

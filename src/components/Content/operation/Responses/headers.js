@@ -29,6 +29,7 @@ const Headers = observer(({headersPath}) => {
         </div>
         <Button
           icon={<Icon icon="plus" iconSize={14} />}
+          data-testid="add-header-btn"
           minimal
           small
           className="ml-1"
@@ -52,6 +53,7 @@ const Headers = observer(({headersPath}) => {
           key={parameter.join('/')}
           parameterPath={parameter}
           parameterIn="header"
+          dataTestid={`header-parameter-${index}`}
           disableRequired={true}
           autoFocus={index === ref.current}
           typePath={parameter.concat(['schema', 'type'])}

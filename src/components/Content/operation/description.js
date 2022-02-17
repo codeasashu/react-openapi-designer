@@ -18,9 +18,11 @@ const Description = observer(({relativeJsonPath}) => {
   return (
     <div className="flex flex-col">
       <div className="flex flex-row justify-between">
-        <div role="operation-id">
+        <div>
           <div className="text-xs uppercase p-2">Operation ID</div>
-          <div className="px-2 py-1 font-medium bg-transparent hover:bg-darken-2 focus:bg-darken-2 rounded-lg text-sm mb-8">
+          <div
+            className="px-2 py-1 font-medium bg-transparent hover:bg-darken-2 focus:bg-darken-2 rounded-lg text-sm mb-8"
+            data-testid="operation-id">
             {getValueFromStore([...relativeJsonPath, 'operationId'])}
           </div>
         </div>

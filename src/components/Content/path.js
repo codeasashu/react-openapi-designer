@@ -143,7 +143,7 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
           </div>
         </div>
         {stores.oasStore.path.pathParamsVisible && (
-          <div className="px-10 pb-2 max-w-6xl">
+          <div className="px-10 pb-2 max-w-6xl" data-testid="path-params">
             <div className="flex items-center mt-5 mb-2">
               <div className="font-semibold text-gray-600 ml-1">
                 Path parameters
@@ -192,13 +192,13 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
         selectedTabPanelClassName="block"
         selectedIndex={selectedTab}
         onSelect={handleTabSelect}>
-        <TabList className="mt-6 px-10 flex bp3-simple-tab-list">
+        <TabList className="mt-6 px-10 flex bp4-simple-tab-list">
           {methods.map((e) => {
             const methodColor = getMethodColor(e.method);
             return (
               <Tab
                 key={e.method}
-                className={classnames('bp3-simple-tab uppercase ')}>
+                className={classnames('bp4-simple-tab uppercase ')}>
                 <span
                   className={classnames('uppercase ', {
                     [`text-${methodColor} dark:text-${methodColor}`]: e.present,
@@ -209,13 +209,19 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
             );
           })}
         </TabList>
-        {methods.map((e) => {
+        {methods.map((e, index) => {
           const mJsonPath = [...activePathNode.relativeJsonPath, e.method];
           const operation = getValueFromStore(mJsonPath);
           return (
             <TabPanel
               key={e.method}
-              className="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative">
+              data-testid={`operation-tabpanel-${e.method.toLowerCase()}`}
+              className={classnames(
+                'FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative',
+                {
+                  active: index === selectedTab,
+                },
+              )}>
               <div
                 className="relative"
                 role={`operation-${e.method.toLowerCase()}`}>

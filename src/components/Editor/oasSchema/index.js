@@ -7,6 +7,7 @@ const Schema = ({relativeJsonPath}) => {
   const stores = React.useContext(StoresContext);
   const {activeSourceNodeId} = stores.uiStore;
   const schemaCollection = stores.oasSchemaCollection;
+  const jsonSchemaCollection = stores.jsonSchemaCollection;
   const storeId = relativeJsonPath
     ? [activeSourceNodeId, ...relativeJsonPath].join('/')
     : activeSourceNodeId;
@@ -16,7 +17,14 @@ const Schema = ({relativeJsonPath}) => {
     sourceNodeId: activeSourceNodeId,
   });
 
-  return <RootSchema store={store} stores={stores} />;
+  const schemaStore = jsonSchemaCollection.lookup(storeId, {
+    id: storeId,
+    relativeJsonPath,
+    sourceNodeId: activeSourceNodeId,
+  });
+
+  return <RootSchema store={store} schemaStore={schemaStore} stores={stores} />;
+  //return null;
 };
 
 Schema.propTypes = {

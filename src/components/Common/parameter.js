@@ -63,7 +63,7 @@ class Parameter extends PureComponent {
           className="flex-auto border border-r-0"
           placeholder={titlePlaceholder}
         />
-        <div className="bp3-select flex-shrink border border-l-0 border-r-0">
+        <div className="bp4-select flex-shrink border border-l-0 border-r-0">
           <select
             onChange={(e) =>
               this.setState({

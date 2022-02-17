@@ -21,7 +21,7 @@ const StyledContent = styled.div`
   width: calc(80% - 2px);
 `;
 
-const getComponentForNode = (node) => {
+const getPanelKind = (node) => {
   switch (node.type) {
     case NodeTypes.Path:
     case NodeTypes.Operation:
@@ -40,24 +40,24 @@ const getComponentForNode = (node) => {
   }
 };
 
-const SubContent = observer(({node, relativeJsonPath}) => {
+const Panel = observer(({node, relativeJsonPath}) => {
   const stores = React.useContext(StoresContext);
   const {activeWidget, widgets} = stores.uiStore;
-  const RenderSubContent = getComponentForNode(node);
+  const PanelKind = getPanelKind(node);
   return activeWidget ? (
     <div className="flex-1 relative flex">
-      <RenderSubContent relativeJsonPath={relativeJsonPath} node={node} />
+      <PanelKind relativeJsonPath={relativeJsonPath} node={node} />
       <div className="relative flex-1 border-l">
         {activeWidget === widgets.lint && <LintWidget />}
         {activeWidget === widgets.samples && <SamplesWidget />}
       </div>
     </div>
   ) : (
-    <RenderSubContent relativeJsonPath={relativeJsonPath} node={node} />
+    <PanelKind relativeJsonPath={relativeJsonPath} node={node} />
   );
 });
 
-SubContent.propTypes = {
+Panel.propTypes = {
   node: PropTypes.object,
 };
 
@@ -71,7 +71,7 @@ const Content = observer(() => {
 
   return (
     <StyledContent className={'flex flex-col flex-1'}>
-      <div className="bp3-dark relative flex flex-1 flex-col bg-canvas">
+      <div className="bp4-dark relative flex flex-1 flex-col bg-canvas">
         <Options
           relativeJsonPath={relativeJsonPath}
           node={node}
@@ -80,7 +80,7 @@ const Content = observer(() => {
           }}
         />
         {activeView === views.form && (
-          <SubContent node={node} relativeJsonPath={relativeJsonPath} />
+          <Panel node={node} relativeJsonPath={relativeJsonPath} />
         )}
         {activeView === views.code && <MonacoEditor />}
         {activeView === views.preview && (

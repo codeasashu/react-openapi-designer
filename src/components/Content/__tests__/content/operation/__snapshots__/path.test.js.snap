@@ -1,0 +1,259 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Path tests matches snapshot 1`] = `
+<DocumentFragment>
+  <div
+    class="flex-1 relative"
+  >
+    <div
+      class="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0"
+    >
+      <div
+        class="flex px-10 mt-10 max-w-6xl justify-between"
+      >
+        <input
+          class="px-2 py-1 font-medium bg-transparent hover:bg-darken-2 focus:bg-darken-2 rounded-lg w-full flex-shrink text-2xl"
+          placeholder="Operation Name"
+          value="Hello"
+        />
+      </div>
+      <div
+        class="px-10 pb-2 max-w-6xl"
+      >
+        <div
+          class="mt-6"
+        >
+          <div
+            class="bp4-control-group flex"
+          >
+            <button
+              class="bp4-button"
+              type="button"
+            >
+              <span
+                class="bp4-button-text"
+              >
+                http://localhost
+              </span>
+            </button>
+            <div
+              class="bp4-input-group flex-1"
+            >
+              <input
+                aria-label="path"
+                class="bp4-input"
+                style="padding-right: 0px;"
+                type="text"
+                value="/user/abc"
+              />
+              <span
+                class="bp4-input-action"
+              />
+            </div>
+            <button
+              class="bp4-button"
+              type="button"
+            >
+              <span
+                class="bp4-button-text"
+              >
+                path params
+              </span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div
+      class="flex flex-col flex-1"
+      data-tabs="true"
+    >
+      <ul
+        class="mt-6 px-10 flex bp4-simple-tab-list"
+        role="tablist"
+      >
+        <li
+          aria-controls="react-tabs-129"
+          aria-disabled="false"
+          aria-selected="false"
+          class="bp4-simple-tab uppercase "
+          id="react-tabs-128"
+          role="tab"
+        >
+          <span
+            class="uppercase "
+          >
+            get
+          </span>
+        </li>
+        <li
+          aria-controls="react-tabs-131"
+          aria-disabled="false"
+          aria-selected="true"
+          class="bp4-simple-tab uppercase  selected-tab"
+          id="react-tabs-130"
+          role="tab"
+          tabindex="0"
+        >
+          <span
+            class="uppercase  text-info dark:text-info"
+          >
+            post
+          </span>
+        </li>
+        <li
+          aria-controls="react-tabs-133"
+          aria-disabled="false"
+          aria-selected="false"
+          class="bp4-simple-tab uppercase "
+          id="react-tabs-132"
+          role="tab"
+        >
+          <span
+            class="uppercase "
+          >
+            put
+          </span>
+        </li>
+        <li
+          aria-controls="react-tabs-135"
+          aria-disabled="false"
+          aria-selected="false"
+          class="bp4-simple-tab uppercase "
+          id="react-tabs-134"
+          role="tab"
+        >
+          <span
+            class="uppercase "
+          >
+            patch
+          </span>
+        </li>
+        <li
+          aria-controls="react-tabs-137"
+          aria-disabled="false"
+          aria-selected="false"
+          class="bp4-simple-tab uppercase "
+          id="react-tabs-136"
+          role="tab"
+        >
+          <span
+            class="uppercase "
+          >
+            delete
+          </span>
+        </li>
+        <li
+          aria-controls="react-tabs-139"
+          aria-disabled="false"
+          aria-selected="false"
+          class="bp4-simple-tab uppercase "
+          id="react-tabs-138"
+          role="tab"
+        >
+          <span
+            class="uppercase "
+          >
+            head
+          </span>
+        </li>
+        <li
+          aria-controls="react-tabs-141"
+          aria-disabled="false"
+          aria-selected="false"
+          class="bp4-simple-tab uppercase "
+          id="react-tabs-140"
+          role="tab"
+        >
+          <span
+            class="uppercase "
+          >
+            options
+          </span>
+        </li>
+        <li
+          aria-controls="react-tabs-143"
+          aria-disabled="false"
+          aria-selected="false"
+          class="bp4-simple-tab uppercase "
+          id="react-tabs-142"
+          role="tab"
+        >
+          <span
+            class="uppercase "
+          >
+            trace
+          </span>
+        </li>
+      </ul>
+      <div
+        aria-labelledby="react-tabs-128"
+        class="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative"
+        data-testid="operation-tabpanel-get"
+        id="react-tabs-129"
+        role="tabpanel"
+      />
+      <div
+        aria-labelledby="react-tabs-130"
+        class="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative active block"
+        data-testid="operation-tabpanel-post"
+        id="react-tabs-131"
+        role="tabpanel"
+      >
+        <div
+          class="relative"
+          role="operation-post"
+        >
+          <div
+            data-testid="path-operation-111"
+          >
+            def
+          </div>
+        </div>
+      </div>
+      <div
+        aria-labelledby="react-tabs-132"
+        class="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative"
+        data-testid="operation-tabpanel-put"
+        id="react-tabs-133"
+        role="tabpanel"
+      />
+      <div
+        aria-labelledby="react-tabs-134"
+        class="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative"
+        data-testid="operation-tabpanel-patch"
+        id="react-tabs-135"
+        role="tabpanel"
+      />
+      <div
+        aria-labelledby="react-tabs-136"
+        class="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative"
+        data-testid="operation-tabpanel-delete"
+        id="react-tabs-137"
+        role="tabpanel"
+      />
+      <div
+        aria-labelledby="react-tabs-138"
+        class="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative"
+        data-testid="operation-tabpanel-head"
+        id="react-tabs-139"
+        role="tabpanel"
+      />
+      <div
+        aria-labelledby="react-tabs-140"
+        class="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative"
+        data-testid="operation-tabpanel-options"
+        id="react-tabs-141"
+        role="tabpanel"
+      />
+      <div
+        aria-labelledby="react-tabs-142"
+        class="FormOasPath__tab-panel rounded-none flex-1 border-l-0 border-r-0 border-b-0 relative"
+        data-testid="operation-tabpanel-trace"
+        id="react-tabs-143"
+        role="tabpanel"
+      />
+    </div>
+  </div>
+</DocumentFragment>
+`;

@@ -19,7 +19,14 @@ const Heading = ({onAdd}) => {
       <div className="font-semibold text-gray-6 dark:text-lighten-8">
         Security Schemes
       </div>
-      <Button icon="plus" className="ml-1" small minimal onClick={onAdd} />
+      <Button
+        icon="plus"
+        className="ml-1"
+        aria-label="add security"
+        small
+        minimal
+        onClick={onAdd}
+      />
     </div>
   );
 };
@@ -47,16 +54,17 @@ const ApiKey = ({scheme, name, onChange}) => {
         onChange={(e) => onChange({...scheme, name: e.target.value})}
         className="pr-0 StudioInput flex-1"
       />
-      <div className="bp3-html-select">
+      <div className="bp4-html-select">
         <select
           placeholder="in"
+          aria-label="api security"
           value={scheme.in}
           onChange={(e) => onChange({...scheme, in: e.target.value})}>
           <option value="query">query</option>
           <option value="header">header</option>
           <option value="cookie">cookie</option>
         </select>
-        <span className="bp3-icon bp3-icon-double-caret-vertical"></span>
+        <span className="bp4-icon bp4-icon-double-caret-vertical"></span>
       </div>
     </>
   );
@@ -78,16 +86,17 @@ const Http = ({scheme, name, onChange}) => {
         className="pr-0 StudioInput flex-1"
         onChange={(e) => onChange(scheme, e.target.value)}
       />
-      <div className="bp3-html-select">
+      <div className="bp4-html-select">
         <select
           placeholder="scheme"
+          aria-label="http security"
           value={scheme.scheme}
           onChange={(e) => onChange({...scheme, scheme: e.target.value})}>
           <option value="basic">basic</option>
           <option value="bearer">bearer</option>
           <option value="digest">digest</option>
         </select>
-        <span className="bp3-icon bp3-icon-double-caret-vertical"></span>
+        <span className="bp4-icon bp4-icon-double-caret-vertical"></span>
       </div>
     </>
   );
@@ -143,7 +152,10 @@ const DescriptionButton = ({description, onChange}) => {
       }
       placement="left">
       <Tooltip2 role={'description'} content={<span>Description</span>}>
-        <Button icon={<Icon iconSize={12} icon="manual" />} />
+        <Button
+          aria-label="add description"
+          icon={<Icon iconSize={12} icon="manual" />}
+        />
       </Tooltip2>
     </Popover2>
   );
@@ -188,10 +200,14 @@ const SecuritySchemes = ({schemes, onChange}) => {
       {schemes &&
         Object.keys(schemes).map((scheme, i) => {
           return (
-            <ControlGroup className="items-center" key={i}>
-              <div className="bp3-html-select">
+            <ControlGroup
+              className="items-center"
+              key={i}
+              data-testid={`security-row-${i}`}>
+              <div className="bp4-html-select">
                 <select
                   placeholder="type"
+                  aria-label="security kind"
                   value={schemes[scheme].type}
                   onChange={(e) => handleTypeChange(scheme, e.target.value)}>
                   <option value="apiKey">apiKey</option>
@@ -199,7 +215,7 @@ const SecuritySchemes = ({schemes, onChange}) => {
                   <option value="oauth2">oauth2</option>
                   <option value="openIdConnect">openIdConnect</option>
                 </select>
-                <span className="bp3-icon bp3-icon-double-caret-vertical"></span>
+                <span className="bp4-icon bp4-icon-double-caret-vertical"></span>
               </div>
               {schemes[scheme].type == 'apiKey' && (
                 <ApiKey
@@ -232,6 +248,7 @@ const SecuritySchemes = ({schemes, onChange}) => {
                 }}
               />
               <Button
+                aria-label="delete"
                 icon={<Icon size={12} icon="trash" />}
                 onClick={() => onDelete(scheme)}
               />

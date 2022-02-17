@@ -11,7 +11,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     //chunkFilename: '[id].[chunkhash].js',
-    //sourceMapFilename: 'main.js.map',
+    sourceMapFilename: '[name].js.map',
     path: path.join(__dirname, '../dist'),
     libraryTarget: 'umd',
     clean: true,

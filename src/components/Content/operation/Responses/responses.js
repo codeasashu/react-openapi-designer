@@ -19,7 +19,7 @@ import {ButtonGroup, Button, Icon, ControlGroup} from '@blueprintjs/core';
 import StatusCodeSuggest from '../../../Pickers/StatusCodeSuggest';
 import Headers from './headers';
 import Response from './response';
-import {MarkdownEditor} from '../../../Editor';
+import Description from './description';
 
 const Responses = observer(({responsesPath}) => {
   const handlePatch = usePatchOperation();
@@ -35,16 +35,15 @@ const Responses = observer(({responsesPath}) => {
   const uiStore = stores.uiStore;
   const statusCodes = sortBy(compact(codes));
 
-  const [selectedCode, setSelectedCode] = React.useState(statusCodes[0]); // [u,l]
-  const activeCodeIndex = statusCodes.indexOf(selectedCode); // d
-  const prevActiveSymbolNodeId = usePrevious(uiStore.activeSymbolNodeId); // h
-  const prevCodeIndex = usePrevious(activeCodeIndex); //f
-  const prevStatusCodeLen = usePrevious(statusCodes.length); //p
+  const [selectedCode, setSelectedCode] = React.useState(statusCodes[0]);
+  const activeCodeIndex = statusCodes.indexOf(selectedCode);
+  const prevActiveSymbolNodeId = usePrevious(uiStore.activeSymbolNodeId);
+  const prevCodeIndex = usePrevious(activeCodeIndex);
+  const prevStatusCodeLen = usePrevious(statusCodes.length);
   const g = React.useRef(null);
   const codeRef = React.useRef(null);
   const v = React.useRef(true);
-  const contentPath = responsesPath.concat([selectedCode]); //y
-  //const description = getValueFromStore(contentPath.concat('description')); //b
+  const contentPath = responsesPath.concat([selectedCode]);
 
   React.useEffect(() => {
     if (statusCodes.length) {
@@ -142,6 +141,7 @@ const Responses = observer(({responsesPath}) => {
                 key={i}
                 ref={(e) => selectedCode && (codeRef.current = e)}
                 active={isSelected}
+                data-testid={`code-${code}`}
                 text={code}
                 icon={
                   <Icon
@@ -156,25 +156,30 @@ const Responses = observer(({responsesPath}) => {
           })}
         </ButtonGroup>
         <div className="ml-3">
-          <ControlGroup>
-            <StatusCodeSuggest
-              valueInPath={true}
-              relativeJsonPath={contentPath}
-              codes={statusCodes}
-              activeCodeIndex={activeCodeIndex}
-            />
-            <Button
-              title="Remove"
-              icon={<Icon icon="trash" iconSize={12} />}
-              onClick={() => {
-                if (statusCodes.length > 1) {
-                  handlePatch(nodeOperations.Remove, contentPath);
-                } else {
-                  handlePatch(nodeOperations.Remove, responsesPath);
-                }
-              }}
-            />
-          </ControlGroup>
+          {statusCodes.length > 0 && (
+            <ControlGroup>
+              <StatusCodeSuggest
+                valueInPath={true}
+                relativeJsonPath={contentPath}
+                codes={statusCodes}
+                activeCodeIndex={activeCodeIndex}
+                onPatch={(e) => {
+                  setSelectedCode(e);
+                }}
+              />
+              <Button
+                title="Remove"
+                icon={<Icon icon="trash" iconSize={12} />}
+                onClick={() => {
+                  if (statusCodes.length > 1) {
+                    handlePatch(nodeOperations.Remove, contentPath);
+                  } else {
+                    handlePatch(nodeOperations.Remove, responsesPath);
+                  }
+                }}
+              />
+            </ControlGroup>
+          )}
         </div>
       </div>
       {statusCodes.length > 0 && (
@@ -182,16 +187,15 @@ const Responses = observer(({responsesPath}) => {
           className="border-l-2 border-gray-3 dark:border-darken-4 mt-8 py-1 pl-6 response"
           data-testid={`response-${selectedCode}`}>
           <>
-            <MarkdownEditor
-              language="md"
-              placeholder="Response description..."
-              relativeJsonPath={contentPath.concat(['description'])}
-            />
+            <Description relativeJsonPath={contentPath.concat('description')} />
             <Headers
               className="mt-6"
               headersPath={contentPath.concat(['headers'])}
             />
-            <Response contentPath={contentPath.concat(['content'])} />
+            <Response
+              className="mt-8"
+              contentPath={contentPath.concat(['content'])}
+            />
           </>
         </div>
       )}

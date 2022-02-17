@@ -160,9 +160,9 @@ const refMenus = () => {
 
                   let formattedNodeUri = nodeUri ? `#${nodeUri}` : ''; //o
 
-                  if (!formattedNodeUri.startsWith('.')) {
-                    formattedNodeUri = './' + formattedNodeUri;
-                  }
+                  // if (!formattedNodeUri.startsWith('.')) {
+                  //   formattedNodeUri = './' + formattedNodeUri;
+                  // }
 
                   if (formattedNodeUri.startsWith('./' + prev.path)) {
                     formattedNodeUri = formattedNodeUri.replace(
@@ -173,7 +173,7 @@ const refMenus = () => {
 
                   return formattedNodeUri;
                 })(activeSourceNode, node)
-              : './' + node.path;
+              : node.path;
 
           const nodePath =
             (NodeCategories.Source === node.category
@@ -287,4 +287,20 @@ export const getRefProviders = () => {
       getItemLabel: (e) => e.label || e.value || '',
     },
   ];
+};
+
+export const useTraceUpdate = (props) => {
+  const prev = React.useRef(props);
+  React.useEffect(() => {
+    const changedProps = Object.entries(props).reduce((ps, [k, v]) => {
+      if (prev.current[k] !== v) {
+        ps[k] = [prev.current[k], v];
+      }
+      return ps;
+    }, {});
+    if (Object.keys(changedProps).length > 0) {
+      console.log('Changed props:', changedProps);
+    }
+    prev.current = props;
+  });
 };

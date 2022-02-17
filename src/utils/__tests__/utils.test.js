@@ -1,4 +1,3 @@
-import React from 'react';
 import * as utils from '../../utils';
 
 test('highlight works on matched strings', () => {

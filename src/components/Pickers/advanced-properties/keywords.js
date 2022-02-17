@@ -32,7 +32,7 @@ export const BoolDefault = (props) => {
       className="flex-1"
       label={LocaleProvider('default')}
       labelFor="text-input">
-      <div className="bp3-select">
+      <div className="bp4-select">
         <select
           value={props.value}
           onChange={props.onChange}
@@ -73,7 +73,7 @@ export const Format = (props) => {
   const format = getFormat(props.format || 'string');
   return (
     <FormGroup label="format" className="flex-1 ml-3">
-      <div className="bp3-select">
+      <div className="bp4-select">
         <select
           style={{width: 150}}
           value={props.value}
@@ -325,7 +325,7 @@ DisallowAdditionalProperties.propTypes = {
 export const ObjectBehaviour = (props) => {
   return (
     <FormGroup className="flex-1" label="Behaviour">
-      <div className="bp3-select">
+      <div className="bp4-select">
         <select
           value={props.value}
           onChange={props.onChange}

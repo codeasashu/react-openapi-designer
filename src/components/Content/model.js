@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
-import SchemaDesigner from '../Editor/oasSchema';
+import SchemaDesigner from '../Editor/JsonSchema';
 import {TitleEditor, MarkdownEditor} from '../Editor';
 import {usePatchOperation, getValueFromStore} from '../../utils/selectors';
 import {nodeOperations} from '../../datasets/tree';
@@ -46,7 +46,8 @@ const ModelContent = observer(({relativeJsonPath, node}) => {
             </div>
           </div>
           <SchemaDesigner
-            relativeJsonPath={relativeJsonPath}
+            schemaPath={relativeJsonPath}
+            examplesPath={relativeJsonPath.concat('examples')}
             className="mt-6"
           />
         </div>

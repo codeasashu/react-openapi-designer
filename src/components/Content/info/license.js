@@ -24,7 +24,7 @@ const License = ({license, onChange}) => {
       <div className="font-semibold text-gray-6 dark:text-lighten-8 ml-1">
         License
       </div>
-      <div className="mt-4 flex items-center">
+      <div className="mt-4 flex items-center" data-testid="license">
         <InputGroup
           className="flex-1 mr-2"
           title="License (MIT, Apache 2.0, etc)"
@@ -32,9 +32,10 @@ const License = ({license, onChange}) => {
           value={license?.name || ''}
           onChange={(e) => onChange({...license, name: e.target.value})}
         />
-        <div className="bp3-html-select">
+        <div className="bp4-html-select">
           <select
-            value={license?.url ? 'url' : 'identifier'}
+            value={licenseKind}
+            data-testid="licenseKind"
             onChange={(e) => setLicenseKind(e.target.value)}>
             <option value="url" label="URL">
               URL
@@ -43,11 +44,12 @@ const License = ({license, onChange}) => {
               Identifier
             </option>
           </select>
-          <span className="bp3-icon bp3-icon-double-caret-vertical"></span>
+          <span className="bp4-icon bp4-icon-double-caret-vertical"></span>
         </div>
         {licenseKind === 'url' && (
           <InputGroup
             className="pr-0"
+            data-testid="licenseUrl"
             value={license?.url || ''}
             onChange={(e) =>
               onChange({...omit(license, ['identifier']), url: e.target.value})
@@ -57,9 +59,10 @@ const License = ({license, onChange}) => {
           />
         )}
         {licenseKind === 'identifier' && (
-          <div className="bp3-html-select">
+          <div className="bp4-html-select">
             <select
-              value={license.identifier}
+              value={license?.identifier}
+              data-testid="licenseIdentifier"
               onChange={(e) =>
                 onChange({
                   ...omit(license, ['url']),
@@ -73,7 +76,7 @@ const License = ({license, onChange}) => {
                 0BSD
               </option>
             </select>
-            <span className="bp3-icon bp3-icon-double-caret-vertical"></span>
+            <span className="bp4-icon bp4-icon-double-caret-vertical"></span>
           </div>
         )}
       </div>

@@ -3,7 +3,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
 import {ControlGroup, HTMLSelect, ButtonGroup, Button} from '@blueprintjs/core';
-import {Popover2, Tooltip2} from '@blueprintjs/popover2';
+import {Tooltip2} from '@blueprintjs/popover2';
 import {
   getValueFromStore,
   usePatchOperation,
@@ -11,9 +11,9 @@ import {
 } from '../../../utils/selectors';
 import {nodeOperations} from '../../../datasets/tree';
 import LocaleProvider from '../../../utils/locale';
-import AdvancedProperties from '../../Pickers/advanced-properties';
-import {isEmpty} from 'lodash';
+import {isEmpty, isObjectLike} from 'lodash';
 import StoreInput from '../../Common/StoreInput';
+import OtherProperties from '../../Editor/JsonSchema/OtherProperties/parameters';
 
 const Parameter = observer(
   ({
@@ -26,6 +26,7 @@ const Parameter = observer(
     disableRequired,
     handleRemove,
     handleUpdateName,
+    dataTestid,
   }) => {
     const schemaOptions = [
       {
@@ -57,27 +58,24 @@ const Parameter = observer(
     const handleRequired = usePatchOperationAt(
       parameterPath.concat(['required']),
     );
-    const handleAdvancedSchema = React.useCallback(
-      (schema) => {
-        if (!schema || isEmpty(schema)) {
-          //handleUpdate(nodeOperations.Remove, schema);
-          handleUpdate(
-            nodeOperations.Replace,
-            parameterPath.concat(['schema']),
-            parameterValue.schema.type,
-          );
+    const handleAdvancedSchema =
+      (basepath) => (propKey, validationName, value) => {
+        if (!value || (isObjectLike(value) && isEmpty(value))) {
+          handleUpdate(nodeOperations.Remove, basepath.concat(validationName));
         } else {
           handleUpdate(
             nodeOperations.Replace,
-            parameterPath.concat(['schema']),
-            schema,
+            basepath.concat(validationName),
+            value,
           );
         }
-      },
-      [handleUpdate],
-    );
+      };
+
     return (
-      <ControlGroup className={className} role="listitem">
+      <ControlGroup
+        className={className}
+        role="listitem"
+        data-testid={dataTestid}>
         {nameInPath ? (
           <StoreInput
             valueInPath={true}
@@ -141,20 +139,11 @@ const Parameter = observer(
               }}
             />
           </Tooltip2>
-          <Popover2
-            content={
-              <AdvancedProperties
-                data={JSON.stringify(parameterValue?.schema, null, 2)}
-                onChange={(schema) => {
-                  handleAdvancedSchema(schema);
-                }}
-              />
-            }
-            placement="right">
-            <Tooltip2 content={<span>{LocaleProvider('adv_setting')}</span>}>
-              <Button icon="property" title="advanced properties" />
-            </Tooltip2>
-          </Popover2>
+          <OtherProperties
+            relativeJsonPath={parameterPath}
+            handleUpdate={handleAdvancedSchema}
+            spec="oas_3.1"
+          />
           <Tooltip2 content="Delete field">
             <Button
               onClick={() => {

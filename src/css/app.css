@@ -10,11 +10,11 @@
   background-color: rgba(0,0,0,0.06)
 }
 
-.DesignTreeListItem .bp3-context-menu{
+.DesignTreeListItem .bp4-context-menu{
   display: inline;
 }
 
-.DesignTreeListItem .bp3-tag {
+.DesignTreeListItem .bp4-tag {
     min-height: 16px;
     padding: 0 4px;
     font-size: 11px;
@@ -60,12 +60,12 @@
 .direction-rtl {
     direction: rtl;
 }
-.bp3-simple-tab-list {
+.bp4-simple-tab-list {
     margin: 0;
     padding: 0;
     user-select: none;
 }
-.bp3-simple-tab {
+.bp4-simple-tab {
     display: inline-block;
     bottom: -1px;
     position: relative;
@@ -76,7 +76,7 @@
     border-width: 1px;
     margin-left: -1px;
 }
-.bp3-simple-tab-panel {
+.bp4-simple-tab-panel {
     /*border-width: 1px;*/
     display: none;
     border-radius: 3px;
@@ -130,27 +130,30 @@
 /**
  * Tab styles
  */
-.bp3-simple-tab.bp3-dark, .bp3-dark .bp3-simple-tab {
+.bp4-simple-tab.bp4-dark, .bp4-dark .bp4-simple-tab {
     color: #738694;
     background-color: #293742;
     border-color: rgba(16,22,26,.4);
     font-size: 12px;
     font-weight: 400;
 }
-.bp3-simple-tab.bp3-dark:hover, .bp3-dark .bp3-simple-tab:hover {
+.bp4-dark .bp4-simple-tab.selected-tab {
+	background-color: rgb(55 65 81)!important;
+}
+.bp4-simple-tab.bp4-dark:hover, .bp4-dark .bp4-simple-tab:hover {
     color: #ced9e0;
 }
-.bp3-focus-disabled :focus {
+.bp4-focus-disabled :focus {
     outline: none!important;
 }
-.bp3-simple-tab:first-of-type {
+.bp4-simple-tab:first-of-type {
     border-top-left-radius: 3px;
     margin-left: 0;
 }
-.bp3-simple-tab:last-of-type {
+.bp4-simple-tab:last-of-type {
     border-top-right-radius: 3px;
 }
-.bp3-simple-tab.selected-tab {
+.bp4-simple-tab.selected-tab {
     cursor: default;
 }
 
@@ -170,22 +173,22 @@
     text-transform: none;
 }
 
-.bp3-dark .dark\:bg-success {
+.bp4-dark .dark\:bg-success {
     background-color: #48bb78;
 }
-.bp3-dark .dark\:bg-info {
+.bp4-dark .dark\:bg-info {
     background-color: #008eff;
 }
-.bp3-dark .dark\:bg-warning {
+.bp4-dark .dark\:bg-warning {
     background-color: #ed8936;
 }
-.bp3-dark .dark\:bg-danger {
+.bp4-dark .dark\:bg-danger {
     background-color: #f56565;
 }
 .text-sm {
     font-size: 11px;
 }
-.StudioInput, .bp3-dark .StudioInput {
+.StudioInput, .bp4-dark .StudioInput {
     border-width: 1px;
     border-radius: 2px;
     height: 30px;

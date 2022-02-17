@@ -61,7 +61,7 @@ class Json extends PureComponent {
     return (
       <>
         <Editor
-          textareaClassName="bp3-code bp3-input bp3-fill reactopenapidesigner__simple__editor"
+          textareaClassName="bp4-code bp4-input bp4-fill reactopenapidesigner__simple__editor"
           preClassName=""
           value={value}
           highlight={(code) =>

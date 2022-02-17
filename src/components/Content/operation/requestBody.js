@@ -10,7 +10,8 @@ import {nodeOperations} from '../../../datasets/tree';
 import {contentTypes as allContentTypes} from '../../../datasets/http';
 import ContentTypeSuggest from '../../Pickers/ContentTypeSuggest';
 import {MarkdownEditor} from '../../Editor';
-import SchemaDesigner from '../../Editor/oasSchema';
+// import SchemaDesigner from '../../Editor/oasSchema';
+import SchemaDesigner from '../../Editor/JsonSchema';
 
 const RequestBody = observer(({className, contentPath, descriptionPath}) => {
   const handlePatch = usePatchOperation();
@@ -26,6 +27,8 @@ const RequestBody = observer(({className, contentPath, descriptionPath}) => {
     hasMediaType ? mediaTypes[0] : undefined,
   );
   const mediaRef = React.useRef(null);
+
+  const description = getValueFromStore(descriptionPath);
 
   return (
     <div className={className} aria-label="request-body">
@@ -62,6 +65,7 @@ const RequestBody = observer(({className, contentPath, descriptionPath}) => {
                 value: e,
               }))}
               value={mediaType}
+              data-testid="select-mediatype"
               onChange={(e) => {
                 setMediaType(e.currentTarget.value);
               }}
@@ -112,12 +116,17 @@ const RequestBody = observer(({className, contentPath, descriptionPath}) => {
           language="md"
           className="mt-6 -mx-1"
           placeholder="Request Body description..."
-          relativeJsonPath={descriptionPath}
+          value={description || ''}
+          onChange={(e) =>
+            handlePatch(nodeOperations.Replace, descriptionPath, e)
+          }
         />
       )}
       {mediaType && hasMediaType && (
         <SchemaDesigner
-          relativeJsonPath={contentPath.concat([mediaType, 'schema'])}
+          className="mt-6"
+          schemaPath={contentPath.concat([mediaType, 'schema'])}
+          examplesPath={contentPath.concat([mediaType, 'examples'])}
         />
       )}
     </div>

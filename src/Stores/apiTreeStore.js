@@ -48,7 +48,7 @@ class ApiTreeStore {
       this.initialScrollOffset = e;
     };
 
-    this.handleNodeClick = (e, node) => {
+    this.handleNodeClick = (node) => {
       // e, t
       if (isParentNode(node)) {
         this.treeStore.toggleExpand(node);
@@ -61,7 +61,6 @@ class ApiTreeStore {
     //this.registerTreeEvents();
 
     this.createNewNode = (node, parent, n) => {
-      // e,t,n
       try {
         let newNode = Object.assign(
           {
@@ -87,7 +86,10 @@ class ApiTreeStore {
   }
 
   registerTreeEvents() {
-    this.treeStore.events.on(eventTypes.NodeClick, this.handleNodeClick);
+    // eslint-disable-next-line
+    this.treeStore.events.on(eventTypes.NodeClick, (e, node) =>
+      this.handleNodeClick(node),
+    );
   }
 
   toggleTreeListNodes(expand) {
@@ -112,7 +114,6 @@ class ApiTreeStore {
         return this.activeGraphNode && this.activeGraphNode.id;
       },
       (nodeId) => {
-        console.log('I am here');
         this.setActiveTreeNode(nodeId);
       },
       {

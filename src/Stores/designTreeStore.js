@@ -174,7 +174,7 @@ class DesignTreeStore extends ApiTreeStore {
         : 30;
     };
 
-    this.handleNodeClick = (e, node) => {
+    this.handleNodeClick = (node) => {
       switch (node.type) {
         case NodeTypes.Models:
         case NodeTypes.Paths:

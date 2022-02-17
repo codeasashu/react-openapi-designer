@@ -166,13 +166,15 @@ class Path {
     const parametersPath = path.slice(0, path.length - 1); // n
     const index = last(parametersPath); // r
 
-    const parameters = this.parameters.map((e, i) =>
-      String(index) === String(i)
-        ? Object.assign(Object.assign({}, e), {
-            name,
-          })
-        : e,
-    );
+    const parameters = this.parameters
+      .map((e, i) =>
+        String(index) === String(i)
+          ? Object.assign(Object.assign({}, e), {
+              name,
+            })
+          : e,
+      )
+      .filter((p) => !!p?.name);
 
     const activePathUri = String(last(this.activePathNode.relativeJsonPath));
     const updatedPathUri = updatePathFromParameters(activePathUri, parameters);
@@ -275,57 +277,63 @@ class Path {
   //}
   //}
 
-  updatePath(e, t) {
-    var n;
+  updatePath(name, nodeId) {
+    // e,t = nodeId
     //var r
 
-    if (this.existingPaths.includes(e)) {
+    if (this.existingPaths.includes(name)) {
       return;
     }
 
-    let i = this.activePathNode;
+    let activeNode = this.activePathNode; // i = activeNode
 
-    if (t) {
-      i = this.stores.graphStore.getNodeById(t);
+    if (nodeId) {
+      activeNode = this.stores.graphStore.getNodeById(nodeId);
     }
 
-    if (NodeCategories.SourceMap !== (i == null ? undefined : i.category)) {
+    if (NodeCategories.SourceMap !== activeNode?.category) {
       return;
     }
 
-    n = i.data.parsed || {};
-    const o = n.parameters && n.parameters.length ? n.parameters : [];
+    const data = activeNode.data.parsed || {}; // n = data
+    const parameters =
+      data.parameters && data.parameters.length ? data.parameters : [];
 
     //const a = te.resolveInlineRef.bind(
     //null,
     //((r = i.parentSourceNode.data.resolved) !== null) && (r !== undefined) ? r : i.parentSourceNode.data.parsed
     //)
 
-    const s = getParametersFromPath(Array.isArray(o) ? o : [], e);
+    const path_parameters = getParametersFromPath(
+      Array.isArray(parameters) ? parameters : [],
+      name,
+    );
 
     this.stores.graphStore.graph.patchSourceNodeProp(
-      i.parentSourceNode.id,
+      activeNode.parentSourceNode.id,
       'data.parsed',
       [
         {
           op: nodeOperations.Move,
-          from: i.relativeJsonPath,
-          path: ['paths', e],
+          from: activeNode.relativeJsonPath,
+          path: ['paths', name],
         },
       ],
     );
 
-    this.stores.graphStore.graph.patchSourceNodeProp(
-      i.parentSourceNode.id,
-      'data.parsed',
-      [
-        {
-          op: nodeOperations.Replace,
-          value: s,
-          path: ['paths', e, 'parameters'],
-        },
-      ],
-    );
+    if (path_parameters.length && data.parameters.length) {
+      this.stores.graphStore.graph.patchSourceNodeProp(
+        activeNode.parentSourceNode.id,
+        'data.parsed',
+        [
+          {
+            op: nodeOperations.Replace,
+            value: path_parameters,
+            path: ['paths', name, 'parameters'],
+          },
+        ],
+      );
+    }
   }
 }
 

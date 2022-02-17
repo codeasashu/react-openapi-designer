@@ -1,10 +1,14 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {nodeOperations} from '../../datasets/tree';
-import {trim} from 'lodash';
-import {getValueFromStore, usePatchOperation} from '../../utils/selectors';
+import {trim, last} from 'lodash';
+import {
+  getValueFromStore,
+  usePatchOperationAt,
+  usePatchOperation,
+} from '../../utils/selectors';
 import {statusCodes} from '../../datasets/http';
-import {Select} from '@blueprintjs/select';
+import {Select2} from '@blueprintjs/select';
 import {Button, MenuItem, Position} from '@blueprintjs/core';
 
 // bc = allStatusCodes
@@ -49,11 +53,18 @@ const StatusCodeSuggest = ({
   codes,
   activeCodeIndex,
 }) => {
-  const handlePatch = usePatchOperation();
+  const handlePatchCore = usePatchOperation();
+  const handlePatch = usePatchOperationAt(relativeJsonPath);
   const currentCode = getValueFromStore(relativeJsonPath, valueInPath);
+  const currentBody = getValueFromStore(relativeJsonPath);
   const [original, setOriginal] = React.useState(currentCode);
+
+  React.useEffect(() => {
+    setOriginal(currentCode);
+  }, [activeCodeIndex]);
+
   return (
-    <Select
+    <Select2
       items={items}
       itemPredicate={filterStatusCodes}
       itemRenderer={itemRenderer}
@@ -64,7 +75,15 @@ const StatusCodeSuggest = ({
         if (trim(code) === '') {
           handlePatch(nodeOperations.Remove);
         } else {
-          handlePatch(nodeOperations.Replace, code);
+          handlePatch(nodeOperations.Move, code);
+          const newPath = [...relativeJsonPath.slice(0, -1), code];
+          const prevCode = last(relativeJsonPath);
+          if (prevCode && statusCodes[prevCode] === currentBody?.description) {
+            handlePatchCore(nodeOperations.Replace, newPath, {
+              ...currentBody,
+              description: i.description,
+            });
+          }
         }
 
         if (onPatch) {
@@ -103,7 +122,7 @@ const StatusCodeSuggest = ({
         }
       }}>
       <Button text={codes[activeCodeIndex]} rightIcon="double-caret-vertical" />
-    </Select>
+    </Select2>
   );
 };
 

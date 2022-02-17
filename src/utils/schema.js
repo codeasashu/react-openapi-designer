@@ -1,4 +1,4 @@
-import {set, map, difference, compact, isObject} from 'lodash';
+import {set, map, difference, compact, isObject, intersection} from 'lodash';
 import {pathMethods} from '../datasets/http';
 
 export const parsePath = (e) =>
@@ -28,6 +28,18 @@ export const fillType = (schema) => {
     _schema['type'] = hasProperties(schema) ? 'object' : 'string';
   }
   return _schema;
+};
+
+export const getEditorLanguage = (mediaType) => {
+  if (/json/.test(mediaType)) {
+    return 'json';
+  } else {
+    if (/html|xml/.test(mediaType)) {
+      return 'html';
+    } else {
+      return 'yaml';
+    }
+  }
 };
 
 const fillTitle = (schema) =>
@@ -252,3 +264,23 @@ export const sortOperations = (operations, path) => {
 export const replaceHash = (e) => e.replace(/^[^#]+#/, '');
 
 export const reverseString = (e) => e.split('').reverse().join('');
+
+export const validCombinerTypes = ['allOf', 'oneOf', 'anyOf'];
+export const validCollectionTypes = ['object', 'array'];
+export const validBasicTypes = [
+  'string',
+  'number',
+  'integer',
+  'boolean',
+  'null',
+  '$ref',
+];
+export const validPrimitiveTypes =
+  validCollectionTypes.concat(validCombinerTypes);
+export const validParentTypes = validCollectionTypes.concat(validCombinerTypes);
+export const validTypes = validParentTypes.concat(validBasicTypes);
+
+export const isInside = (e, t) => (Array.isArray(t) ? t.includes(e) : t === e);
+export const isTypesInsideTypes = (e, t) =>
+  t !== null &&
+  (Array.isArray(t) ? intersection(t, e).length > 0 : e.includes(t));

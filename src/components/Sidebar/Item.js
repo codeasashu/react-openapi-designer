@@ -40,7 +40,7 @@ const Item = ({
             {node.name}
           </span>
           {node.metadata && node.metadata.subtype && (
-            <span className="absolute capitalize bp3-tag right-0 mr-12 mt-2 bg-gray">
+            <span className="absolute capitalize bp4-tag right-0 mr-12 mt-2 bg-gray">
               {node.metadata.subtype}
             </span>
           )}

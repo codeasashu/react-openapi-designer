@@ -127,24 +127,24 @@ const RootSchema = observer(({store, stores, className, onChange}) => {
   }, [schema]);
 
   return (
-    <div className={classnames('json-schema-react-editor bp3-dark', className)}>
+    <div className={classnames('json-schema-react-editor bp4-dark', className)}>
       <Tabs
         className="react-tabs"
         selectedTabClassName="selected-tab bg-gray-700"
         selectedTabPanelClassName="block"
         selectedIndex={selectedTab}
         onSelect={(tab) => setSelectedTab(tab)}>
-        <TabList className="bp3-simple-tab-list">
-          <Tab className="bp3-simple-tab">Schema</Tab>
+        <TabList className="bp4-simple-tab-list">
+          <Tab className="bp4-simple-tab">Schema</Tab>
           {store.examples &&
             Object.keys(store.examples).map((example, i) => (
-              <Tab className="bp3-simple-tab" key={i}>
+              <Tab className="bp4-simple-tab" key={i}>
                 {example}
               </Tab>
             ))}
           <AddExampleBtn onAdd={() => store.generateExampleFromSchema()} />
         </TabList>
-        <TabPanel className="bp3-simple-tab-panel">
+        <TabPanel className="bp4-simple-tab-panel">
           <div className="border border-gray-600">
             {generateCode ? (
               <Code
@@ -175,7 +175,7 @@ const RootSchema = observer(({store, stores, className, onChange}) => {
         </TabPanel>
         {store.examples &&
           Object.keys(store.examples).map((example, i) => (
-            <TabPanel className="bp3-simple-tab-panel" key={i}>
+            <TabPanel className="bp4-simple-tab-panel" key={i}>
               <div className="border border-gray-600">
                 <ExampleRenderer
                   title={example}

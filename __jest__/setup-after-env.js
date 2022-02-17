@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import '@testing-library/jest-dom/extend-expect';
 import * as matchers from 'jest-extended';
 import Worker from './workerStub';

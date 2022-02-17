@@ -38,7 +38,7 @@ const PathItem = observer(({isEdited, node}) => {
             <span
               key={id}
               className={classnames(
-                'bp3-tag mr-2 mt-1',
+                'bp4-tag mr-2 mt-1',
                 'dark:bg-' + getMethodTagColor(method.toLowerCase()),
                 {
                   ['bg-' + getMethodTagColor(method.toLowerCase())]: !(

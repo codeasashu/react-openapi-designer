@@ -12,7 +12,7 @@ const Designer = observer(() => {
   const shouldShowSidebar =
     fullscreen === false && activeView !== views.preview;
   return (
-    <div className="dark bp3-dark">
+    <div className="dark bp4-dark">
       <div className={'OasContainer h-screen w-full'}>
         <div className={'Studio h-full flex flex-1 flex-col'}>
           {stores.uiStore.fullscreen === false && (

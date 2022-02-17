@@ -2,7 +2,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import {Icon, MenuItem} from '@blueprintjs/core';
-import {MultiSelect} from '@blueprintjs/select';
+import {MultiSelect2} from '@blueprintjs/select';
 import {highlightText} from '../../utils';
 
 const TagSuggest = ({
@@ -55,7 +55,7 @@ const TagSuggest = ({
   );
 
   return (
-    <MultiSelect
+    <MultiSelect2
       className={className}
       selectedItems={selectedItems}
       items={items}

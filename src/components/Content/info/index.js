@@ -18,12 +18,13 @@ const Info = observer(() => {
       <div className="EditorPanel EditorPanel--primary EditorPanel--forms group p-0 flex flex-col relative inset-0">
         <div className="w-10/12 m-auto p-10">
           <div className="flex items-center mb-8">
-            <div className="FormHttpService__version bp3-tag bg-green p-2">
+            <div className="FormHttpService__version bp4-tag bg-green p-2">
               <div className="FormEditableText text-xl font-bold">
                 <AutosizeInput
                   inputClassName="bg-transparent hover:bg-darken-1 focus:bg-darken-2"
                   minWidth={30}
                   key={'/'}
+                  aria-label="version"
                   value={getValueFromStore(['info', 'version']) || '0.1'}
                   onChange={(e) => {
                     handlePatch(

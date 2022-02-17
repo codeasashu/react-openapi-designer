@@ -53,6 +53,7 @@ ArrayProperty.propTypes = {
     minItems: PropTypes.any,
     maxItems: PropTypes.any,
     uniqueItems: PropTypes.bool,
+    type: PropTypes.string,
   }),
   isSubtype: PropTypes.bool,
   child: PropTypes.element, // @TODO: React node

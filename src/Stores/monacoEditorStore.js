@@ -383,6 +383,7 @@ class MonacoEditorStore {
     };
   }
 
+  // eslint-disable-next-line
   async _setMonacoDeltaDecorations(e, t = []) {
     if (this.monacoCodeStoreEditor) {
       //const n = t.map(Ya.diagnosticsToDecoration)

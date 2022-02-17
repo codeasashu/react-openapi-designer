@@ -23,7 +23,9 @@
     "node": true,
     "es6": true,
   },
-  "plugins": ["react"],
+  "plugins": [
+    "react"
+  ],
   "settings": {
     "react": {
       "createClass": "createReactClass", // Regex for Component Factory to use,
@@ -39,30 +41,54 @@
     "propWrapperFunctions": [
       // The names of any function used to wrap propTypes, e.g. `forbidExtraProps`. If this isn't set, any propTypes wrapped in a function will be skipped.
       "forbidExtraProps",
-      {"property": "freeze", "object": "Object"},
-      {"property": "myFavoriteWrapper"}
+      {
+        "property": "freeze",
+        "object": "Object"
+      },
+      {
+        "property": "myFavoriteWrapper"
+      }
     ],
     "linkComponents": [
       // Components used as alternatives to <a> for linking, eg. <Link to={ url } />
       "Hyperlink",
-      {"name": "Link", "linkAttribute": "to"}
+      {
+        "name": "Link",
+        "linkAttribute": "to"
+      }
     ]
   },
   "overrides": [
     {
-      "files": ["**/*.test.js"],
+      "files": [
+        "**/*.test.js"
+      ],
       "env": {
         "jest": true // now **/*.test.js files' env has both es6 *and* jest
       },
       // Can't extend in overrides: https://github.com/eslint/eslint/issues/8813
-      "extends": ["plugin:jest/recommended"],
-      "plugins": ["jest"],
+      "extends": [
+        "plugin:jest/recommended",
+      ],
+      "plugins": [
+        "jest",
+        "jest-dom",
+        "testing-library"
+      ],
       "rules": {
         "jest/no-disabled-tests": "warn",
         "jest/no-focused-tests": "error",
         "jest/no-identical-title": "error",
         "jest/prefer-to-have-length": "warn",
-        "jest/valid-expect": "error"
+        "jest/valid-expect": "error",
+        "testing-library/await-async-query": "error",
+        "testing-library/no-await-sync-query": "error",
+        "testing-library/no-debugging-utils": "warn",
+        "testing-library/no-dom-import": "off",
+        "jest-dom/prefer-checked": "error",
+        "jest-dom/prefer-enabled-disabled": "error",
+        "jest-dom/prefer-required": "error",
+        "jest-dom/prefer-to-have-attribute": "error",
       }
     }
   ]
