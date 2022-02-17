@@ -25,8 +25,7 @@ class JsonSchemaStore {
     this.sourceNodeId = sourceNodeId;
     this.relativeJsonPath = relativeJsonPath;
     const oasVersion = 'oas3_1';
-    console.log('schema', sourceNodeId, relativeJsonPath, this.getSchema());
-    //this.store = new Schema(this.getSchema(), oasVersion);
+    this.store = new Schema(this.getSchema(), oasVersion);
     //this._disposables.push(this.store);
     //this._registerListeners();
   }
@@ -41,8 +40,6 @@ class JsonSchemaStore {
     if (!node) {
       return;
     }
-
-    console.log('nodeData', node.data.parsed);
 
     const nodeData = node.data.parsed; //t
 

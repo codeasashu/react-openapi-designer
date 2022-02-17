@@ -1,4 +1,11 @@
-import {makeObservable, computed, observable, reaction, action} from 'mobx';
+import {
+  makeObservable,
+  toJS,
+  computed,
+  observable,
+  reaction,
+  action,
+} from 'mobx';
 import {isEmpty, set, omit, unset, intersection} from 'lodash';
 import Transformer from './transformer';
 import Tree from '../../Tree/Tree';
@@ -65,7 +72,8 @@ class Schema {
     this.transformer = Transformer(spec);
     this.spec = spec;
     this.schema = schema;
-    const treeState = new TreeState(); //n
+    const treeState = new TreeState();
+    console.log('transformed', toJS(this.transformed));
 
     this.tree = new Tree(
       {
@@ -74,11 +82,11 @@ class Schema {
       Tree.toTree(Ts(this.transformed)),
     );
 
-    this.treeStore = new TreeStore(this.tree, treeState, {
-      defaultExpandedDepth: 4,
-    });
+    //this.treeStore = new TreeStore(this.tree, treeState, {
+    //defaultExpandedDepth: 4,
+    //});
 
-    this._setupReactions();
+    //this._setupReactions();
   }
 
   _onSchemaChange(e) {
@@ -92,8 +100,9 @@ class Schema {
     reaction(
       () => this._lastUpdated,
       action(() => {
+        console.log('updated1', this.transformed);
         //super.emit(Za.Transformed, this.transformed);
-        this.tree.setRoot(Tree.toTree(Ts(this.transformed)));
+        //this.tree.setRoot(Tree.toTree(Ts(this.transformed)));
       }),
     );
 
@@ -131,8 +140,8 @@ class Schema {
 
   _handleUpdate() {
     if (!this._externalUpdate) {
-      this._schema = this.transformer.toJsonSchema(this.transformed);
-      this._onSchemaChange(this._schema);
+      //this._schema = this.transformer.toJsonSchema(this.transformed);
+      //this._onSchemaChange(this._schema);
     }
   }
 
@@ -159,6 +168,7 @@ class Schema {
   _updateSchema(e, t = {}) {
     const {external: n, immediate: r} = t;
 
+    console.log('update schema', e);
     try {
       let t = e || {};
 
@@ -166,13 +176,16 @@ class Schema {
         t = JSON.parse(t);
       }
 
+      console.log('update schema1', this._schema, t);
       if (JSON.stringify(this.schema) !== JSON.stringify(t)) {
+        console.log('update schema2', e);
         this._externalUpdate = !!n;
         this._schema = t;
         this.transformed = this.transformer.toStoplightSchema(
           t || '{\n    "type": "object"\n}',
         );
 
+        console.log('update schema3', e);
         if (r) {
           this._onSchemaChange(this.schema);
         } else {
@@ -187,6 +200,7 @@ class Schema {
     } catch (t) {
       this.invalidSchema = e;
       this.error = t;
+      console.error(t);
     }
   }
 }

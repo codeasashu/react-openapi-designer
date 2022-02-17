@@ -6,16 +6,16 @@ import RootSchema from './root';
 const Schema = ({relativeJsonPath}) => {
   const stores = React.useContext(StoresContext);
   const {activeSourceNodeId} = stores.uiStore;
-  //const schemaCollection = stores.oasSchemaCollection;
+  const schemaCollection = stores.oasSchemaCollection;
   const jsonSchemaCollection = stores.jsonSchemaCollection;
   const storeId = relativeJsonPath
     ? [activeSourceNodeId, ...relativeJsonPath].join('/')
     : activeSourceNodeId;
-  //const store = schemaCollection.lookup(storeId, {
-  //id: storeId,
-  //relativeJsonPath,
-  //sourceNodeId: activeSourceNodeId,
-  //});
+  const store = schemaCollection.lookup(storeId, {
+    id: storeId,
+    relativeJsonPath,
+    sourceNodeId: activeSourceNodeId,
+  });
 
   const schemaStore = jsonSchemaCollection.lookup(storeId, {
     id: storeId,
@@ -25,8 +25,8 @@ const Schema = ({relativeJsonPath}) => {
 
   console.log('llp', storeId, schemaStore);
 
-  //return <RootSchema store={store} schemaStore={schemaStore} stores={stores} />;
-  return null;
+  return <RootSchema store={store} schemaStore={schemaStore} stores={stores} />;
+  //return null;
 };
 
 Schema.propTypes = {
