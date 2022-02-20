@@ -153,9 +153,11 @@ const Schema = ({
   };
 
   const rowRenderer = (node, rowOptions) => {
+    console.log('rowOptions11', node);
     return (
       <SchemaRow
         node={node}
+        {...node.metadata}
         rowOptions={rowOptions}
         store={store}
         customRowActionRenderer={customRowActionRenderer}

@@ -43,10 +43,10 @@ const Ref = (props) => {
   const store = props.store;
   const [isOpen, setIsOpen] = React.useState(false);
 
-  const handleOpen = (e) => {
-    console.log('handlepemn', e);
+  const handleOpen = (state) => {
+    console.log('handlepemn', state);
     if (!store.refLoading) {
-      setIsOpen(true);
+      setIsOpen(state);
     }
   };
 
@@ -159,6 +159,7 @@ const Ref = (props) => {
     //}
   }
 
+  console.log('refloading', store.refLoading);
   return (
     <div className="flex items-center overflow-hidden">
       {!isCombinerChild && (level > 0 || rootName) && (
@@ -166,10 +167,11 @@ const Ref = (props) => {
       )}
       <Popover2
         boundary="window"
-        position="top-left"
+        placement="top-left"
+        interactionKind="click"
         onInteraction={handleOpen}
         className="TypeSelector"
-        isOpen={isOpen || store.refLoading}
+        isOpen={isOpen}
         content={
           <Selector
             id={id}
@@ -184,7 +186,6 @@ const Ref = (props) => {
           />
         }
         renderTarget={(targetProps) => {
-          console.log('renderTarget', targetProps);
           return (
             <div
               tabIndex={0}

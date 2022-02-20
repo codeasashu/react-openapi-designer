@@ -57,10 +57,12 @@ const SubType = (e) => {
   return null;
 };
 const Caret = ({node, hasChildren, treeStore}) => {
+  console.log('node12', node, hasChildren, treeStore);
   const toggleExpand = () => {
+    treeStore.toggleExpand(node);
     console.log('toggleExpand');
   };
-  return hasChildren && treeStore.isParentNode(node) ? (
+  return hasChildren && isParentNode(node) ? (
     <div
       className="flex justify-center cursor-pointer p-1 rounded hover:bg-darken-3"
       style={{
@@ -82,6 +84,29 @@ Caret.propTypes = {
   node: PropTypes.object.isRequired,
   hasChildren: PropTypes.bool.isRequired,
   treeStore: PropTypes.object.isRequired,
+};
+
+const AddPropertyBtn = ({node, handleAdd}) => {
+  return (
+    isParentNode(node) && (
+      <div
+        onClick={() => handleAdd(node)}
+        data-test="add-property-btn"
+        className="absolute flex items-center justify-center cursor-pointer rounded hover:bg-darken-3 z-10"
+        style={{width: 20, height: 20}}>
+        <Icon
+          icon="plus"
+          iconSize={12}
+          className="text-darken-9 dark:text-lighten-9"
+        />
+      </div>
+    )
+  );
+};
+
+AddPropertyBtn.propTypes = {
+  node: PropTypes.object,
+  handleAdd: PropTypes.func,
 };
 
 const SchemaInput = ({
@@ -156,6 +181,7 @@ const SchemaRow = (props) => {
     store,
     isCombinerChild,
     rootName,
+    name,
     isAutoFocusBlocked,
     setAutoFocusBlocked,
     getRefLabel,
@@ -165,12 +191,7 @@ const SchemaRow = (props) => {
     isLast,
     parent,
   } = props;
-  const hasChildren = !!(
-    level > 0 &&
-    isParentNode(node) &&
-    childCount &&
-    childCount > 0
-  );
+  const hasChildren = !!(isParentNode(node) && childCount && childCount > 0);
 
   //const {
   //node: r,
@@ -242,16 +263,23 @@ const SchemaRow = (props) => {
     }
   };
 
+  console.log('level11', level, name);
+
   return (
     <div
       className="flex-1 flex items-center overflow-hidden"
       style={{marginLeft: 7, marginRight: 7}}>
+      <AddPropertyBtn node={node} handleAdd={handleAdd} />
       <div
         className="flex flex-1 items-center text-sm leading-tight w-full h-full relative overflow-hidden"
         style={{
           paddingLeft: (level + 1) * 20 + 7,
         }}>
-        <Caret node={node} hasChildren={hasChildren} treeStore={store} />
+        <Caret
+          node={node}
+          hasChildren={hasChildren}
+          treeStore={store.store.treeStore}
+        />
         <div className="flex items-center flex-1 text-sm mr-2 overflow-hidden">
           {!isCombinerChild && (level != 0 || rootName) && (
             <SchemaInput
@@ -320,6 +348,7 @@ SchemaRow.propTypes = {
   store: PropTypes.object,
   isCombinerChild: PropTypes.bool,
   rootName: PropTypes.string,
+  name: PropTypes.string,
   isAutoFocusBlocked: PropTypes.bool,
   isLast: PropTypes.bool,
   setAutoFocusBlocked: PropTypes.func,
