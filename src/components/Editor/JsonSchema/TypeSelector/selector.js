@@ -314,7 +314,7 @@ Selector.propTypes = {
   id: PropTypes.string,
   refSelector: PropTypes.func,
   whitelistTypes: PropTypes.array,
-  type: PropTypes.string,
+  type: PropTypes.array,
   subtype: PropTypes.array,
   refPath: PropTypes.string,
   extraProps: PropTypes.object,

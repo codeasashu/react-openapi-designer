@@ -183,13 +183,16 @@ const Ref = (props) => {
             handleSave={handleSaveDetails}
           />
         }
-        target={
-          <div
-            tabIndex={0}
-            className="flex items-center cursor-pointer hover:underline truncate">
-            {types.length ? types : 'noType'}
-          </div>
-        }
+        renderTarget={(targetProps) => {
+          console.log('renderTarget', targetProps);
+          return (
+            <div
+              tabIndex={0}
+              className="flex items-center cursor-pointer hover:underline truncate">
+              {types.length ? types : 'noType'}
+            </div>
+          );
+        }}
         targetProps={{'data-test': 'property-type-selector'}}
         usePortal={true}
       />
