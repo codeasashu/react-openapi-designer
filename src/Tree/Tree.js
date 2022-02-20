@@ -133,8 +133,6 @@ class Tree {
     for (const _node of childNodes) {
       const parentNode = nodes[_node.level];
       const node = Tree.transformDeprecatedNode(_node, null);
-      console.log('parentnode', parentNode, _node.level);
-
       if (isParentNode(node)) {
         if (nodes.length <= _node.level) {
           nodes.push(node);
@@ -142,14 +140,12 @@ class Tree {
           nodes[_node.level + 1] = node;
         }
       }
-      console.log('parentnode2', parentNode, node);
 
-      //if (parentNode) {
-      //node.parent = parentNode;
-      //parentNode.children.push(node);
-      //}
+      if (parentNode) {
+        node.parent = parentNode;
+        parentNode.children.push(node);
+      }
     }
-    console.log('nodes', nodes);
   }
 
   static createArtificialRoot() {
@@ -169,7 +165,6 @@ class Tree {
       children: [],
     };
 
-    console.log('t00', rootNode, node.slice());
     Tree._toTree(rootNode, node.slice());
     return rootNode;
   }

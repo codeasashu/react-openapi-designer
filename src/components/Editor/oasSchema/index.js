@@ -23,8 +23,6 @@ const Schema = ({relativeJsonPath}) => {
     sourceNodeId: activeSourceNodeId,
   });
 
-  console.log('llp', storeId, schemaStore);
-
   return <RootSchema store={store} schemaStore={schemaStore} stores={stores} />;
   //return null;
 };

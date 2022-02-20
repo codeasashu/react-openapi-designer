@@ -129,7 +129,8 @@ const TreeContainer = observer((props) => {
             {...listProps}
             autoSize={props.autoSize}
             instanceRef={instanceRef}
-            itemSize={getItemSize}>
+            height={50}
+            itemSize={50}>
             {TreeRow}
           </FixedSizeList>
         ) : (
