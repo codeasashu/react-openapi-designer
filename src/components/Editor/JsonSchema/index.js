@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import {toJS} from 'mobx';
+// import {toJS} from 'mobx';
 import {observer} from 'mobx-react';
 import {
   get,
@@ -222,9 +222,8 @@ const Schema = observer(
         generateContextMenu={() => console.log('generateContextMenu')}
         rowRenderer={rowRenderer}
         className={classnames('SidebarTreeList', props.className)}
-        innerPadding={15}
+        rowHeight={() => 30}
         initialScrollOffset={0}
-        autoSize={true}
       />
     );
   },

@@ -218,7 +218,7 @@ const SchemaInput = ({
       e.focus();
       setAutoFocusBlocked(true);
     }
-  }, [inputRef.current, isAutoFocusBlocked]);
+  }, [inputRef.current]);
 
   const handleBlur = () => {
     if (onChange && value !== val) {
@@ -238,6 +238,7 @@ const SchemaInput = ({
   return (
     <span style={{maxWidth: 250}}>
       <AutosizeInput
+        ref={inputRef}
         value={val}
         onBlur={handleBlur}
         onChange={handleChange}
@@ -499,8 +500,9 @@ const SchemaRow = (props) => {
           {!isCombinerChild && (level != 0 || rootName) && (
             <SchemaInput
               type="text"
+              placeholder="name"
               value={name || ''}
-              minWidth={0}
+              minWidth={30}
               isAutoFocusBlocked={isAutoFocusBlocked}
               setAutoFocusBlocked={setAutoFocusBlocked}
               onChange={(e) => {
