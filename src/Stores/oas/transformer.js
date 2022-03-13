@@ -183,8 +183,34 @@ const Transformer = (e) => {
       return this._toStoplightSchema(cloneDeep(e));
     },
 
-    //_cleanStoplightSchema: (t = {}) => ;
-    //((e === "oas2_0") && t.deprecated && (t["x-deprecated"] = t.deprecated, delete t.deprecated), (e !== "oas3_1") && (t.type === "null" ? (t[e === "oas2_0" ? "x-nullable" : "nullable"] = true, delete t.type) : Array.isArray(t.type) && t.type.includes("null") && (t.type.splice(t.type.indexOf("null"), 1), t[e === "oas2_0" ? "x-nullable" : "nullable"] = true, t.type.length === 0 ? delete t.type : (t.type.length === 1) && (t.type = t.type[0]))), (e === "oas3_1") && ((typeof t.exclusiveMinimum == "boolean") && (t.exclusiveMinimum ? (t.exclusiveMinimum = t.minimum, delete t.minimum) : delete t.exclusiveMinimum), (typeof t.exclusiveMaximum == "boolean") && (t.exclusiveMaximum ? (t.exclusiveMaximum = t.maximum, delete t.maximum) : delete t.exclusiveMaximum)), t),
+    _cleanStoplightSchema: (t = {}) => {
+      return (
+        e === 'oas2_0' &&
+          t.deprecated &&
+          ((t['x-deprecated'] = t.deprecated), delete t.deprecated),
+        e !== 'oas3_1' &&
+          (t.type === 'null'
+            ? ((t[e === 'oas2_0' ? 'x-nullable' : 'nullable'] = true),
+              delete t.type)
+            : Array.isArray(t.type) &&
+              t.type.includes('null') &&
+              (t.type.splice(t.type.indexOf('null'), 1),
+              (t[e === 'oas2_0' ? 'x-nullable' : 'nullable'] = true),
+              t.type.length === 0
+                ? delete t.type
+                : t.type.length === 1 && (t.type = t.type[0]))),
+        e === 'oas3_1' &&
+          (typeof t.exclusiveMinimum == 'boolean' &&
+            (t.exclusiveMinimum
+              ? ((t.exclusiveMinimum = t.minimum), delete t.minimum)
+              : delete t.exclusiveMinimum),
+          typeof t.exclusiveMaximum == 'boolean' &&
+            (t.exclusiveMaximum
+              ? ((t.exclusiveMaximum = t.maximum), delete t.maximum)
+              : delete t.exclusiveMaximum)),
+        t
+      );
+    },
 
     _reduceStoplightSchema(e = {}) {
       let t = {};

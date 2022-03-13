@@ -1,5 +1,6 @@
 import {makeObservable, computed, observable, reaction, action} from 'mobx';
 import {isEmpty, set, omit, unset, intersection} from 'lodash';
+import {eventTypes} from '../../datasets/tree';
 import Transformer from './transformer';
 import Tree from '../../Tree/SchemaTree';
 import TreeState from '../../Tree/State';
@@ -43,7 +44,7 @@ class Schema {
   error = null;
   _schema = {};
 
-  constructor(schema, spec) {
+  constructor(schema, spec, stores) {
     // e = schema, t = spec (oas3_1)
     makeObservable(this, {
       transformed: observable,
@@ -61,6 +62,8 @@ class Schema {
       _updateSchema: action.bound,
     });
     this.invalidSchema = null;
+
+    this.stores = stores;
 
     this.transformer = Transformer(spec);
     this.spec = spec;
@@ -84,7 +87,7 @@ class Schema {
   _onSchemaChange(e) {
     if (!this._externalUpdate) {
       console.log('emit Change', e);
-      //super.emit(Za.Change, e);
+      this.stores.eventEmitter.emit(eventTypes.StoreEvents.Change, e);
     }
   }
 

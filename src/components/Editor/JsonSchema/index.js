@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import {toJS} from 'mobx';
+import {observer} from 'mobx-react';
 import {
   get,
   clone,
@@ -15,6 +17,7 @@ import {StoresContext} from '../../Context';
 import TreeList from '../../Tree/List';
 import SchemaRow from './row';
 import {basename, extname} from '../../../utils/tree';
+import Ja from '../../../utils/oas/ja';
 
 const is = ['allOf', 'oneOf', 'anyOf'];
 const fs = (e, t) =>
@@ -53,144 +56,179 @@ const ls = [
   'definitions',
 ];
 
-const Schema = ({
-  relativeJsonPath,
-  shouldRenderGoToRef,
-  getRefLabel,
-  refSelector,
-  rootName,
-  whitelistTypes,
-  customRowActionRenderer,
-  ...props
-}) => {
-  const stores = React.useContext(StoresContext);
-  const {activeSourceNodeId} = stores.uiStore;
-  const storeId = relativeJsonPath
-    ? [activeSourceNodeId, ...relativeJsonPath].join('/')
-    : activeSourceNodeId;
-
-  const store = stores.jsonSchemaCollection.lookup(storeId, {
-    id: storeId,
+const Schema = observer(
+  ({
     relativeJsonPath,
-    sourceNodeId: activeSourceNodeId,
-  });
+    shouldRenderGoToRef,
+    getRefLabel,
+    refSelector,
+    rootName,
+    whitelistTypes,
+    customRowActionRenderer,
+    ...props
+  }) => {
+    const stores = React.useContext(StoresContext);
+    const {activeSourceNodeId} = stores.uiStore;
+    const storeId = relativeJsonPath
+      ? [activeSourceNodeId, ...relativeJsonPath].join('/')
+      : activeSourceNodeId;
 
-  console.log('store11', store.store.treeStore);
+    const store = stores.jsonSchemaCollection.lookup(storeId, {
+      id: storeId,
+      relativeJsonPath,
+      sourceNodeId: activeSourceNodeId,
+    });
 
-  const swapHandler = (e, t, n) => {
-    const r = e.slice(0, e.length - 1);
-    const i = get(store.transformed, r).slice();
-    i[n] = i.splice(t, 1, i[n])[0];
-    store.updateTransformed('set', r, i);
-  };
+    console.log('store11', store.store.treeStore);
 
-  const cloneHandler = (e) => {
-    const t = e.slice(0, e.length - 1);
-    const n = get(store.transformed, t).slice();
-    const r = n[e[e.length - 1]];
-    const i = cloneDeep(r);
-    n.splice(n.indexOf(r), 0, i);
+    const swapHandler = (path, originalIndex, newIndex) => {
+      const exceptLast = path.slice(0, path.length - 1);
+      const parent = get(store.store.transformed, exceptLast).slice();
+      parent[newIndex] = parent.splice(originalIndex, 1, parent[newIndex])[0];
+      store.store.updateTransformed('set', exceptLast, parent);
+    };
 
-    if ('name' in r) {
-      r.name = Ai(map(n, 'name'), r.name);
-    }
+    const cloneHandler = (e) => {
+      const t = e.slice(0, e.length - 1);
+      const n = get(store.store.transformed, t).slice();
+      const r = n[e[e.length - 1]];
+      const i = cloneDeep(r);
+      n.splice(n.indexOf(r), 0, i);
 
-    store.updateTransformed('set', t, n);
-  };
+      if ('name' in r) {
+        r.name = Ai(map(n, 'name'), r.name);
+      }
 
-  const typeChangeHandler = (e, t, n, r, i, o, a) => {
-    console.log('propsChangeHandler', e, t, n, r, i, o, a);
-  };
+      store.store.updateTransformed('set', t, n);
+    };
 
-  const propsChangeHandler = (path, updatedSchema) => {
-    let schema = path.length ? get(store.transformed, path) : store.transformed;
-    schema = cloneDeep(pick(schema, ls));
-    merge(schema, updatedSchema);
-    store.updateTransformed('set', path, schema);
-  };
+    const typeChangeHandler = (
+      e,
+      type,
+      selectedTypes,
+      path,
+      subtype,
+      selectedSubTypes,
+      selectedRefPath,
+    ) => {
+      // (e, t, n, r, i, o, a) => {
+      console.log(
+        'typeChangeHandler',
+        e,
+        type,
+        selectedTypes,
+        path,
+        subtype,
+        selectedSubTypes,
+        selectedRefPath,
+      );
+      Ja(
+        {
+          schema: store.store.transformed,
+          onChange: store.store.updateTransformed,
+        },
+        e,
+        type,
+        selectedTypes,
+        path,
+        subtype,
+        selectedSubTypes,
+        selectedRefPath,
+      );
+    };
 
-  const changeHandler = (e, t) => {
-    store.updateTransformed('set', e, t);
-  };
+    const propsChangeHandler = (path, updatedSchema) => {
+      let schema = path.length
+        ? get(store.store.transformed, path)
+        : store.store.transformed;
+      schema = cloneDeep(pick(schema, ls));
+      merge(schema, updatedSchema);
+      store.store.updateTransformed('set', path, schema);
+    };
 
-  const removeHandler = (e) => {
-    const t = cloneDeep(store.transformed);
-    const n = clone(e);
-    const r = n.pop();
-    pullAt(get(t, n), Number(r));
-    store.updateTransformed('set', [], t);
-  };
+    const changeHandler = (e, t) => {
+      store.store.updateTransformed('set', e, t);
+    };
 
-  const addHandler = (e, t, n, r) => {
-    let i;
-    let o = n;
+    const removeHandler = (e) => {
+      const t = cloneDeep(store.store.transformed);
+      const n = clone(e);
+      const r = n.pop();
+      pullAt(get(t, n), Number(r));
+      store.store.updateTransformed('set', [], t);
+    };
 
-    if (r) {
-      o = o.concat(r);
-    }
+    const addHandler = (e, t, n, r) => {
+      let i;
+      let o = n;
 
-    if (t) {
-      o = o.concat('0');
-    }
+      if (r) {
+        o = o.concat(r);
+      }
 
-    i = fs(is, e)
-      ? {
-          type: 'object',
-          properties: {},
-        }
-      : {
-          type: 'string',
-        };
+      if (t) {
+        o = o.concat('0');
+      }
 
-    o = fs(is, t)
-      ? o.concat(t)
-      : fs(is, e)
-      ? o.concat(e)
-      : o.concat('children');
-    const a = cloneDeep(get(store.transformed, o)) || [];
-    a.push(i);
-    store.updateTransformed('set', o, a);
-  };
+      i = fs(is, e)
+        ? {
+            type: 'object',
+            properties: {},
+          }
+        : {
+            type: 'string',
+          };
 
-  const rowRenderer = (node, rowOptions) => {
-    console.log('rowOptions11', node);
+      o = fs(is, t)
+        ? o.concat(t)
+        : fs(is, e)
+        ? o.concat(e)
+        : o.concat('children');
+      const a = cloneDeep(get(store.store.transformed, o)) || [];
+      console.log('newNode11', i, a, o);
+      a.push(i);
+      store.store.updateTransformed('set', o, a);
+    };
+
+    const rowRenderer = (node, rowOptions) => {
+      return (
+        <SchemaRow
+          node={node}
+          {...node.metadata}
+          rowOptions={rowOptions}
+          store={store}
+          customRowActionRenderer={customRowActionRenderer}
+          refSelector={refSelector}
+          rootName={rootName}
+          whitelistTypes={whitelistTypes}
+          getRefLabel={getRefLabel}
+          shouldRenderGoToRef={shouldRenderGoToRef}
+          addHandler={addHandler}
+          removeHandler={removeHandler}
+          changeHandler={changeHandler}
+          typeChangeHandler={typeChangeHandler}
+          propsChangeHandler={propsChangeHandler}
+          isAutoFocusBlocked={store.isAutoFocusBlocked}
+          setAutoFocusBlocked={(e) => (store.isAutoFocusBlocked = e)}
+          swapHandler={swapHandler}
+          cloneHandler={cloneHandler}
+        />
+      );
+    };
+
     return (
-      <SchemaRow
-        node={node}
-        {...node.metadata}
-        rowOptions={rowOptions}
-        store={store}
-        customRowActionRenderer={customRowActionRenderer}
-        refSelector={refSelector}
-        rootName={rootName}
-        whitelistTypes={whitelistTypes}
-        getRefLabel={getRefLabel}
-        shouldRenderGoToRef={shouldRenderGoToRef}
-        addHandler={addHandler}
-        removeHandler={removeHandler}
-        changeHandler={changeHandler}
-        typeChangeHandler={typeChangeHandler}
-        propsChangeHandler={propsChangeHandler}
-        isAutoFocusBlocked={store.isAutoFocusBlocked}
-        setAutoFocusBlocked={(e) => (store.isAutoFocusBlocked = e)}
-        swapHandler={swapHandler}
-        cloneHandler={cloneHandler}
+      <TreeList
+        store={store.store.treeStore}
+        generateContextMenu={() => console.log('generateContextMenu')}
+        rowRenderer={rowRenderer}
+        className={classnames('SidebarTreeList', props.className)}
+        innerPadding={15}
+        initialScrollOffset={0}
+        autoSize={true}
       />
     );
-  };
-
-  return (
-    <TreeList
-      store={store.store.treeStore}
-      generateContextMenu={() => console.log('generateContextMenu')}
-      rowRenderer={rowRenderer}
-      className={classnames('SidebarTreeList', props.className)}
-      innerPadding={15}
-      initialScrollOffset={0}
-      autoSize={true}
-    />
-  );
-};
+  },
+);
 
 Schema.propTypes = {
   relativeJsonPath: PropTypes.array,

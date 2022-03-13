@@ -25,9 +25,9 @@ class JsonSchemaStore {
     this.sourceNodeId = sourceNodeId;
     this.relativeJsonPath = relativeJsonPath;
     const oasVersion = 'oas3_1';
-    this.store = new Schema(this.getSchema(), oasVersion);
+    this.store = new Schema(this.getSchema(), oasVersion, this.stores);
     //this._disposables.push(this.store);
-    //this._registerListeners();
+    this._registerListeners();
   }
 
   get sourceNode() {
@@ -53,28 +53,28 @@ class JsonSchemaStore {
   _registerListeners() {
     const e = this;
 
-    this.stores.graphStore.notifier.on(eventTypes.DidRemoveNode, ({id}) => {
-      if (this.sourceNodeId === id) {
-        this.store.schema = undefined;
-      }
-    });
+    // this.stores.graphStore.notifier.on(eventTypes.DidRemoveNode, ({id}) => {
+    //   if (this.sourceNodeId === id) {
+    //     this.store.schema = undefined;
+    //   }
+    // });
 
-    this.stores.graphStore.notifier.on(
-      eventTypes.DidChangeSourceNode,
-      action(
-        ({
-          node: {id: e},
+    // this.stores.graphStore.notifier.on(
+    //   eventTypes.DidChangeSourceNode,
+    //   action(
+    //     ({
+    //       node: {id: e},
 
-          change: {prop: t},
-        }) => {
-          if (this.sourceNodeId === e && t === 'data.parsed') {
-            this.setSchema();
-          }
-        },
-      ),
-    );
+    //       change: {prop: t},
+    //     }) => {
+    //       if (this.sourceNodeId === e && t === 'data.parsed') {
+    //         this.setSchema();
+    //       }
+    //     },
+    //   ),
+    // );
 
-    this.store.on(eventTypes.Change, (t) => {
+    e.stores.eventEmitter.on(eventTypes.StoreEvents.Change, (t) => {
       e.stores.graphStore.graph.patchSourceNodeProp(
         e.sourceNodeId,
         'data.parsed',

@@ -1,40 +1,130 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {clone, isEqual} from 'lodash';
+import classnames from 'classnames';
+import {
+  clone,
+  isEqual,
+  intersection,
+  pickBy,
+  isEmpty,
+  compact,
+  flattenDeep,
+} from 'lodash';
 import AutosizeInput from 'react-input-autosize';
 import {isParentNode} from '../../../utils/tree';
-import {Icon} from '@blueprintjs/core';
+import {
+  TextArea,
+  Button,
+  Colors,
+  Icon,
+  Popover,
+  Tooltip,
+} from '@blueprintjs/core';
 import Container from './TypeSelector/container';
 import {eventTypes} from '../../../datasets/tree';
+import MovePropertyButton from './movePropertyButton';
+import ValidationSelector from './ValidationSelector';
 
-const Ps = (e) => {
-  var t;
-  var n;
-  const r = clone((t = e.extraProps) !== null && t !== undefined ? t : {});
-  const i = clone(
-    (n = e.subtypeExtraProps) !== null && n !== undefined ? n : {},
-  );
-  let o = [];
+const is = ['allOf', 'oneOf', 'anyOf'];
+const os = ['object', 'array'];
+//const as = ['string', 'number', 'integer', 'boolean', 'null', '$ref'];
+const ss = os.concat(is);
 
-  if (e.type instanceof Array) {
-    o = e.type;
+const as = ['string', 'number', 'integer', 'boolean', 'null', '$ref'];
+const us = as.concat(os);
+const cs = ss.concat(as);
+
+const fs = (e, type) =>
+  type !== null &&
+  (Array.isArray(type) ? intersection(type, e).length > 0 : e.includes(type));
+const ps = (e, type) => (Array.isArray(type) ? type.includes(e) : type === e);
+
+const getRowState = (props) => {
+  const extraProps = clone(props.extraProps || {});
+  const subtypeExtraProps = clone(props.subtypeExtraProps || {});
+  let type = [];
+
+  if (props.type instanceof Array) {
+    type = props.type;
   } else {
-    if (e.type) {
-      o = [e.type];
+    if (props.type) {
+      type = [props.type];
     }
   }
 
   return {
-    type: o,
-    subtype: Array.isArray(e.subtype)
-      ? e.subtype
-      : e.subtype
-      ? [e.subtype]
+    type,
+    subtype: Array.isArray(props.subtype)
+      ? props.subtype
+      : props.subtype
+      ? [props.subtype]
       : [],
-    refPath: e.refPath,
-    extraProps: r,
-    subtypeExtraProps: i,
+    refPath: props.refPath,
+    extraProps,
+    subtypeExtraProps,
   };
+};
+
+const Is = (e, t) => {
+  const n = Object.assign({}, e);
+  t = Array.isArray(t) ? t : [t];
+  const r = pickBy(n, (e, n) => t.includes(n));
+
+  if (r.enum) {
+    n.enum = JSON.parse(r.enum, r.enum);
+  } else {
+    if (!(r.enum === undefined || r.enum)) {
+      delete n.enum;
+    }
+  }
+
+  if (r.additionalProperties) {
+    delete n.additionalProperties;
+  }
+
+  if (r.deprecated === false) {
+    delete n.deprecated;
+  }
+
+  for (const [e, t] of Object.entries(r)) {
+    if (!['boolean', 'number'].includes(typeof t) && isEmpty(t)) {
+      delete n[e];
+    }
+  }
+
+  return n;
+};
+
+const Os = (
+  e,
+  {type: t, subtype: n, ref: r, extraProps: i, subtypeExtraProps: o},
+) => {
+  let a = compact(flattenDeep([t]));
+  let s = compact(flattenDeep([n]));
+
+  if (a.length === 0) {
+    a = null;
+  } else {
+    if (a.length === 1) {
+      a = a[0];
+    }
+  }
+
+  if (s.length === 0) {
+    s = null;
+  } else {
+    if (s.length === 1) {
+      s = s[0];
+    }
+  }
+
+  let u = r;
+
+  if (!(ps('$ref', t) || ps('$ref', n))) {
+    u = null;
+  }
+
+  e(a, s, u, i, o);
 };
 
 const SubType = (e) => {
@@ -57,22 +147,21 @@ const SubType = (e) => {
   return null;
 };
 const Caret = ({node, hasChildren, treeStore}) => {
-  console.log('node12', node, hasChildren, treeStore);
   const toggleExpand = () => {
     treeStore.toggleExpand(node);
-    console.log('toggleExpand');
   };
   return hasChildren && isParentNode(node) ? (
     <div
       className="flex justify-center cursor-pointer p-1 rounded hover:bg-darken-3"
       style={{
-        marginLeft: -23.5,
+        marginLeft: -10.5,
         marginRight: 3.5,
         width: 20,
         height: 20,
       }}
       onClick={toggleExpand}
-      data-test="row-collapse">
+      data-test="row-collapse"
+    >
       <Icon
         icon={treeStore.isNodeExpanded(node) ? 'caret-down' : 'caret-right'}
       />
@@ -93,7 +182,8 @@ const AddPropertyBtn = ({node, handleAdd}) => {
         onClick={() => handleAdd(node)}
         data-test="add-property-btn"
         className="absolute flex items-center justify-center cursor-pointer rounded hover:bg-darken-3 z-10"
-        style={{width: 20, height: 20}}>
+        style={{width: 20, height: 20}}
+      >
         <Icon
           icon="plus"
           iconSize={12}
@@ -114,6 +204,7 @@ const SchemaInput = ({
   isAutoFocusBlocked,
   setAutoFocusBlocked,
   children,
+  onChange,
   ...props
 }) => {
   const [val, setVal] = React.useState(value || '');
@@ -130,12 +221,13 @@ const SchemaInput = ({
   }, [inputRef.current, isAutoFocusBlocked]);
 
   const handleBlur = () => {
-    if (props.onChange && value !== val) {
-      props.onChange(val);
+    if (onChange && value !== val) {
+      onChange(val);
     }
   };
 
   const handleChange = (e) => {
+    console.log('vall', e.target.value);
     setVal(e.target.value);
   };
 
@@ -154,7 +246,8 @@ const SchemaInput = ({
         }}
         tabIndex={1}
         inputClassName="bg-transparent hover:bg-darken-1 focus:bg-darken-2"
-        {...props}>
+        {...props}
+      >
         {children}
       </AutosizeInput>
     </span>
@@ -171,11 +264,14 @@ SchemaInput.propTypes = {
 
 const SchemaRow = (props) => {
   const {
+    index,
     level,
     node,
     type,
     subtype,
     refPath,
+    path,
+    extraProps,
     enumValue,
     childCount,
     store,
@@ -190,8 +286,63 @@ const SchemaRow = (props) => {
     format,
     isLast,
     parent,
+    addHandler,
+    changeHandler,
+    swapHandler,
+    cloneHandler,
+    removeHandler,
   } = props;
   const hasChildren = !!(isParentNode(node) && childCount && childCount > 0);
+
+  const renderValidationSelector = () => {
+    const {
+      type: e,
+      subtype: t,
+      refPath: n,
+      extraProps: r,
+      subtypeExtraProps: i,
+    } = getRowState(props);
+
+    return (
+      <ValidationSelector
+        type={e}
+        subtype={t}
+        extraProps={r}
+        subtypeExtraProps={i}
+        spec={props.store.spec}
+        handleUpdateProp={(o, a, s) => {
+          let u = {};
+
+          switch (o) {
+            case 'extraProps':
+              u = r;
+              break;
+            case 'subtypeExtraProps':
+              u = i;
+          }
+
+          if (s === '') {
+            delete u[a];
+          } else {
+            u[a] = s;
+          }
+
+          Os(handleSaveDetails, {
+            type: e,
+            subtype: t,
+            ref: n,
+            extraProps: o === 'extraProps' ? Is(u, a) : r,
+            subtypeExtraProps: o === 'subtypeExtraProps' ? Is(u, a) : i,
+          });
+
+          //this.props.store.emit(Za.ExtraPropUpdate, {
+          //field: a,
+          //value: s,
+          //});
+        }}
+      />
+    );
+  };
 
   //const {
   //node: r,
@@ -225,8 +376,38 @@ const SchemaRow = (props) => {
   //swapHandler: T,
   //} = props;
 
-  const handleAdd = () => {
-    console.log('Add');
+  const isExtensible = (type, subtype) => {
+    if (type) {
+      console.log('eee', type, subtype);
+      if (!(fs(ss, type) && !ps('array', type))) {
+        console.log('eee2', type, subtype);
+        if (fs(ss, subtype)) {
+          return !ps('array', subtype);
+        }
+      }
+      return true;
+    }
+  };
+
+  const handleAdd = (node, props) => {
+    const {type, subtype, path} = props;
+
+    //if (!isExtensible) {
+    //return;
+    //}
+
+    const inittype = type; //s
+    let u = '';
+    const initpath = path; //c
+    let l = [];
+
+    if (fs(ss, subtype) && !ps('array', subtype)) {
+      u = subtype;
+      l = ['children'];
+    }
+
+    store.store.treeStore.toggleExpand(node, true);
+    return addHandler(inittype, u, initpath, l);
   };
 
   const handleRefClick = () => {
@@ -238,43 +419,77 @@ const SchemaRow = (props) => {
     );
   };
 
-  const handleSaveDetails = (e, t, n, r, i) => {
+  const handleSaveDetails = (
+    selectedTypes,
+    selectedSubTypes,
+    selectedRefPath,
+    newExtraProps,
+    newSubtypeExtraProps,
+  ) => {
     const {
-      path: o,
-      type: a,
-      subtype: s,
-      refPath: u,
-      extraProps: c,
-      subtypeExtraProps: l,
-      propsChangeHandler: d,
-      typeChangeHandler: h,
+      path,
+      type,
+      subtype,
+      refPath,
+      extraProps,
+      subtypeExtraProps,
+      propsChangeHandler,
+      typeChangeHandler,
     } = props;
 
-    if (isEqual(l, i)) {
-      if (!isEqual(c, r)) {
-        d(o, r);
+    if (isEqual(subtypeExtraProps, newSubtypeExtraProps)) {
+      //i
+      if (!isEqual(extraProps, newExtraProps)) {
+        propsChangeHandler(path, newExtraProps);
       }
     } else {
-      d(o.concat(['children', '0']), i);
+      propsChangeHandler(path.concat(['children', '0']), newSubtypeExtraProps);
     }
 
-    if (!(isEqual(a, e) && isEqual(s, t) && u === n)) {
-      h(null, a, e, o, s, t, typeof n != 'string' ? (u != null ? u : null) : n);
+    if (
+      !(
+        isEqual(type, selectedTypes) &&
+        isEqual(subtype, selectedSubTypes) &&
+        refPath === selectedRefPath
+      )
+    ) {
+      typeChangeHandler(
+        null,
+        type,
+        selectedTypes,
+        path,
+        subtype,
+        selectedSubTypes,
+        typeof selectedRefPath != 'string'
+          ? refPath != null
+            ? refPath
+            : null
+          : selectedRefPath,
+      );
     }
   };
 
-  console.log('level11', level, name);
+  const isAdvancedType = !isCombinerChild && level !== 0 && fs(cs, type);
+  const isBasicType = fs(us, type) && type !== '$ref' && type !== 'noType';
+  const isRootOrRef = (level === 0 && !!rootName) || type === '$ref';
 
   return (
     <div
       className="flex-1 flex items-center overflow-hidden"
-      style={{marginLeft: 7, marginRight: 7}}>
-      <AddPropertyBtn node={node} handleAdd={handleAdd} />
+      style={{marginLeft: 7, marginRight: 7}}
+    >
+      {isExtensible(type, subtype) && (
+        <AddPropertyBtn
+          node={node}
+          handleAdd={(node) => handleAdd(node, props)}
+        />
+      )}
       <div
         className="flex flex-1 items-center text-sm leading-tight w-full h-full relative overflow-hidden"
         style={{
           paddingLeft: (level + 1) * 20 + 7,
-        }}>
+        }}
+      >
         <Caret
           node={node}
           hasChildren={hasChildren}
@@ -284,10 +499,13 @@ const SchemaRow = (props) => {
           {!isCombinerChild && (level != 0 || rootName) && (
             <SchemaInput
               type="text"
-              value={name}
+              value={name || ''}
               minWidth={0}
               isAutoFocusBlocked={isAutoFocusBlocked}
               setAutoFocusBlocked={setAutoFocusBlocked}
+              onChange={(e) => {
+                changeHandler(path.concat('name'), e);
+              }}
               onKeyDown={(e) => {
                 if (
                   isLast &&
@@ -322,7 +540,7 @@ const SchemaRow = (props) => {
             shouldRenderGoToRef={shouldRenderGoToRef}
             rootName={rootName}
             onRefClick={handleRefClick}
-            rowState={Ps(props)}
+            rowState={getRowState(props)}
             handleSaveDetails={handleSaveDetails}
           />
           <SubType
@@ -333,14 +551,132 @@ const SchemaRow = (props) => {
           />
         </div>
       </div>
+      <div
+        className={classnames('ml-auto mr-4 JsonSchemaEditor_ActionItems', {
+          'mr-12 pr-4': !isBasicType,
+        })}
+      >
+        <MovePropertyButton
+          data-test="move-property-up-button"
+          icon={<Icon icon="arrow-up" iconSize={12} color={Colors.GRAY4} />}
+          tooltip="move up"
+          disabled={level === 0 || index === 0}
+          onClick={() => {
+            swapHandler(path, index, index - 1);
+          }}
+        />
+        <MovePropertyButton
+          data-test="move-property-down-button"
+          icon={<Icon icon="arrow-down" iconSize={12} color={Colors.GRAY4} />}
+          tooltip="move down"
+          disabled={
+            level === 0 ||
+            (parent &&
+              parent.metadata &&
+              parent.metadata.childCount === index + 1)
+          }
+          onClick={() => {
+            swapHandler(path, index, index + 1);
+          }}
+        />
+        <MovePropertyButton
+          data-test="duplicate-property-button"
+          icon={<Icon icon="duplicate" iconSize={12} color={Colors.GRAY4} />}
+          tooltip="duplicate"
+          disabled={level === 0}
+          onClick={() => {
+            cloneHandler(path);
+          }}
+        />
+        <MovePropertyButton
+          data-test="remove-property-button"
+          icon={<Icon icon="trash" iconSize={12} color={Colors.GRAY4} />}
+          tooltip="remove"
+          disabled={level === 0}
+          onClick={() => {
+            removeHandler(path);
+          }}
+        />
+        {/* {isBasicType && renderValidationSelector(props)} */}
+        <Tooltip
+          boundary="window"
+          position="top"
+          content="Required?"
+          disabled={!isAdvancedType}
+        >
+          <Button
+            data-test="property-required-btn"
+            className={classnames({'opacity-25': isAdvancedType})}
+            small={true}
+            minimal={true}
+            disabled={!isAdvancedType}
+            onClick={() => {
+              changeHandler(path.concat('required'), !extraProps.required);
+            }}
+            title="Required"
+            icon={
+              <Icon
+                icon="issue"
+                iconSize={12}
+                color={extraProps.required ? Colors.RED3 : Colors.GRAY4}
+              />
+            }
+          />
+        </Tooltip>
+        <Popover
+          position="top-right"
+          boundary="window"
+          disabled={isRootOrRef}
+          target={
+            <Tooltip
+              boundary="window"
+              position="top"
+              content="Description"
+              disabled={isRootOrRef}
+            >
+              <Button
+                data-test="property-description-btn"
+                className={classnames('z-10', {'opacity-25': isRootOrRef})}
+                small={true}
+                minimal={true}
+                disabled={isRootOrRef}
+                icon={
+                  <Icon
+                    icon="manual"
+                    iconSize={12}
+                    color={extraProps.description ? Colors.BLUE4 : Colors.GRAY4}
+                  />
+                }
+              />
+            </Tooltip>
+          }
+          content={
+            <TextArea
+              className="relative max-h-400px overflow-auto"
+              style={{
+                width: 400,
+                minHeight: 38,
+              }}
+              placeholder="Description..."
+              aria-label={'description'}
+              growVertically
+              value={extraProps.description || ''}
+              onChange={(e) =>
+                changeHandler(path.concat(['description']), e.target.value)
+              }
+            />
+          }
+        />
+      </div>
     </div>
   );
 };
 
 SchemaRow.propTypes = {
+  path: PropTypes.array,
   level: PropTypes.number,
   node: PropTypes.object,
-  type: PropTypes.string,
+  type: PropTypes.oneOfType([PropTypes.string, PropTypes.array]),
   subtype: PropTypes.string,
   index: PropTypes.number,
   parent: PropTypes.object,
@@ -357,12 +693,16 @@ SchemaRow.propTypes = {
   subtypeExtraProps: PropTypes.object,
   propsChangeHandler: PropTypes.func,
   typeChangeHandler: PropTypes.func,
-  path: PropTypes.array,
   enumValue: PropTypes.string,
   getRefLabel: PropTypes.func,
   shouldRenderGoToRef: PropTypes.func,
   refSelector: PropTypes.func,
   format: PropTypes.string,
+  addHandler: PropTypes.func,
+  changeHandler: PropTypes.func,
+  swapHandler: PropTypes.func,
+  cloneHandler: PropTypes.func,
+  removeHandler: PropTypes.func,
 };
 
 export default SchemaRow;

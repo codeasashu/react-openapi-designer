@@ -2,7 +2,8 @@ import React from 'react';
 import {isArray, isString} from 'lodash';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import {Popover2} from '@blueprintjs/popover2';
+//import {Popover2} from '@blueprintjs/popover2';
+import {Popover} from '@blueprintjs/core';
 import Selector from './selector';
 
 const hs = {
@@ -75,15 +76,14 @@ const Ref = (props) => {
   let types = [];
 
   for (const index in _types) {
-    // const e of ..
     if (!Object.prototype.hasOwnProperty.call(_types, index)) {
       continue;
     }
 
-    let _type = _types[index]; // t
-    let _subtype = (subtype !== _type && subtype) || ''; //n
-    let ref = ''; // r
-    const refLabel = getRefLabel ? getRefLabel(refPath) : refPath; // i
+    let _type = _types[index];
+    let _subtype = (subtype !== _type && subtype) || '';
+    let ref = '';
+    const refLabel = getRefLabel ? getRefLabel(refPath) : refPath;
 
     if (!_type) {
       _type = 'any';
@@ -151,12 +151,15 @@ const Ref = (props) => {
       </div>,
     );
 
-    //if ((parseInt(index) + 1) < I.length) {
-    //D.push(c.createElement("span", {
-    //key: D.length,
-    //className: "mx-2 opacity-75 text-darken-7 dark:text-lighten-9",
-    //}, "or"))
-    //}
+    if (parseInt(index) + 1 < _types.length) {
+      types.push(
+        <span
+          key={types.length}
+          className="mx-2 opacity-75 text-darken-7 dark:text-lighten-9">
+          or
+        </span>,
+      );
+    }
   }
 
   console.log('refloading', store.refLoading);
@@ -165,13 +168,12 @@ const Ref = (props) => {
       {!isCombinerChild && (level > 0 || rootName) && (
         <span className="mr-2">:</span>
       )}
-      <Popover2
-        boundary="window"
-        placement="top-left"
+      <Popover
+        placement="top"
         interactionKind="click"
-        onInteraction={handleOpen}
+        //onInteraction={handleOpen}
         className="TypeSelector"
-        isOpen={isOpen}
+        //isOpen={isOpen}
         content={
           <Selector
             id={id}
@@ -185,17 +187,14 @@ const Ref = (props) => {
             handleSave={handleSaveDetails}
           />
         }
-        renderTarget={(targetProps) => {
-          return (
-            <div
-              tabIndex={0}
-              className="flex items-center cursor-pointer hover:underline truncate">
-              {types.length ? types : 'noType'}
-            </div>
-          );
-        }}
-        targetProps={{'data-test': 'property-type-selector'}}
         usePortal={true}
+        target={
+          <div
+            tabIndex={0}
+            className="flex items-center cursor-pointer hover:underline truncate">
+            {types.length ? types : 'noType'}
+          </div>
+        }
       />
       {refLink}
     </div>
