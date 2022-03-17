@@ -414,8 +414,8 @@ const SchemaRow = (props) => {
   const handleRefClick = () => {
     var e;
 
-    this.props.store.emit(
-      eventTypes.GoToRef,
+    store.stores.eventEmitter.emit(
+      eventTypes.StoreEvents.GoToRef,
       String((e = refPath) !== null && e !== undefined ? e : ''),
     );
   };

@@ -160,9 +160,9 @@ const refMenus = () => {
 
                   let formattedNodeUri = nodeUri ? `#${nodeUri}` : ''; //o
 
-                  if (!formattedNodeUri.startsWith('.')) {
-                    formattedNodeUri = './' + formattedNodeUri;
-                  }
+                  // if (!formattedNodeUri.startsWith('.')) {
+                  //   formattedNodeUri = './' + formattedNodeUri;
+                  // }
 
                   if (formattedNodeUri.startsWith('./' + prev.path)) {
                     formattedNodeUri = formattedNodeUri.replace(
@@ -173,7 +173,7 @@ const refMenus = () => {
 
                   return formattedNodeUri;
                 })(activeSourceNode, node)
-              : './' + node.path;
+              : node.path;
 
           const nodePath =
             (NodeCategories.Source === node.category

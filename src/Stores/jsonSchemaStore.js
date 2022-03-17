@@ -1,6 +1,6 @@
-import {action} from 'mobx';
+// import {action} from 'mobx';
 import {debounce, get} from 'lodash';
-import {eventTypes, nodeOperations} from '../datasets/tree';
+import {eventTypes, NodeCategories, nodeOperations} from '../datasets/tree';
 import Schema from './oas/schema';
 
 class JsonSchemaStore {
@@ -17,7 +17,53 @@ class JsonSchemaStore {
       this.setSchema.cancel();
     };
 
-    //this.goToRef = (e) => {};
+    this.goToRef = (e) => {
+      console.log('GotoRefa11', e);
+      if (!this.sourceNode) {
+        return;
+      }
+
+      // if (A.isURL(e)) {
+      //   this.stores.browserStore.openUrlInBrowser(e);
+      //   return;
+      // }
+
+      let sourceNodeUri;
+      let nodeUri;
+
+      if (e.startsWith('#')) {
+        sourceNodeUri = this.sourceNode.uri;
+        nodeUri = e.slice(1);
+      }
+
+      const sourceNode = this.stores.graphStore.getNodeByUri(sourceNodeUri);
+
+      if (
+        sourceNode === undefined ||
+        NodeCategories.Source !== sourceNode.category
+      ) {
+        console.warn(
+          'Could not redirect to ref. Is the file missing? Diagnostics panel might contain more information.',
+        );
+      } else if (nodeUri === undefined) {
+        this.stores.uiStore.setActiveNode(sourceNode);
+      } else {
+        const node = this.stores.graphStore.getNodeByUri(
+          `${sourceNodeUri}${nodeUri}`,
+        );
+
+        if (node !== undefined && NodeCategories.SourceMap === node.category) {
+          console.log('Going to node1', node);
+          this.stores.uiStore.setActiveNode(node);
+        } else {
+          console.log('Going to node2', sourceNode);
+          this.stores.uiStore.setActiveNode(sourceNode);
+          console.warn(
+            'We redirected you to the file, but the ref could not be found.',
+          );
+        }
+      }
+    };
 
     const {relativeJsonPath, sourceNodeId} = node; // n, i
 
@@ -88,6 +134,9 @@ class JsonSchemaStore {
       );
     });
 
+    e.stores.eventEmitter.on(eventTypes.StoreEvents.GoToRef, (t) => {
+      this.goToRef(t);
+    });
     //this._disposables.push(this.store.on(Za.GoToRef, this.goToRef))
   }
 }

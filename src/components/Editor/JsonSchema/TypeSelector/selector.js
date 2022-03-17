@@ -115,7 +115,8 @@ const TypeList = ({
         key={'t-' + e}
         onClick={() => {
           clickHandler(e === 'none' ? null : e);
-        }}>
+        }}
+      >
         {e}
       </div>,
     );
@@ -153,11 +154,11 @@ const Selector = ({
 }) => {
   var d;
   const h = difference(validTypes, is);
-  let f;
+  let subtypes;
   let p;
 
   if (ps('array', r)) {
-    f = (
+    subtypes = (
       <TypeList
         className="mt-4"
         sectionName="SUBTYPE"
@@ -197,43 +198,45 @@ const Selector = ({
   }
 
   if (ps('$ref', r) || ps('$ref', i)) {
-    p =
-      (d =
-        t == null
-          ? undefined
-          : t({
-              id: e,
-              refPath: o,
+    const d =
+      t == null
+        ? undefined
+        : t({
+            id: e,
+            refPath: o,
 
-              onChange: (e) => {
-                Os(l, {
-                  type: r,
-                  subtype: i,
-                  ref: e,
-                  extraProps: a,
-                  subtypeExtraProps: u,
-                });
-              },
-            })) !== null && d !== undefined ? (
-        d
-      ) : (
-        <InputGroup
-          className="text-sm w-full"
-          value={o}
-          onChange={(e) => {
-            Os(l, {
-              type: r,
-              subtype: i,
-              ref: String(e.target.value),
-              extraProps: a,
-              subtypeExtraProps: u,
-            });
-          }}
-        />
-      );
+            onChange: (e) => {
+              Os(l, {
+                type: r,
+                subtype: i,
+                ref: e,
+                extraProps: a,
+                subtypeExtraProps: u,
+              });
+            },
+          });
+
+    console.log('dd', d);
+    p = d ? (
+      d
+    ) : (
+      <InputGroup
+        className="text-sm w-full"
+        value={o}
+        onChange={(e) => {
+          Os(l, {
+            type: r,
+            subtype: i,
+            ref: String(e.target.value),
+            extraProps: a,
+            subtypeExtraProps: u,
+          });
+        }}
+      />
+    );
   }
 
-  const g = (
+  const combinerTypes = (
     <TypeList
       whitelistTypes={n}
       sectionName={'TYPE'}
@@ -250,7 +253,7 @@ const Selector = ({
     />
   );
 
-  const m = (
+  const basicTypes = (
     <TypeList
       data-test="property-type-selector-basic-section"
       className="mt-2"
@@ -302,9 +305,9 @@ const Selector = ({
 
   return (
     <div className="flex flex-col text-sm p-3">
-      {g}
-      {m}
-      {f}
+      {combinerTypes}
+      {basicTypes}
+      {subtypes}
       {p}
     </div>
   );
