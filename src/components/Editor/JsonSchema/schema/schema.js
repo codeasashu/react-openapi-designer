@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-// import {toJS} from 'mobx';
 import {observer} from 'mobx-react';
 import {
   get,
@@ -13,10 +12,10 @@ import {
   merge,
   intersection,
 } from 'lodash';
-import TreeList from '../../Tree/List';
-import SchemaRow from './row';
-import {basename, extname} from '../../../utils/tree';
-import Ja from '../../../utils/oas/ja';
+import TreeList from '../../../Tree/List';
+import SchemaRow from '../row';
+import {basename, extname} from '../../../../utils/tree';
+import Ja from '../../../../utils/oas/ja';
 
 const is = ['allOf', 'oneOf', 'anyOf'];
 const fs = (e, t) =>
@@ -97,17 +96,6 @@ const Schema = observer(
       selectedSubTypes,
       selectedRefPath,
     ) => {
-      // (e, t, n, r, i, o, a) => {
-      console.log(
-        'typeChangeHandler',
-        e,
-        type,
-        selectedTypes,
-        path,
-        subtype,
-        selectedSubTypes,
-        selectedRefPath,
-      );
       Ja(
         {
           schema: store.store.transformed,
@@ -171,7 +159,6 @@ const Schema = observer(
         ? o.concat(e)
         : o.concat('children');
       const a = cloneDeep(get(store.store.transformed, o)) || [];
-      console.log('newNode11', i, a, o);
       a.push(i);
       store.store.updateTransformed('set', o, a);
     };
@@ -205,7 +192,7 @@ const Schema = observer(
     return (
       <TreeList
         store={store.store.treeStore}
-        generateContextMenu={() => console.log('generateContextMenu')}
+        generateContextMenu={() => {}}
         rowRenderer={rowRenderer}
         className={classnames('SidebarTreeList', props.className)}
         rowHeight={() => 30}

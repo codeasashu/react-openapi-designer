@@ -1,10 +1,28 @@
 import {makeObservable, computed, observable, reaction, action} from 'mobx';
-import {isEmpty, set, omit, unset, intersection} from 'lodash';
+import {isObject, isEmpty, set, omit, unset, intersection} from 'lodash';
+import jsf from 'json-schema-faker';
 import {eventTypes} from '../../datasets/tree';
 import Transformer from './transformer';
 import Tree from '../../Tree/SchemaTree';
 import TreeState from '../../Tree/State';
 import TreeStore from '../../Tree/Store';
+import GenerateSchema from '../../utils/generate-schema';
+import {fillSchema} from '../../utils/schema';
+import EventEmitter from '../../EventEmitter';
+
+jsf.define('fixedValue', (value, schema) => {
+  switch (schema?.type) {
+    case 'string':
+      return 'string';
+    case 'integer':
+    case 'number':
+      return 0;
+    case 'boolean':
+      return true;
+    default:
+      return value;
+  }
+});
 
 const ls = [
   '$ref',
@@ -65,9 +83,17 @@ class Schema {
 
     this.stores = stores;
 
+    jsf.option({
+      requiredOnly: false,
+      fillProperties: true,
+      optionalsProbability: 0,
+      alwaysFakeOptionals: true,
+    });
+
     this.transformer = Transformer(spec);
     this.spec = spec;
     this.schema = schema;
+    this.eventEmitter = new EventEmitter();
     const treeState = new TreeState();
 
     this.tree = new Tree(
@@ -84,10 +110,24 @@ class Schema {
     this._setupReactions();
   }
 
+  generateSchema(code) {
+    let generatedJSON = null;
+    try {
+      generatedJSON = JSON.parse(code);
+    } catch (error) {
+      console.warn('[JSON parseError]', error);
+      throw 'Invalid JSON';
+    }
+    if (isObject(generatedJSON)) {
+      const value = GenerateSchema(generatedJSON);
+      this.schema = fillSchema(value);
+    }
+  }
+
   _onSchemaChange(e) {
     if (!this._externalUpdate) {
       console.log('emit Change', e);
-      this.stores.eventEmitter.emit(eventTypes.StoreEvents.Change, e);
+      this.eventEmitter.emit(eventTypes.StoreEvents.Change, e);
     }
   }
 

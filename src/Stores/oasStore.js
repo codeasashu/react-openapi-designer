@@ -1,8 +1,25 @@
 import {hasIn, escapeRegExp} from 'lodash';
 import {toFSPath, resolve, isURL} from '@stoplight/path';
+import {cloneDeep} from 'lodash';
+import {schemaWalk} from '@cloudflare/json-schema-walker';
 import Path from './oas/path';
 import Service from './oas/service';
 import {eventTypes, nodeOperations} from '../datasets/tree';
+import jsf from 'json-schema-faker';
+
+jsf.define('fixedValue', (value, schema) => {
+  switch (schema?.type) {
+    case 'string':
+      return 'string';
+    case 'integer':
+    case 'number':
+      return 0;
+    case 'boolean':
+      return true;
+    default:
+      return value;
+  }
+});
 
 class OasStore {
   constructor(e) {
@@ -57,6 +74,30 @@ class OasStore {
         this.stores.uiStore.setActiveNode(node);
       }
     });
+  }
+
+  generateExampleFromSchema(schema) {
+    schema = cloneDeep(schema);
+    schemaWalk(
+      schema,
+      (_schema) => {
+        if (Object.prototype.hasOwnProperty.call(_schema, 'type')) {
+          switch (_schema.type.toLowerCase()) {
+            case 'string':
+            case 'integer':
+            case 'boolean':
+            case 'number':
+              _schema['fixedValue'] = true;
+          }
+        }
+      },
+      null,
+    );
+    const value = jsf.generate(
+      cloneDeep({...schema, additionalProperties: false}),
+    );
+
+    return value;
   }
 
   addSharedParameter({sourceNodeId, name, parameterType}) {

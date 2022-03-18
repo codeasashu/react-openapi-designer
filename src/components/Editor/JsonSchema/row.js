@@ -160,8 +160,7 @@ const Caret = ({node, hasChildren, treeStore}) => {
         height: 20,
       }}
       onClick={toggleExpand}
-      data-test="row-collapse"
-    >
+      data-test="row-collapse">
       <Icon
         icon={treeStore.isNodeExpanded(node) ? 'caret-down' : 'caret-right'}
       />
@@ -182,8 +181,7 @@ const AddPropertyBtn = ({node, handleAdd}) => {
         onClick={() => handleAdd(node)}
         data-test="add-property-btn"
         className="absolute flex items-center justify-center cursor-pointer rounded hover:bg-darken-3 z-10"
-        style={{width: 20, height: 20}}
-      >
+        style={{width: 20, height: 20}}>
         <Icon
           icon="plus"
           iconSize={12}
@@ -247,8 +245,7 @@ const SchemaInput = ({
         }}
         tabIndex={1}
         inputClassName="bg-transparent hover:bg-darken-1 focus:bg-darken-2"
-        {...props}
-      >
+        {...props}>
         {children}
       </AutosizeInput>
     </span>
@@ -414,7 +411,7 @@ const SchemaRow = (props) => {
   const handleRefClick = () => {
     var e;
 
-    store.stores.eventEmitter.emit(
+    store.store.eventEmitter.emit(
       eventTypes.StoreEvents.GoToRef,
       String((e = refPath) !== null && e !== undefined ? e : ''),
     );
@@ -477,8 +474,7 @@ const SchemaRow = (props) => {
   return (
     <div
       className="flex-1 flex items-center overflow-hidden"
-      style={{marginLeft: 7, marginRight: 7}}
-    >
+      style={{marginLeft: 7, marginRight: 7}}>
       {isExtensible(type, subtype) && (
         <AddPropertyBtn
           node={node}
@@ -489,8 +485,7 @@ const SchemaRow = (props) => {
         className="flex flex-1 items-center text-sm leading-tight w-full h-full relative overflow-hidden"
         style={{
           paddingLeft: (level + 1) * 20 + 7,
-        }}
-      >
+        }}>
         <Caret
           node={node}
           hasChildren={hasChildren}
@@ -556,8 +551,7 @@ const SchemaRow = (props) => {
       <div
         className={classnames('ml-auto mr-4 JsonSchemaEditor_ActionItems', {
           'mr-12 pr-4': !isBasicType,
-        })}
-      >
+        })}>
         <MovePropertyButton
           data-test="move-property-up-button"
           icon={<Icon icon="arrow-up" iconSize={12} color={Colors.GRAY4} />}
@@ -604,8 +598,7 @@ const SchemaRow = (props) => {
           boundary="window"
           position="top"
           content="Required?"
-          disabled={!isAdvancedType}
-        >
+          disabled={!isAdvancedType}>
           <Button
             data-test="property-required-btn"
             className={classnames({'opacity-25': isAdvancedType})}
@@ -634,8 +627,7 @@ const SchemaRow = (props) => {
               boundary="window"
               position="top"
               content="Description"
-              disabled={isRootOrRef}
-            >
+              disabled={isRootOrRef}>
               <Button
                 data-test="property-description-btn"
                 className={classnames('z-10', {'opacity-25': isRootOrRef})}

@@ -313,7 +313,7 @@ const Transformer = (e) => {
           try {
             t[e] = JSON.parse(t[e]);
           } catch (e) {
-            console.error(e);
+            console.warn(e);
           }
         }
       }

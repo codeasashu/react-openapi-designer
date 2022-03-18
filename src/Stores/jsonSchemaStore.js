@@ -18,7 +18,6 @@ class JsonSchemaStore {
     };
 
     this.goToRef = (e) => {
-      console.log('GotoRefa11', e);
       if (!this.sourceNode) {
         return;
       }
@@ -53,10 +52,8 @@ class JsonSchemaStore {
         );
 
         if (node !== undefined && NodeCategories.SourceMap === node.category) {
-          console.log('Going to node1', node);
           this.stores.uiStore.setActiveNode(node);
         } else {
-          console.log('Going to node2', sourceNode);
           this.stores.uiStore.setActiveNode(sourceNode);
           console.warn(
             'We redirected you to the file, but the ref could not be found.',
@@ -120,7 +117,7 @@ class JsonSchemaStore {
     //   ),
     // );
 
-    e.stores.eventEmitter.on(eventTypes.StoreEvents.Change, (t) => {
+    this.store.eventEmitter.on(eventTypes.StoreEvents.Change, (t) => {
       e.stores.graphStore.graph.patchSourceNodeProp(
         e.sourceNodeId,
         'data.parsed',
@@ -134,7 +131,7 @@ class JsonSchemaStore {
       );
     });
 
-    e.stores.eventEmitter.on(eventTypes.StoreEvents.GoToRef, (t) => {
+    this.store.eventEmitter.on(eventTypes.StoreEvents.GoToRef, (t) => {
       this.goToRef(t);
     });
     //this._disposables.push(this.store.on(Za.GoToRef, this.goToRef))

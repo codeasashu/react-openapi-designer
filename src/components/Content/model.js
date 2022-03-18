@@ -46,7 +46,8 @@ const ModelContent = observer(({relativeJsonPath, node}) => {
             </div>
           </div>
           <SchemaDesigner
-            relativeJsonPath={relativeJsonPath}
+            schemaPath={relativeJsonPath}
+            examplesPath={relativeJsonPath.concat('examples')}
             className="mt-6"
           />
         </div>

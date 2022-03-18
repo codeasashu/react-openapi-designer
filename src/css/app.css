@@ -137,6 +137,9 @@
     font-size: 12px;
     font-weight: 400;
 }
+.bp3-dark .bp3-simple-tab.selected-tab {
+	background-color: rgb(55 65 81)!important;
+}
 .bp3-simple-tab.bp3-dark:hover, .bp3-dark .bp3-simple-tab:hover {
     color: #ced9e0;
 }

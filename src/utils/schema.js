@@ -30,6 +30,18 @@ export const fillType = (schema) => {
   return _schema;
 };
 
+export const getEditorLanguage = (mediaType) => {
+  if (/json/.test(mediaType)) {
+    return 'json';
+  } else {
+    if (/html|xml/.test(mediaType)) {
+      return 'html';
+    } else {
+      return 'yaml';
+    }
+  }
+};
+
 const fillTitle = (schema) =>
   !hasTitle(schema) ? Object.assign({}, {title: ''}, schema) : schema;
 

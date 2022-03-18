@@ -1,77 +1,118 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import Schema from './schema';
 import {observer} from 'mobx-react';
+import {get, keys, cloneDeep} from 'lodash';
+import {Tabs, TabList, Tab, TabPanel} from 'react-tabs';
+import {Button, Icon} from '@blueprintjs/core';
+import SwaggerParser from '@apidevtools/swagger-parser';
 import {StoresContext} from '../../Context';
-import RefSelector from './RefSelector';
-import {getRefProviders} from '../../../utils/selectors';
+import Schema from './schema';
+import Example from './examples';
+import {usePatchOperation, getValueFromStore} from '../../../utils/selectors';
+import {nodeOperations} from '../../../datasets/tree';
 
-// function sg(e = '', t = []) {
-//   return t.find((t) => {
-//     var n;
-//     return !!((n = t.matcher) === null || n === undefined
-//       ? undefined
-//       : n.call(t, e));
-//   });
-// }
+function usePrevious(e) {
+  const t = React.useRef(e);
 
-const JsonSchema = observer(({relativeJsonPath}) => {
-  const stores = React.useContext(StoresContext);
-  const {activeSourceNodeId} = stores.uiStore;
-  const storeId = relativeJsonPath
-    ? [activeSourceNodeId, ...relativeJsonPath].join('/')
-    : activeSourceNodeId;
-
-  const store = stores.jsonSchemaCollection.lookup(storeId, {
-    id: storeId,
-    relativeJsonPath,
-    sourceNodeId: activeSourceNodeId,
+  React.useEffect(() => {
+    t.current = e;
   });
 
-  const refProviders = getRefProviders();
+  return t.current;
+}
 
-  return (
-    <div>
-      <Schema
-        customRowActionRenderer={() => {
-          // const {
-          //     refPath: t,
-          // } = e
+const JsonSchema = observer(
+  ({schemaPath, examplesPath, mediaType, className}) => {
+    const stores = React.useContext(StoresContext);
+    const {activeSourceNode} = stores.uiStore;
+    const [selectedTab, setSelectedTab] = React.useState(0);
+    const previousTab = usePrevious(selectedTab);
 
-          // if (t !== undefined) {
-          //     const n = sg(t, u)
+    const examples = getValueFromStore(examplesPath);
+    const exampleNames = keys(examples);
+    const previousExampleNames = usePrevious(exampleNames);
+    const inputRef = React.useRef(null);
 
-          //     if (ug.SCDM === (n == null ? undefined : n.name)) {
-          //         return c.createElement(Mg, Object.assign({}, e))
-          //     }
-          // }
+    const handlePatch = usePatchOperation();
 
-          return null;
-        }}
-        refSelector={({id, refPath, onChange}) => (
-          <RefSelector
-            id={id}
-            refPath={refPath}
-            refProviders={refProviders}
-            onChange={onChange}
-            store={store.store}
-          />
-        )}
-        store={store}
-        // getRefLabel={(e) => {
-        //   const t = sg(e, u);
+    React.useEffect(() => {
+      if (exampleNames.length) {
+        if (previousExampleNames.length > exampleNames.length) {
+          const newIndex = previousTab - 1;
+          setSelectedTab(newIndex < 0 ? 0 : newIndex);
+        }
+      } else {
+        setSelectedTab(0);
+      }
+    }, [exampleNames.length, previousExampleNames.length, previousTab]);
 
-        //   if (t) {
-        //     return t.getRefLabel(e);
-        //   } else {
-        //     return e;
-        //   }
-        // }}
-        // shouldRenderGoToRef={(e) => !!e && !f.match(e)}
-      />
-    </div>
-  );
-});
+    React.useLayoutEffect(() => {
+      if (inputRef && inputRef.current) {
+        inputRef.current.focus();
+      }
+    }, [selectedTab]);
+
+    const addExample = async () => {
+      let api = await SwaggerParser.dereference(
+        cloneDeep(activeSourceNode.data.parsed),
+      );
+      const schema = get(api, schemaPath);
+      const value = stores.oasStore.generateExampleFromSchema(schema);
+      handlePatch(
+        nodeOperations.Add,
+        examplesPath.concat('example-' + (exampleNames.length + 1)),
+        {value},
+      );
+      setSelectedTab(exampleNames.length + 1);
+    };
+
+    return (
+      <div className={className}>
+        <Tabs
+          className="react-tabs"
+          selectedTabClassName="selected-tab bg-gray-700"
+          selectedTabPanelClassName="block"
+          selectedIndex={selectedTab}
+          onSelect={(tab) => setSelectedTab(tab)}>
+          <TabList className="bp3-simple-tab-list">
+            <Tab className="bp3-simple-tab">Schema</Tab>
+            {exampleNames.map((example, i) => (
+              <Tab className="bp3-simple-tab" key={i}>
+                {example}
+              </Tab>
+            ))}
+            <Button
+              minimal
+              small
+              icon={<Icon iconSize={12} icon="plus" />}
+              onClick={addExample}>
+              Example
+            </Button>
+          </TabList>
+          <TabPanel className="bp3-simple-tab-panel">
+            <div className="border-2 border-gray-600">
+              <Schema relativeJsonPath={schemaPath} maxRows={25} />
+            </div>
+          </TabPanel>
+          {exampleNames.map((example) => (
+            <TabPanel key={example}>
+              <div className="p-4 bg-canvas border-2">
+                <Example
+                  title={example}
+                  inputRef={inputRef}
+                  mediaType={mediaType}
+                  examplePath={examplesPath.concat(example)}
+                  exampleValuePath={examplesPath.concat([example, 'value'])}
+                  content={examplesPath.concat([example, 'value'])}
+                />
+              </div>
+            </TabPanel>
+          ))}
+        </Tabs>
+      </div>
+    );
+  },
+);
 
 JsonSchema.propTypes = {
   relativeJsonPath: PropTypes.array,

@@ -3,8 +3,6 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {observer} from 'mobx-react-lite';
 import {keys, difference, uniq, sortBy} from 'lodash';
-//import Description from './description';
-//import Parameters from './parameters';
 import {
   getValueFromStore,
   usePatchOperation,
@@ -13,18 +11,14 @@ import {Button, ControlGroup, HTMLSelect, Icon} from '@blueprintjs/core';
 import {nodeOperations} from '../../../../datasets/tree';
 import {contentTypes as allContentTypes} from '../../../../datasets/http';
 import ContentTypeSuggest from '../../../Pickers/ContentTypeSuggest';
-//import {MarkdownEditor} from '../../../Editor';
-//import SchemaDesigner from '../../../Designer/Schema';
-import SchemaDesigner from '../../../Editor/oasSchema';
+import SchemaDesigner from '../../../Editor/JsonSchema';
 
 const Response = observer(({className, contentPath}) => {
   const handlePatch = usePatchOperation();
   const contentTypes = getValueFromStore(contentPath, false);
   let mediaTypes = [];
-  //let relativeJsonPaths = [];
   if (contentTypes) {
     mediaTypes = keys(contentTypes);
-    //relativeJsonPaths = mediaTypes.map((i) => contentPath.concat(i));
   }
 
   const hasMediaType = mediaTypes && mediaTypes.length > 0;
@@ -33,15 +27,6 @@ const Response = observer(({className, contentPath}) => {
     hasMediaType ? mediaTypes[0] : undefined,
   );
   const mediaRef = React.useRef(null);
-
-  //const stores = React.useContext(StoresContext);
-  //const parameterJsonPath = mapParametersJsonPaths(relativeJsonPath);
-
-  //const {
-  //activeSourceNode,
-  //} = stores.uiStore;
-
-  //const handlePatch = usePatchOperation();
 
   return (
     <div className={className}>
@@ -126,7 +111,8 @@ const Response = observer(({className, contentPath}) => {
       {mediaType && hasMediaType && (
         <SchemaDesigner
           className="mt-6"
-          relativeJsonPath={contentPath.concat([mediaType, 'schema'])}
+          schemaPath={contentPath.concat([mediaType, 'schema'])}
+          examplesPath={contentPath.concat([mediaType, 'examples'])}
         />
       )}
     </div>
