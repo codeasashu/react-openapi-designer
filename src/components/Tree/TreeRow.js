@@ -72,7 +72,8 @@ const TreeRow = observer((props) => {
     itemClassName,
     {
       'TreeListItem--active': isActive,
-      'TreeListItem--striped': striped && nodeIndex % 2 != 0,
+      'TreeListItem--striped bg-white bg-opacity-5':
+        striped && nodeIndex % 2 != 0,
     },
   );
 

@@ -196,7 +196,9 @@ const Schema = observer(
         rowRenderer={rowRenderer}
         className={classnames('SidebarTreeList', props.className)}
         rowHeight={() => 30}
+        maxRows={25}
         initialScrollOffset={0}
+        striped
       />
     );
   },
