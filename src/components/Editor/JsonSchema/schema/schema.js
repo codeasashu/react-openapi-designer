@@ -120,16 +120,16 @@ const Schema = observer(
       store.store.updateTransformed('set', path, schema);
     };
 
-    const changeHandler = (e, t) => {
-      store.store.updateTransformed('set', e, t);
+    const changeHandler = (path, schema) => {
+      store.store.updateTransformed('set', path, schema);
     };
 
-    const removeHandler = (e) => {
-      const t = cloneDeep(store.store.transformed);
-      const n = clone(e);
-      const r = n.pop();
-      pullAt(get(t, n), Number(r));
-      store.store.updateTransformed('set', [], t);
+    const removeHandler = (path) => {
+      const schema = cloneDeep(store.store.transformed);
+      const _path = clone(path);
+      const removeAt = _path.pop();
+      pullAt(get(schema, _path), Number(removeAt));
+      store.store.updateTransformed('set', [], schema);
     };
 
     const addHandler = (e, t, n, r) => {

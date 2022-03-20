@@ -179,23 +179,26 @@ class Schema {
     }
   }
 
-  updateTransformed(e, t, n) {
-    switch (((this._externalUpdate = false), e)) {
+  updateTransformed(operation, path, transformed) {
+    this._externalUpdate = false;
+    switch (operation) {
       case 'set':
-        if (isEmpty(t)) {
-          this.transformed = n;
+        if (isEmpty(path)) {
+          this.transformed = transformed;
         } else {
-          set(this.transformed, t, n);
+          set(this.transformed, path, transformed);
         }
 
         this._lastUpdated = new Date().getTime();
         break;
       case 'unset':
-        unset(this.transformed, t);
+        unset(this.transformed, path);
         this._lastUpdated = new Date().getTime();
         break;
       default:
-        console.warn(`'${e}' transformation not supported by jsonSchemaStore`);
+        console.warn(
+          `'${operation}' transformation not supported by jsonSchemaStore`,
+        );
     }
   }
 

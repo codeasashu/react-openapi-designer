@@ -550,7 +550,8 @@ const SchemaRow = (props) => {
       </div>
       <div
         className={classnames('ml-auto mr-4 JsonSchemaEditor_ActionItems', {
-          'mr-12 pr-4': !isBasicType,
+          //'mr-12 pr-4': !isBasicType,
+          'mr-12 pr-4': false,
         })}>
         <MovePropertyButton
           data-test="move-property-up-button"
@@ -593,75 +594,75 @@ const SchemaRow = (props) => {
             removeHandler(path);
           }}
         />
-        {/* {isBasicType && renderValidationSelector(props)} */}
-        <Tooltip
-          boundary="window"
-          position="top"
-          content="Required?"
-          disabled={!isAdvancedType}>
-          <Button
-            data-test="property-required-btn"
-            className={classnames({'opacity-25': isAdvancedType})}
-            small={true}
-            minimal={true}
-            disabled={!isAdvancedType}
-            onClick={() => {
-              changeHandler(path.concat('required'), !extraProps.required);
-            }}
-            title="Required"
-            icon={
-              <Icon
-                icon="issue"
-                iconSize={12}
-                color={extraProps.required ? Colors.RED3 : Colors.GRAY4}
-              />
-            }
-          />
-        </Tooltip>
-        <Popover
-          position="top-right"
-          boundary="window"
-          disabled={isRootOrRef}
-          target={
-            <Tooltip
-              boundary="window"
-              position="top"
-              content="Description"
-              disabled={isRootOrRef}>
-              <Button
-                data-test="property-description-btn"
-                className={classnames('z-10', {'opacity-25': isRootOrRef})}
-                small={true}
-                minimal={true}
-                disabled={isRootOrRef}
-                icon={
-                  <Icon
-                    icon="manual"
-                    iconSize={12}
-                    color={extraProps.description ? Colors.BLUE4 : Colors.GRAY4}
-                  />
-                }
-              />
-            </Tooltip>
-          }
-          content={
-            <TextArea
-              className="relative max-h-400px overflow-auto"
-              style={{
-                width: 400,
-                minHeight: 38,
-              }}
-              placeholder="Description..."
-              aria-label={'description'}
-              growVertically
-              value={extraProps.description || ''}
-              onChange={(e) =>
-                changeHandler(path.concat(['description']), e.target.value)
-              }
+      </div>
+      {/* {isBasicType && renderValidationSelector(props)} */}
+      <Tooltip
+        boundary="window"
+        position="top"
+        content="Required?"
+        disabled={!isAdvancedType}>
+        <Button
+          data-test="property-required-btn"
+          className={classnames({'opacity-25': isAdvancedType})}
+          small={true}
+          minimal={true}
+          disabled={!isAdvancedType}
+          onClick={() => {
+            changeHandler(path.concat('required'), !extraProps.required);
+          }}
+          title="Required"
+          icon={
+            <Icon
+              icon="issue"
+              iconSize={12}
+              color={extraProps.required ? Colors.RED3 : Colors.GRAY4}
             />
           }
         />
-      </div>
+      </Tooltip>
+      <Popover
+        position="top-right"
+        boundary="window"
+        disabled={isRootOrRef}
+        target={
+          <Tooltip
+            boundary="window"
+            position="top"
+            content="Description"
+            disabled={isRootOrRef}>
+            <Button
+              data-test="property-description-btn"
+              className={classnames('z-10', {'opacity-25': isRootOrRef})}
+              small={true}
+              minimal={true}
+              disabled={isRootOrRef}
+              icon={
+                <Icon
+                  icon="manual"
+                  iconSize={12}
+                  color={extraProps.description ? Colors.BLUE4 : Colors.GRAY4}
+                />
+              }
+            />
+          </Tooltip>
+        }
+        content={
+          <TextArea
+            className="relative max-h-400px overflow-auto"
+            style={{
+              width: 400,
+              minHeight: 38,
+            }}
+            placeholder="Description..."
+            aria-label={'description'}
+            growVertically
+            value={extraProps.description || ''}
+            onChange={(e) =>
+              changeHandler(path.concat(['description']), e.target.value)
+            }
+          />
+        }
+      />
     </div>
   );
 };

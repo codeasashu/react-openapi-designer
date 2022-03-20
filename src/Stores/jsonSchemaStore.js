@@ -1,4 +1,4 @@
-// import {action} from 'mobx';
+import {action} from 'mobx';
 import {debounce, get} from 'lodash';
 import {eventTypes, NodeCategories, nodeOperations} from '../datasets/tree';
 import Schema from './oas/schema';
@@ -96,26 +96,20 @@ class JsonSchemaStore {
   _registerListeners() {
     const e = this;
 
-    // this.stores.graphStore.notifier.on(eventTypes.DidRemoveNode, ({id}) => {
-    //   if (this.sourceNodeId === id) {
-    //     this.store.schema = undefined;
-    //   }
-    // });
+    //this.stores.graphStore.eventEmitter.on(eventTypes.DidRemoveNode, ({id}) => {
+    //if (this.sourceNodeId === id) {
+    //this.store.schema = undefined;
+    //}
+    //});
 
-    // this.stores.graphStore.notifier.on(
-    //   eventTypes.DidChangeSourceNode,
-    //   action(
-    //     ({
-    //       node: {id: e},
-
-    //       change: {prop: t},
-    //     }) => {
-    //       if (this.sourceNodeId === e && t === 'data.parsed') {
-    //         this.setSchema();
-    //       }
-    //     },
-    //   ),
-    // );
+    this.stores.graphStore.eventEmitter.on(
+      eventTypes.DidChangeSourceNode,
+      action(({node: {id: e}, change: {prop: t}}) => {
+        if (this.sourceNodeId === e && t === 'data.parsed') {
+          this.setSchema();
+        }
+      }),
+    );
 
     this.store.eventEmitter.on(eventTypes.StoreEvents.Change, (t) => {
       e.stores.graphStore.graph.patchSourceNodeProp(
@@ -134,7 +128,6 @@ class JsonSchemaStore {
     this.store.eventEmitter.on(eventTypes.StoreEvents.GoToRef, (t) => {
       this.goToRef(t);
     });
-    //this._disposables.push(this.store.on(Za.GoToRef, this.goToRef))
   }
 }
 

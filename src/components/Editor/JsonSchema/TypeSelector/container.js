@@ -2,7 +2,7 @@ import React from 'react';
 import {isArray, isString} from 'lodash';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-//import {Popover2} from '@blueprintjs/popover2';
+import {Popover2} from '@blueprintjs/popover2';
 import {Popover} from '@blueprintjs/core';
 import Selector from './selector';
 
@@ -168,12 +168,9 @@ const Ref = (props) => {
       {!isCombinerChild && (level > 0 || rootName) && (
         <span className="mr-2">:</span>
       )}
-      <Popover
-        placement="top"
+      <Popover2
         interactionKind="click"
-        //onInteraction={handleOpen}
         className="TypeSelector"
-        //isOpen={isOpen}
         content={
           <Selector
             id={id}
@@ -187,15 +184,13 @@ const Ref = (props) => {
             handleSave={handleSaveDetails}
           />
         }
-        usePortal={true}
-        target={
-          <div
-            tabIndex={0}
-            className="flex items-center cursor-pointer hover:underline truncate">
-            {types.length ? types : 'noType'}
-          </div>
-        }
-      />
+        usePortal={true}>
+        <div
+          tabIndex={0}
+          className="flex items-center cursor-pointer hover:underline truncate">
+          {types.length ? types : 'noType'}
+        </div>
+      </Popover2>
       {refLink}
     </div>
   );

@@ -20,83 +20,94 @@ const gg = (e, t) =>
   );
 
 const RefSelector = ({
-  refProviders: e = [],
-  refPath: t = '',
-  onChange: n,
-  onBlur: r,
-  store: i,
+  refProviders = [],
+  refPath = '',
+  onChange,
+  onBlur,
+  store,
 }) => {
-  const o = React.useMemo(() => {
+  const refProvider = React.useMemo(() => {
+    // o
     var n;
 
-    for (const r of e) {
+    for (const refProvider of refProviders) {
+      // r of e
       if (
-        typeof r.matcher == 'function' &&
-        ((n = r.matcher) === null || n === undefined ? undefined : n.call(r, t))
+        typeof refProvider.matcher == 'function' &&
+        ((n = refProvider.matcher) === null || n === undefined
+          ? undefined
+          : n.call(refProvider, refPath))
       ) {
-        return r;
+        return refProvider;
       }
     }
 
-    return e.find((e) => !!e.default);
-  }, [e, t]);
+    return refProviders.find((p) => !!p.default);
+  }, [refProviders, refPath]);
 
-  const a = o ? o.getRefLabel(t) : t;
-  const [u, l] = React.useState(o);
-  const [d, h] = React.useState(a);
-  const [f, p] = React.useState();
-  const [g, m] = React.useState(false);
-  const [v, y] = React.useState([]);
+  const defaultValue = refProvider ? refProvider.getRefLabel(refPath) : refPath; //a
+  const [currentRefProvider, setCurrentRefProvider] =
+    React.useState(refProvider); // u, l
+  const [currentRefPath, setCurrentRefPath] = React.useState(defaultValue); // d,h
+  const [activeItem, setActiveItem] = React.useState(); //f,p
+  const [shouldRenderList, setShouldRenderList] = React.useState(false); //g, m
+  const [refItems, setRefItems] = React.useState([]); // v,y
 
-  const b = React.useCallback(
+  console.log('rerendering11');
+  const handleActiveItemChange = React.useCallback(
     (e) => {
-      const n = e ? e.value : t;
-      p(v.find((e) => n === e.value));
+      const n = e ? e.value : refPath;
+      setActiveItem(refItems.find((e) => n === e.value));
     },
-    [v, t],
+    [refItems, refPath],
   );
 
-  const _ = React.useCallback(
+  const setRefLoading = React.useCallback(
+    // _
     (e) => {
-      if (i !== undefined) {
-        i.refLoading = e;
+      if (store !== undefined) {
+        store.refLoading = e;
       }
     },
-    [i],
+    [store],
   );
 
-  const w = React.useCallback(
+  const onItemSelect = React.useCallback(
     async (e) => {
-      if (u == null ? undefined : u.handleItemSelect) {
+      if (
+        currentRefProvider == null
+          ? undefined
+          : currentRefProvider.handleItemSelect
+      ) {
         try {
-          _(true);
-          e = await u.handleItemSelect(e);
+          setRefLoading(true);
+          e = await currentRefProvider.handleItemSelect(e);
         } finally {
-          _(false);
+          setRefLoading(false);
         }
       }
 
-      n(String(e.value));
+      onChange(String(e.value));
 
-      if (r) {
-        r(String(e.value));
+      if (onBlur) {
+        onBlur(String(e.value));
       }
     },
-    [n, u, r, _],
+    [onChange, currentRefProvider, onBlur, setRefLoading],
   );
 
-  const M = React.useCallback(
-    async (e, t = u) => {
-      h(e);
+  const handleSearch = React.useCallback(
+    async (e, t = currentRefProvider) => {
+      setCurrentRefPath(e);
 
       if (t && t.handleSearch) {
         try {
-          m(true);
+          setShouldRenderList(true);
           const n = await t.handleSearch(e);
-          m(false);
+          setShouldRenderList(false);
 
           if (n) {
-            y(
+            setRefItems(
               ((e, t) =>
                 e.map((e) =>
                   Object.assign(Object.assign({}, e), {
@@ -106,29 +117,32 @@ const RefSelector = ({
             );
           }
         } catch (e) {
-          m(false);
+          setShouldRenderList(false);
           console.warn(e);
         }
       }
     },
-    [u],
+    [currentRefProvider],
   );
 
-  const x = React.useCallback(
-    (t) => {
-      const n = e.find((e) => t.currentTarget.value === e.name);
-      l(n);
+  const handleRefProviderChange = React.useCallback(
+    (e) => {
+      //t
+      const selectedProvider = refProviders.find(
+        (p) => e.currentTarget.value === p.name,
+      ); // n
+      setCurrentRefProvider(selectedProvider);
 
-      if (has(n, 'handleSearch')) {
-        M('', n);
+      if (has(selectedProvider, 'handleSearch')) {
+        handleSearch('', selectedProvider);
       }
     },
-    [l, e, M],
+    [setCurrentRefProvider, refProviders, handleSearch],
   );
 
   React.useEffect(() => {
-    b(null);
-  }, [v, b]);
+    handleActiveItemChange(null);
+  }, [refItems, handleActiveItemChange]);
 
   return (
     <div className="mx-0 flex flex-col flex-no-wrap mt-5 w-auto">
@@ -136,58 +150,63 @@ const RefSelector = ({
       <div className="flex flex-no-wrap">
         <HTMLSelect
           className="w-2/5 mr-2"
-          value={u ? u.name : undefined}
-          options={e.map((e) => e.name)}
-          onChange={x}
+          value={currentRefProvider ? currentRefProvider.name : undefined}
+          options={refProviders.map((p) => p.name)}
+          onChange={handleRefProviderChange}
         />
-        {has(u, 'handleSearch') ? (
+        {has(currentRefProvider, 'handleSearch') ? (
           <Suggest
             className="w-full"
             popoverProps={{
-              usePortal: false,
+              usePortal: true,
               targetClassName: 'w-full',
+              captureDismiss: true,
+              shouldReturnFocusOnClose: false,
             }}
-            items={v}
-            query={d}
+            items={refItems}
+            query={currentRefPath}
             onQueryChange={(e) => {
-              if (d !== e) {
-                M(e);
+              if (currentRefPath !== e) {
+                handleSearch(e);
               }
             }}
             inputProps={{
-              placeholder: a || 'search',
+              placeholder: defaultValue || 'search',
 
               onFocus: () => {
-                M('');
+                console.log('oonFocus11');
+                handleSearch('');
               },
 
               onBlur: () => {
-                if (t !== d) {
-                  h(a);
+                console.log('oonBlur11');
+                if (refPath !== currentRefPath) {
+                  setCurrentRefPath(defaultValue);
                 }
               },
 
-              disabled: i == null ? undefined : i.refLoading,
+              disabled: store == null ? undefined : store.refLoading,
             }}
             inputValueRenderer={(e) => {
-              return (i == null ? undefined : i.refLoading)
+              const val = (store == null ? undefined : store.refLoading)
                 ? 'Loading...'
                 : e.value || e.provider.getItemLabel(e);
+              console.log('inputVal', val);
+              return val;
             }}
-            onItemSelect={w}
-            activeItem={f}
+            onItemSelect={onItemSelect} //w
+            activeItem={activeItem} //f
             noResults={<Fragment>No results</Fragment>}
-            itemListRenderer={({filteredItems: e, renderItem: t}) =>
-              g ? (
+            itemListRenderer={({filteredItems, renderItem}) =>
+              shouldRenderList ? (
                 <div
                   className="p-2"
                   style={{
                     width: 300,
-                  }}
-                >
+                  }}>
                   Searching...
                 </div>
-              ) : e.length === 0 ? (
+              ) : filteredItems.length === 0 ? (
                 <span className="px-2" style={{width: 300}}>
                   No results found
                 </span>
@@ -195,52 +214,55 @@ const RefSelector = ({
                 <Menu
                   className="-mx-1"
                   style={{
-                    width: 300
-                  }}
-                >
-                  {e.map(t)}
+                    width: 300,
+                  }}>
+                  {filteredItems.map(renderItem)}
                 </Menu>
               )
             }
-            onActiveItemChange={b}
-            itemRenderer={(e, {modifiers: t, index: n, handleClick: r}) => {
-              const i = React.createElement('div', {
-                dangerouslySetInnerHTML: {
-                  __html: e.label,
-                },
-              });
+            onActiveItemChange={handleActiveItemChange}
+            itemRenderer={(item, {modifiers, index, handleClick}) => {
+              const i = (
+                <div
+                  dangerouslySetInnerHTML={{
+                    __html: item.label,
+                  }}
+                />
+              );
 
-              return React.createElement(
-                React.Fragment,
-                null,
-                n !== undefined &&
-                  (e == null ? undefined : e.parentKey) !== undefined &&
-                  (n === 0 ||
-                    (v.length > 0 &&
-                      v.length > n &&
-                      e.parentKey !== v[n - 1].parentKey &&
-                      React.createElement(MenuDivider, {
-                        className: 'mt-1',
-                        title: e.parentKey,
-                      }))),
-                React.createElement(MenuItem, {
-                  key: e.value,
-                  active: t.active,
-                  text: i,
-                  onClick: r,
-                  shouldDismissPopover: false,
-                }),
+              return (
+                <React.Fragment>
+                  {index &&
+                    item &&
+                    item.parentKey &&
+                    (index === 0 ||
+                      (refItems.length > 0 &&
+                        refItems.length > index &&
+                        item.parentKey !== refItems[index - 1].parentKey && (
+                          <MenuDivider
+                            className="mt-1"
+                            title={item.parentKey}
+                          />
+                        )))}
+                  <MenuItem
+                    key={item.value}
+                    active={modifiers.active}
+                    text={i}
+                    onClick={handleClick}
+                    shouldDismissPopover={false}
+                  />
+                </React.Fragment>
               );
             }}
           />
         ) : (
           <InputGroup
             className="text-sm w-full"
-            value={t}
-            onChange={(e) => n(String(e.target.value))}
+            value={refPath}
+            onChange={(e) => onChange(String(e.target.value))}
             onBlur={(e) => {
-              if (r) {
-                r(String(e.target.value));
+              if (onBlur) {
+                onBlur(String(e.target.value));
               }
             }}
           />
