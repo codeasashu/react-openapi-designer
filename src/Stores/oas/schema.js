@@ -2,7 +2,7 @@ import {makeObservable, computed, observable, reaction, action} from 'mobx';
 import {isObject, isEmpty, set, omit, unset, intersection} from 'lodash';
 import jsf from 'json-schema-faker';
 import {eventTypes} from '../../datasets/tree';
-import Transformer from './transformer';
+import {Transformer} from '../schema/utils';
 import Tree from '../../Tree/SchemaTree';
 import TreeState from '../../Tree/State';
 import TreeStore from '../../Tree/Store';
@@ -38,20 +38,6 @@ const ls = [
 const is = ['allOf', 'oneOf', 'anyOf'];
 const os = ['object', 'array'];
 const ss = os.concat(is);
-
-//Object(h.d)([p.observable], As.prototype, "transformed", undefined);
-//Object(h.d)([p.observable.ref], As.prototype, "error", undefined);
-//Object(h.d)([p.observable], As.prototype, "_lastUpdated", undefined);
-//Object(h.d)([p.observable], As.prototype, "_externalUpdate", undefined);
-//Object(h.d)([p.observable.ref], As.prototype, "_schema", undefined);
-//Object(h.d)([p.observable], As.prototype, "_refLoading", undefined);
-//Object(h.d)([p.observable], As.prototype, "_isAutoFocusBlocked", undefined);
-//Object(h.d)([p.computed], As.prototype, "refLoading", null);
-//Object(h.d)([p.computed], As.prototype, "schema", null);
-//Object(h.d)([p.computed], As.prototype, "isAutoFocusBlocked", null);
-//Object(h.d)([p.action.bound], As.prototype, "_handleUpdate", null);
-//Object(h.d)([p.action.bound], As.prototype, "updateTransformed", null);
-//Object(h.d)([p.action.bound], As.prototype, "_updateSchema", null);
 
 class Schema {
   transformed = {};
@@ -404,6 +390,5 @@ function* vs(
   yield* l;
   return l;
 }
-//const Ls = Object(c.createContext)(new As({}));
 
 export default Schema;

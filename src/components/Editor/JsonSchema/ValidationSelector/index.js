@@ -1,6 +1,7 @@
 import React from 'react';
 //import PropTypes from 'prop-types';
 import {Button, Icon, Popover, Colors, Tooltip} from '@blueprintjs/core';
+import {Popover2} from '@blueprintjs/popover2';
 import {
   pick,
   cloneDeep,
@@ -244,18 +245,154 @@ const ys = {
   },
 };
 
+const Xa = {
+  integer: [
+    {
+      key: 'int32',
+      label: 'int32',
+      value: 'int32',
+    },
+    {
+      key: 'int64',
+      label: 'int64',
+      value: 'int64',
+    },
+  ],
+
+  number: [
+    {
+      key: 'float',
+      label: 'float',
+      value: 'float',
+    },
+    {
+      key: 'double',
+      label: 'double',
+      value: 'double',
+    },
+  ],
+
+  string: [
+    {
+      key: 'date',
+      label: 'date',
+      value: 'date',
+    },
+    {
+      key: 'time',
+      label: 'time',
+      value: 'time',
+    },
+    {
+      key: 'date-time',
+      label: 'date-time',
+      value: 'date-time',
+    },
+    {
+      key: 'duration',
+      label: 'duration',
+      value: 'duration',
+    },
+    {
+      key: 'uri',
+      label: 'uri',
+      value: 'uri',
+    },
+    {
+      key: 'uri-reference',
+      label: 'uri-reference',
+      value: 'uri-reference',
+    },
+    {
+      key: 'iri',
+      label: 'iri',
+      value: 'iri',
+    },
+    {
+      key: 'iri-reference',
+      label: 'iri-reference',
+      value: 'iri-reference',
+    },
+    {
+      key: 'email',
+      label: 'email',
+      value: 'email',
+    },
+    {
+      key: 'idn-email',
+      label: 'idn-email',
+      value: 'idn-email',
+    },
+    {
+      key: 'hostname',
+      label: 'hostname',
+      value: 'hostname',
+    },
+    {
+      key: 'idn-hostname',
+      label: 'idn-hostname',
+      value: 'idn-hostname',
+    },
+    {
+      key: 'password',
+      label: 'password',
+      value: 'password',
+    },
+    {
+      key: 'ipv4',
+      label: 'ipv4',
+      value: 'ipv4',
+    },
+    {
+      key: 'ipv6',
+      label: 'ipv6',
+      value: 'ipv6',
+    },
+    {
+      key: 'uuid',
+      label: 'uuid',
+      value: 'uuid',
+    },
+    {
+      key: 'uuid',
+      label: 'uuid',
+      value: 'uuid',
+    },
+    {
+      key: 'binary',
+      label: 'binary',
+      value: 'binary',
+    },
+    {
+      key: 'byte',
+      label: 'byte',
+      value: 'byte',
+    },
+    {
+      key: 'json-pointer',
+      label: 'json-pointer',
+      value: 'json-pointer',
+    },
+    {
+      key: 'relative-json-pointer',
+      label: 'relative-json-pointer',
+      value: 'relative-json-pointer',
+    },
+  ],
+};
+
 const Ss = {
   common: [
     [
-      //{
-      //format: {
-      //elemType: 'suggestSelect',
+      {
+        format: {
+          elemType: 'suggestSelect',
 
-      //elemData: {
-      //validations: Xa,
-      //},
-      //},
-      //},
+          elemData: {
+            validations: Xa,
+          },
+        },
+      },
       {
         default: Object.assign(Object.assign({}, Ms), {
           elemProps: {
@@ -517,7 +654,6 @@ const rs = {
 };
 
 const $s = (e, t, n) => {
-  console.log('paarams11', e, t, n);
   const r = flattenDeep(compact([fs(as, t) && 'common', t]));
   const i = pick(Ns(e, n), r);
 
@@ -584,7 +720,6 @@ const ValidationSelector = (e) => {
   let subTypeSelector;
 
   if (ps('array', type) && subtype.length) {
-    //validations: $s(Ss, subtype, spec),
     subTypeSelector = (
       <Selector
         propKey={'subtypeExtraProps'}
@@ -592,36 +727,16 @@ const ValidationSelector = (e) => {
         props={subtypeExtraProps}
         isArrayChild={true}
         handleUpdateProp={handleUpdateProp}
+        validations={$s(Ss, subtype, spec)}
       />
     );
   }
 
   return (
-    <Popover
-      boundary="window"
-      position="top-right"
-      targetClassName="h-full"
-      target={
-        <Tooltip boundary="window" content="Other Properties" position="top">
-          <span className="w-12 inline-flex justify-end">
-            <Button
-              icon={
-                <Icon
-                  icon="property"
-                  size={12}
-                  color={u > 0 ? Colors.GRAY1 : Colors.GRAY4}
-                />
-              }
-              minimal
-              small
-              className="z-10 text-sm mr-1"
-              style={{color: u > 0 ? Colors.GRAY1 : Colors.GRAY4}}
-              tabIndex={0}
-              text={u > 0 ? u : ''}
-            />
-          </span>
-        </Tooltip>
-      }
+    <Popover2
+      //boundary="window"
+      //position="top-right"
+      //targetClassName="h-full"
       content={
         <div className="p-5">
           <Selector
@@ -634,8 +749,27 @@ const ValidationSelector = (e) => {
           />
           {subTypeSelector}
         </div>
-      }
-    />
+      }>
+      <Tooltip boundary="window" content="Other Properties" position="top">
+        <span className="w-12 inline-flex justify-end">
+          <Button
+            icon={
+              <Icon
+                icon="property"
+                size={12}
+                color={u > 0 ? Colors.GRAY1 : Colors.GRAY4}
+              />
+            }
+            minimal
+            small
+            className="z-10 text-sm mr-1"
+            style={{color: u > 0 ? Colors.GRAY1 : Colors.GRAY4}}
+            tabIndex={0}
+            text={u > 0 ? u : ''}
+          />
+        </span>
+      </Tooltip>
+    </Popover2>
   );
 };
 

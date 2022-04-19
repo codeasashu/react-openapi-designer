@@ -20,7 +20,7 @@ import {
   Popover,
   Tooltip,
 } from '@blueprintjs/core';
-import Container from './TypeSelector/container';
+import Ref from './TypeSelector/container';
 import {eventTypes} from '../../../datasets/tree';
 import MovePropertyButton from './movePropertyButton';
 import ValidationSelector from './ValidationSelector';
@@ -65,34 +65,38 @@ const getRowState = (props) => {
   };
 };
 
-const Is = (e, t) => {
-  const n = Object.assign({}, e);
-  t = Array.isArray(t) ? t : [t];
-  const r = pickBy(n, (e, n) => t.includes(n));
+const cleanExtraProps = (obj, path) => {
+  const cloneObj = Object.assign({}, obj);
+  path = Array.isArray(path) ? path : [path];
+  const filteredObj = pickBy(cloneObj, (_, prop) => path.includes(prop));
 
-  if (r.enum) {
-    n.enum = JSON.parse(r.enum, r.enum);
+  if (filteredObj.enum) {
+    try {
+      cloneObj.enum = JSON.parse(filteredObj.enum, filteredObj.enum);
+    } catch(err) {
+      cloneObj.enum = filteredObj.enum
+    }
   } else {
-    if (!(r.enum === undefined || r.enum)) {
-      delete n.enum;
+    if (filteredObj.enum === undefined || !filteredObj.enum) {
+      delete cloneObj.enum;
     }
   }
 
-  if (r.additionalProperties) {
-    delete n.additionalProperties;
+  if (filteredObj.additionalProperties) {
+    delete cloneObj.additionalProperties;
   }
 
-  if (r.deprecated === false) {
-    delete n.deprecated;
+  if (filteredObj.deprecated === false) {
+    delete cloneObj.deprecated;
   }
 
-  for (const [e, t] of Object.entries(r)) {
+  for (const [e, t] of Object.entries(filteredObj)) {
     if (!['boolean', 'number'].includes(typeof t) && isEmpty(t)) {
-      delete n[e];
+      delete cloneObj[e];
     }
   }
 
-  return n;
+  return cloneObj;
 };
 
 const Os = (
@@ -225,7 +229,6 @@ const SchemaInput = ({
   };
 
   const handleChange = (e) => {
-    console.log('vall', e.target.value);
     setVal(e.target.value);
   };
 
@@ -297,40 +300,40 @@ const SchemaRow = (props) => {
       type: e,
       subtype: t,
       refPath: n,
-      extraProps: r,
-      subtypeExtraProps: i,
+      extraProps : _extraProps,
+      subtypeExtraProps,
     } = getRowState(props);
 
     return (
       <ValidationSelector
         type={e}
         subtype={t}
-        extraProps={r}
-        subtypeExtraProps={i}
+        extraProps={_extraProps}
+        subtypeExtraProps={subtypeExtraProps}
         spec={props.store.spec}
-        handleUpdateProp={(o, a, s) => {
-          let u = {};
+        handleUpdateProp={(action, path, value) => {
+          let obj = {};
 
-          switch (o) {
+          switch (action) {
             case 'extraProps':
-              u = r;
+              obj = _extraProps;
               break;
             case 'subtypeExtraProps':
-              u = i;
+              obj = subtypeExtraProps;
           }
 
-          if (s === '') {
-            delete u[a];
+          if (value === '') {
+            delete obj[path];
           } else {
-            u[a] = s;
+            obj[path] = value;
           }
 
           Os(handleSaveDetails, {
             type: e,
             subtype: t,
             ref: n,
-            extraProps: o === 'extraProps' ? Is(u, a) : r,
-            subtypeExtraProps: o === 'subtypeExtraProps' ? Is(u, a) : i,
+            extraProps: action === 'extraProps' ? cleanExtraProps(obj, path) : _extraProps,
+            subtypeExtraProps: action === 'subtypeExtraProps' ? cleanExtraProps(obj, path) : subtypeExtraProps,
           });
 
           //this.props.store.emit(Za.ExtraPropUpdate, {
@@ -376,9 +379,7 @@ const SchemaRow = (props) => {
 
   const isExtensible = (type, subtype) => {
     if (type) {
-      console.log('eee', type, subtype);
       if (!(fs(ss, type) && !ps('array', type))) {
-        console.log('eee2', type, subtype);
         if (fs(ss, subtype)) {
           return !ps('array', subtype);
         }
@@ -523,7 +524,7 @@ const SchemaRow = (props) => {
               }}
             />
           )}
-          <Container
+          <Ref
             store={store}
             level={level}
             type={type}
@@ -595,7 +596,7 @@ const SchemaRow = (props) => {
           }}
         />
       </div>
-      {/* {isBasicType && renderValidationSelector(props)} */}
+      {isBasicType && renderValidationSelector(props)}
       <Tooltip
         boundary="window"
         position="top"
@@ -688,7 +689,7 @@ SchemaRow.propTypes = {
   subtypeExtraProps: PropTypes.object,
   propsChangeHandler: PropTypes.func,
   typeChangeHandler: PropTypes.func,
-  enumValue: PropTypes.string,
+  enumValue: PropTypes.array,
   getRefLabel: PropTypes.func,
   shouldRenderGoToRef: PropTypes.func,
   refSelector: PropTypes.func,

@@ -52,7 +52,6 @@ const itemPredicate = (e = '', t = '') => {
 };
 
 const Suggestions = ({items, selectedItem, onItemSelect, className}) => {
-  console.log('rendeer11', items);
   const [item, setItem] = React.useState(selectedItem);
 
   React.useEffect(() => {
@@ -86,38 +85,41 @@ const Suggestions = ({items, selectedItem, onItemSelect, className}) => {
 
   return (
     <Suggest
-      className={className}
-      activeItem={item}
-      onActiveItemChange={(e) => {
-        console.log('activeItem', e, getCreateNewItem());
-        setItem(e);
-      }}
-      selectedItem
-      itemRenderer={itemRenderer}
-      items={items}
       inputValueRenderer={(e) => {
-        console.log('inputValueRenderer', e);
+        if(e.toLowerCase() === "none") {
+          return null;
+        }
         return e;
       }}
-      //createNewItemFromQuery={(e) => e}
-      //createNewItemRenderer={createNewItemRenderer}
+      itemRenderer={itemRenderer}
+      items={items}
       onItemSelect={(e) => {
-        console.log('onItemSelect', e);
+        e = e.toLowerCase() === "none" ? null : e;
         onItemSelect(e);
         setItem(e);
       }}
-      //inputProps={{
-      //placeholder: 'Create or choose existing',
-      //inputRef: (e) => (inputRef ? (inputRef.current = e) : undefined),
-      //}}
-      //popoverProps={{
-      //minimal: true,
-      //targetClassName: 'w-full',
-      //}}
+      className={className}
+      activeItem={item}
+      onActiveItemChange={(e) => {
+        setItem(e);
+      }}
+      selectedItem={item}
+      createNewItemFromQuery={(e) => e}
+      createNewItemRenderer={createNewItemRenderer}
+      inputProps={{
+        placeholder: 'Create or choose existing',
+      }}
+      popoverProps={{
+        minimal: true,
+        targetClassName: 'w-full',
+        //usePortal: true,
+        captureDismiss: true,
+        shouldReturnFocusOnClose: false,
+      }}
       itemPredicate={itemPredicate}
-      //resetOnClose={false}
-      //resetOnQuery={false}
-      //resetOnSelect={false}
+      resetOnClose={false}
+      resetOnQuery={false}
+      resetOnSelect={false}
     />
   );
 };

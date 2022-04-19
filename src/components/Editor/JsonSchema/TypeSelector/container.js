@@ -3,7 +3,6 @@ import {isArray, isString} from 'lodash';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import {Popover2} from '@blueprintjs/popover2';
-import {Popover} from '@blueprintjs/core';
 import Selector from './selector';
 
 const hs = {
@@ -45,7 +44,6 @@ const Ref = (props) => {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const handleOpen = (state) => {
-    console.log('handlepemn', state);
     if (!store.refLoading) {
       setIsOpen(state);
     }
@@ -162,7 +160,6 @@ const Ref = (props) => {
     }
   }
 
-  console.log('refloading', store.refLoading);
   return (
     <div className="flex items-center overflow-hidden">
       {!isCombinerChild && (level > 0 || rootName) && (

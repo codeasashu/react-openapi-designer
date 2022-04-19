@@ -273,7 +273,7 @@ const js = (e) => {
   return t;
 };
 
-export const ks = (e) => ({
+export const Transformer = (e) => ({
   _jsonSchemaIsRequired: (e = {}, t) => includes(e.required, t),
 
   _cleanJsonSchema(t = {}) {
@@ -544,8 +544,8 @@ export const ks = (e) => ({
       ) {
         try {
           t[e] = JSON.parse(t[e]);
-        } catch (e) {
-          console.error(e);
+        } catch (_) {
+          // pass
         }
       }
     }

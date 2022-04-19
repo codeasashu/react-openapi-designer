@@ -112,7 +112,7 @@ const Response = observer(({className, contentPath}) => {
         <SchemaDesigner
           className="mt-6"
           schemaPath={contentPath.concat([mediaType, 'schema'])}
-          examplesPath={contentPath.concat([mediaType, 'examples'])}
+          examplesPath={contentPath.concat([mediaType, 'schema', 'x-examples'])}
         />
       )}
     </div>

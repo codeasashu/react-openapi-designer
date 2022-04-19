@@ -53,21 +53,16 @@ const Selector = (props) => {
 
   const h = [];
 
-  console.log('init selector1', validations);
-
   for (const validation in validations) {
-    console.log('validator11', validation);
-    // e in u
     if (isEmpty(validations[validation])) {
       continue;
     }
 
     const d = [];
+    let fakeIndex = 0;
 
     for (const validators of validations[validation]) {
-      // o of u[e]
       const e = validators.map((validator, index) => {
-        // map(e, o) =>
         const u = keys(validator)[0];
         const l = values(validator)[0];
         const d = l.elemProps;
@@ -218,13 +213,13 @@ const Selector = (props) => {
       });
 
       if (e.length) {
-        d.push(<div className="flex pb-2">{e}</div>);
+        d.push(<div key={fakeIndex} className="flex pb-2">{e}</div>);
+        fakeIndex += 1;
       }
     }
 
     if (d.length) {
       const t = Object.keys(validations);
-      console.log('key11', validation);
       h.push(
         <div
           key={validation}
