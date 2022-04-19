@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import {nodeOperations} from '../../datasets/tree';
 import {trim} from 'lodash';
-import {getValueFromStore, usePatchOperation} from '../../utils/selectors';
+import {getValueFromStore, usePatchOperation, usePatchOperationAt} from '../../utils/selectors';
 import {statusCodes} from '../../datasets/http';
 import {Select} from '@blueprintjs/select';
 import {Button, MenuItem, Position} from '@blueprintjs/core';
@@ -60,11 +60,11 @@ const StatusCodeSuggest = ({
       noResults={<MenuItem disabled={true} text="No results." />}
       onItemSelect={(i) => {
         const code = String(i.statusCode);
-
+        const remainingPath = relativeJsonPath.slice(0, -1)
         if (trim(code) === '') {
           handlePatch(nodeOperations.Remove);
         } else {
-          handlePatch(nodeOperations.Replace, code);
+          handlePatch(nodeOperations.Move, relativeJsonPath, remainingPath.concat([parseInt(code)]))
         }
 
         if (onPatch) {

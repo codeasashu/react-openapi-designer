@@ -69,13 +69,11 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
   //? relativeJsonPath
   //: relativeJsonPath.slice(0, 2);
   //const pathItem = getValueFromStore(relativePathItemPath);
-  //console.log('node', node, pathItem, relativeJsonPath);
   //if (node.type === NodeTypes.Path) {
   //const defaultMethod = selectDefaultMethod(pathItem);
   //relativeJsonPath.concat([defaultMethod]);
   //}
   //const methodIndex = validPathMethods.findIndex((e) => e === i.path);
-  //console.log('relativeb', relativeJsonPath);
 
   const pathUrlRef = React.useRef(null);
 

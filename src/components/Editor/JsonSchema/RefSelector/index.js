@@ -53,7 +53,6 @@ const RefSelector = ({
   const [shouldRenderList, setShouldRenderList] = React.useState(false); //g, m
   const [refItems, setRefItems] = React.useState([]); // v,y
 
-  console.log('rerendering11');
   const handleActiveItemChange = React.useCallback(
     (e) => {
       const n = e ? e.value : refPath;
@@ -174,12 +173,10 @@ const RefSelector = ({
               placeholder: defaultValue || 'search',
 
               onFocus: () => {
-                console.log('oonFocus11');
                 handleSearch('');
               },
 
               onBlur: () => {
-                console.log('oonBlur11');
                 if (refPath !== currentRefPath) {
                   setCurrentRefPath(defaultValue);
                 }
@@ -191,7 +188,6 @@ const RefSelector = ({
               const val = (store == null ? undefined : store.refLoading)
                 ? 'Loading...'
                 : e.value || e.provider.getItemLabel(e);
-              console.log('inputVal', val);
               return val;
             }}
             onItemSelect={onItemSelect} //w

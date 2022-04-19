@@ -100,12 +100,6 @@ class OasSchemaStore {
     }
   }
 
-  transformSchema(schema) {
-    const transformer = Transformer('oas3_1');
-    const transformed = transformer.toStoplightSchema(schema);
-    console.log('transformed', transformed);
-  }
-
   setOpenDropdownPath(key, value) {
     const sidebar = cloneDeep(this.sidebar);
     const path = [].concat(key, 'show');
@@ -314,7 +308,6 @@ class OasSchemaStore {
     const node = this.sourceNode;
 
     if (!node) {
-      console.log('No schema', node);
       return null;
     }
 

@@ -43,7 +43,7 @@ const Responses = observer(({responsesPath}) => {
   const g = React.useRef(null);
   const codeRef = React.useRef(null);
   const v = React.useRef(true);
-  const contentPath = responsesPath.concat([selectedCode]); //y
+  const contentPath = responsesPath.concat([parseInt(selectedCode)]); //y
   //const description = getValueFromStore(contentPath.concat('description')); //b
 
   React.useEffect(() => {
@@ -126,7 +126,7 @@ const Responses = observer(({responsesPath}) => {
 
               handlePatch(
                 nodeOperations.Add,
-                responsesPath.concat([code]),
+                responsesPath.concat([String(code)]),
                 responseSchema,
               );
               setSelectedCode(String(code));
@@ -162,6 +162,7 @@ const Responses = observer(({responsesPath}) => {
               relativeJsonPath={contentPath}
               codes={statusCodes}
               activeCodeIndex={activeCodeIndex}
+              onPatch={(code) => setSelectedCode(code)}
             />
             <Button
               title="Remove"

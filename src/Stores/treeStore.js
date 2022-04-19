@@ -181,7 +181,6 @@ class Store {
       } else {
         this.tree.wrap(node);
       }
-      console.log('tree', this.tree);
     }
 
     if (!this.isNodeExpanded(node)) {

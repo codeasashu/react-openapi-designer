@@ -32,12 +32,10 @@ class LocalStorageMock {
   }
 
   getItem(key) {
-    console.log('gGetting item', key);
     return this.store[key] || null;
   }
 
   setItem(key, value) {
-    console.log('Setting item', key, value);
     this.store[key] = String(value);
   }
 

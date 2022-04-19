@@ -11,7 +11,6 @@ import {NodeTypes} from '../../datasets/tree';
 const Sidebar = observer((props) => {
   const stores = React.useContext(StoresContext);
   const handleScroll = () => {
-    //console.log('onScrroll', e);
   };
 
   const rowRenderer = React.useCallback(

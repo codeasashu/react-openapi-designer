@@ -216,7 +216,6 @@ const Selector = ({
             },
           });
 
-    console.log('dd', d);
     p = d ? (
       d
     ) : (

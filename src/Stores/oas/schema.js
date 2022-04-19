@@ -112,7 +112,6 @@ class Schema {
 
   _onSchemaChange(e) {
     if (!this._externalUpdate) {
-      console.log('emit Change', e);
       this.eventEmitter.emit(eventTypes.StoreEvents.Change, e);
     }
   }

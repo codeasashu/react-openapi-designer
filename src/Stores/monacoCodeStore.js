@@ -78,7 +78,6 @@ class MonacoCodeStore {
   }
 
   setValue(e) {
-    console.log('setting val', e);
     if (e !== this.model.getValue()) {
       this.model.setValue(e);
     }
