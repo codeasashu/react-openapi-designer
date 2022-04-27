@@ -183,7 +183,7 @@ const AddPropertyBtn = ({node, handleAdd}) => {
     isParentNode(node) && (
       <div
         onClick={() => handleAdd(node)}
-        data-test="add-property-btn"
+        data-testid="add-property-btn"
         className="absolute flex items-center justify-center cursor-pointer rounded hover:bg-darken-3 z-10"
         style={{width: 20, height: 20}}>
         <Icon
@@ -247,6 +247,7 @@ const SchemaInput = ({
           outline: 'none',
         }}
         tabIndex={1}
+        data-testid="namefield"
         inputClassName="bg-transparent hover:bg-darken-1 focus:bg-darken-2"
         {...props}>
         {children}
