@@ -204,6 +204,8 @@ PERFORMANCE OF THIS SOFTWARE.
 
 /*! js-yaml 4.1.0 https://github.com/nodeca/js-yaml @license MIT */
 
+/*! regenerator-runtime -- Copyright (c) 2014-present, Facebook, Inc. -- license (MIT): https://github.com/facebook/regenerator/blob/main/LICENSE */
+
 /*!***************************************************
 * mark.js v8.11.1
 * https://markjs.io/
