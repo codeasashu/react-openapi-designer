@@ -2,9 +2,14 @@ import {spec as defaultSpec} from '../datasets/openapi';
 
 export const LOCALSTORAGE_KEY = 'SourceNode';
 
+export const StorageKind = {
+  local: 'local',
+};
+
 class StorageStore {
-  constructor(e) {
+  constructor(e, options) {
     this.props = e;
+    this.options = options;
   }
 
   activate() {
@@ -31,10 +36,12 @@ class StorageStore {
   }
 
   save(spec) {
-    window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(spec));
+    if (this.options?.storage === StorageKind.local) {
+      window.localStorage.setItem(LOCALSTORAGE_KEY, JSON.stringify(spec));
+    }
   }
 
-  get() {
+  getFromLocalStore() {
     //if (this.hasExpired()) {
     //return defaultSpec;
     //}
@@ -47,6 +54,12 @@ class StorageStore {
       }
     }
     return defaultSpec;
+  }
+
+  get() {
+    if (this.options?.storage === StorageKind.local) {
+      return this.getFromLocalStore();
+    }
   }
 
   get spec() {

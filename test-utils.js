@@ -17,7 +17,7 @@ import securitySchemes from './src/datasets/securitySchemes';
 import Stores from './src/Stores';
 import {StoresContext} from './src/components/Context';
 import basicOasData from './__jest__/fixtures/basic.json';
-import StorageStore from './src/Stores/storageStore';
+import StorageStore, {StorageKind} from './src/Stores/storageStore';
 
 //const schemaStoreObject = {
 //reducer: {
@@ -28,6 +28,20 @@ import StorageStore from './src/Stores/storageStore';
 
 //jest.mock('monaco-editor/esm/vs/editor/editor.api.js');
 //
+// jest.mock()
+Object.defineProperty(window, 'BlobEvent', {
+  writable: true,
+  value: jest
+    .fn()
+    .mockImplementation(
+      (type, eventInitDict) => new Event(type, eventInitDict),
+    ),
+});
+
+Object.defineProperty(window, 'open', {
+  writable: false,
+  value: jest.fn(),
+});
 
 const basicObjectSchema = {title: '', type: 'object'};
 
@@ -838,8 +852,12 @@ function initStore(data = {}, options = {}) {
   data = {...basicOasData, ...data};
 
   const mockBrowserStore = {reloadWindow: jest.fn()};
-  const storage = new StorageStore({browserStore: mockBrowserStore});
+  const storage = new StorageStore(
+    {browserStore: mockBrowserStore},
+    {storage: StorageKind.local},
+  );
   storage.save(data);
+  options = {...options, storage: StorageKind.local};
   const stores = new Stores(options);
   const rootNode = stores.graphStore.rootNode;
 

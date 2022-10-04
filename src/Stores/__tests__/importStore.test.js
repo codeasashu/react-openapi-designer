@@ -4,9 +4,6 @@ describe('import store tests', () => {
   it('throws error on invalid openapi url', () => {
     const importStore = new ImportStore(this);
     const mockPostMessage = jest.spyOn(importStore.worker, 'postMessage');
-    expect(() => importStore.convert_openapi_url('abc')).toThrow(
-      'Invalid url abc',
-    );
     expect(mockPostMessage).not.toHaveBeenCalled();
   });
 

@@ -8,14 +8,19 @@ import './css/styles.min.css';
 
 function getOptions(element) {
   const specUrl = element.getAttribute('spec-url');
-  const showHeader = element.hasAttribute('show-header') || true;
+  const showHeader = element.hasAttribute('noheader') === false;
   const readOnly = element.hasAttribute('readonly');
   const view = element.getAttribute('view');
+  const mockUrl = element.getAttribute('mock-url');
+  const storage = element.getAttribute('storage');
   return {
     specUrl,
     showHeader,
     readOnly,
     view,
+    mockUrl,
+    element,
+    storage,
   };
 }
 

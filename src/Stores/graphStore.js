@@ -1,7 +1,8 @@
 import {observable, action, makeObservable, runInAction, reaction} from 'mobx';
-import {join} from 'lodash';
+import {isElement, join} from 'lodash';
 import Graph from './graph';
 import {recomputeGraphNodes} from './graph/addNode';
+import {spec as defaultSpec} from '../datasets/openapi';
 import {
   NodeCategories,
   taskTypes,
@@ -14,13 +15,14 @@ class GraphStore {
   eventEmitter = {};
   graph;
 
-  constructor(e) {
+  constructor(e, options) {
     makeObservable(this, {
       rootNode: observable.ref,
       graph: observable,
       setRootNode: action,
     });
     this.props = e;
+    this.rootEventTarget = options?.element;
 
     this._parserOptions = {
       lineWidth: -1,
@@ -92,6 +94,15 @@ class GraphStore {
       () => this.rootNode && this.rootNode.data.parsed,
       (spec) => {
         this.props.storageStore.save(spec);
+        if (isElement(this.rootEventTarget)) {
+          console.log('rootElemt', this.rootEventTarget);
+          const exportspec = {yaml: this.rootNode.data._raw, json: spec};
+          const blob = new Blob([JSON.stringify(exportspec, null, 2)], {
+            type: 'application/json',
+          });
+          const event = new BlobEvent('specChanged', {data: blob});
+          this.rootEventTarget.dispatchEvent(event);
+        }
       },
       {fireImmediately: false, delay: 1000},
     );
@@ -187,7 +198,7 @@ class GraphStore {
     this.eventEmitter.on(eventTypes.GraphNodeAdd, ({task, node}) => {
       if (task === taskTypes.ReadSourceNode && node.parent == null) {
         runInAction(() => {
-          const spec = this.props.storageStore.spec;
+          const spec = this.props.storageStore.spec || defaultSpec;
           this.graph.setSourceNodeProp(
             node.id,
             'data.original',

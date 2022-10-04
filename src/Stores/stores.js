@@ -10,15 +10,17 @@ import EventEmitter from '../EventEmitter';
 import LintStore from './lintStore';
 import ImportStore from './importStore';
 import StorageStore from './storageStore';
+import MockStore from './mockStore';
 
 class Stores {
   constructor(options) {
-    const {uiOptions, importOptions} = this.fetchOptions(options);
+    const {uiOptions, importOptions, mockOptions, coreOptions, storageOptions} =
+      this.fetchOptions(options);
 
     this.eventEmitter = new EventEmitter();
     this.browserStore = new BrowserStore(this);
-    this.storageStore = new StorageStore(this);
-    this.graphStore = new GraphStore(this);
+    this.storageStore = new StorageStore(this, storageOptions);
+    this.graphStore = new GraphStore(this, coreOptions);
     this.uiStore = new UiStore(this, uiOptions);
     this.oasStore = new OasStore(this);
     this.designTreeStore = new DesignTreeStore(this);
@@ -27,12 +29,17 @@ class Stores {
     this.editorStore = new EditorStore(this);
     this.lintStore = new LintStore(this);
     this.importStore = new ImportStore(this, importOptions);
+    this.mockStore = new MockStore(this, mockOptions);
 
     this.registerEventListeners();
     this.activate();
   }
 
   fetchOptions(options) {
+    const coreOptions = {
+      element: options?.element,
+    };
+
     // @TODO allow only valid options
     const uiOptions = {
       view: options?.view,
@@ -42,7 +49,15 @@ class Stores {
     const importOptions = {
       specUrl: options?.specUrl,
     };
-    return {uiOptions, importOptions};
+
+    const mockOptions = {
+      url: options?.mockUrl,
+    };
+
+    const storageOptions = {
+      storage: options?.storage,
+    };
+    return {coreOptions, uiOptions, importOptions, mockOptions, storageOptions};
   }
 
   generateOasSchemaCollection(currentInstance) {
@@ -144,6 +159,7 @@ class Stores {
     this.editorStore.doActivate();
     this.lintStore.activate();
     this.importStore.activate();
+    this.mockStore.activate();
   }
 }
 

@@ -1,7 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
-const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 module.exports = {
   mode: 'development',
@@ -46,12 +45,12 @@ module.exports = {
         },
       },
       {
+        test: /\.s[ac]ss$/i,
+        use: ['style-loader', 'css-loader', 'postcss-loader', 'sass-loader'],
+      },
+      {
         test: /\.css$/,
-        use: [
-          MiniCssExtractPlugin.loader,
-          {loader: 'css-loader', options: {url: false}},
-          'postcss-loader',
-        ],
+        use: ['style-loader', 'css-loader', 'postcss-loader'],
       },
       {
         test: /\.(png|svg|jpg|jpeg|gif)$/i,
@@ -72,9 +71,6 @@ module.exports = {
     new webpack.ProvidePlugin({
       Buffer: ['buffer', 'Buffer'],
       process: ['process/browser.js'],
-    }),
-    new MiniCssExtractPlugin({
-      filename: 'css/[name].css',
     }),
     new MonacoWebpackPlugin({
       languages: ['json', 'yaml'],

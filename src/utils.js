@@ -262,7 +262,7 @@ export const startsWith = (needle, haystack) => {
 
 export const isValidUrl = (urlString) => {
   try {
-    return Boolean(new URL(urlString));
+    return Boolean(new URL(urlString, 'http://localhost'));
   } catch (e) {
     return false;
   }

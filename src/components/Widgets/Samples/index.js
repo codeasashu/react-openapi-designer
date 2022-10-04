@@ -5,11 +5,11 @@ import {
   useParsedValue,
   TryItWithRequestSamples,
 } from '@stoplight/elements-core';
+import {transformOas3Operation} from '@stoplight/http-spec/oas3';
 import {Tooltip2} from '@blueprintjs/popover2';
 import {Button, Icon} from '@blueprintjs/core';
 import {Provider as MosaicProvider} from '@stoplight/mosaic';
-import {NodeType} from '@stoplight/types';
-import {transformOasToServiceNode} from '../../../utils/oas';
+import {decodeUriFragment} from '../../../utils';
 import {StoresContext} from '../../Context';
 
 const Samples = observer(() => {
@@ -20,27 +20,40 @@ const Samples = observer(() => {
   const bundledDocument = useBundleRefsIntoDocument(parsedDocument, {
     baseUrl,
   });
-  const serviceNode = React.useMemo(
-    () => transformOasToServiceNode(bundledDocument),
-    [bundledDocument],
-  );
 
-  const getOperationItems = (serviceNode) => {
-    const ungrouped = [];
-    for (const node of serviceNode.children) {
-      if (node.type !== NodeType.HttpOperation) continue;
-      ungrouped.push(node);
+  const {
+    path: {activePathNode},
+    service: {activeOperationNodes, activeOperationNode},
+  } = stores.oasStore;
+
+  React.useEffect(() => {
+    if (!activePathNode) {
+      stores.uiStore.toggleWidget(stores.uiStore.widgets.samples);
     }
-    return ungrouped;
-  };
+  }, [activePathNode]);
 
-  const items = getOperationItems(serviceNode);
-  const item = items.length ? items[0] : null;
+  const {url: mockUrl} = stores.mockStore;
+
+  let currentOperationNode = activeOperationNode || activeOperationNodes[0];
+
+  const item = React.useMemo(
+    () =>
+      activePathNode
+        ? transformOas3Operation({
+            path: decodeUriFragment(activePathNode.path),
+            method: currentOperationNode.path,
+            document: bundledDocument,
+          })
+        : null,
+    [bundledDocument, currentOperationNode, activePathNode],
+  );
 
   return (
     <MosaicProvider>
       <div className="App pt-10">
-        {item && <TryItWithRequestSamples httpOperation={item.data} />}
+        {item && (
+          <TryItWithRequestSamples httpOperation={item} mockUrl={mockUrl} />
+        )}
       </div>
       <div className="absolute top-0 right-0 h-10 pr-3 pt-2">
         <Tooltip2 content={<div className="text-sm">Close Panel</div>}>
