@@ -4,6 +4,12 @@ import {NodeCategories, eventTypes} from '../datasets/tree';
 import {NodeTypes} from '../datasets/tree';
 import {startsWith} from '../utils';
 
+export const ViewOptions = {
+  code: 'code',
+  form: 'form',
+  preview: 'preview',
+};
+
 class UiStore {
   _chosenSourceNodeUri;
   _chosenSymbolNodeUri;
@@ -14,18 +20,14 @@ class UiStore {
   activeView;
   activeWidget;
 
-  views = {
-    code: 'code',
-    form: 'form',
-    preview: 'preview',
-  };
+  views = ViewOptions;
 
   widgets = {
     lint: 'lint',
     samples: 'samples',
   };
 
-  constructor(stores) {
+  constructor(stores, options) {
     makeObservable(this, {
       toggleFullscreen: action.bound,
       setActiveSidebarTree: action,
@@ -54,6 +56,7 @@ class UiStore {
       toggleWidget: action,
     });
 
+    this.options = options;
     this.stores = stores;
     this._layouts = new Map();
     this.fullscreen = false;
@@ -61,7 +64,7 @@ class UiStore {
     this._smallLayout = false;
     this._chosenSourceNodeUri = undefined;
     this._chosenSymbolNodeUri = undefined;
-    this.activeView = this.views.form;
+    this.activeView = this.defaultView();
     this.activeWidget = null;
     this._preferences = observable.object(
       {
@@ -207,6 +210,14 @@ class UiStore {
     };
 
     this._locationParams = new URLSearchParams(window.location.search);
+  }
+
+  defaultView() {
+    const optionView = this.options?.view;
+    if (!optionView || !Object.keys(this.views).includes(optionView)) {
+      return this.views.form;
+    }
+    return optionView;
   }
 
   activate() {

@@ -1,5 +1,5 @@
 import GraphStore from './graphStore';
-import UiStore from './uiStore';
+import UiStore, {ViewOptions} from './uiStore';
 import OasStore from './oasStore';
 import EditorStore from './editorStore';
 import DesignTreeStore from './designTreeStore';
@@ -12,22 +12,36 @@ import ImportStore from './importStore';
 import StorageStore from './storageStore';
 
 class Stores {
-  constructor() {
+  constructor(options) {
+    const {uiOptions, importOptions} = this.fetchOptions(options);
+
     this.eventEmitter = new EventEmitter();
     this.browserStore = new BrowserStore(this);
     this.storageStore = new StorageStore(this);
     this.graphStore = new GraphStore(this);
-    this.uiStore = new UiStore(this);
+    this.uiStore = new UiStore(this, uiOptions);
     this.oasStore = new OasStore(this);
     this.designTreeStore = new DesignTreeStore(this);
     this.jsonSchemaCollection = this.generateJsonSchemaCollection(this);
     this.oasSchemaCollection = this.generateOasSchemaCollection(this);
     this.editorStore = new EditorStore(this);
     this.lintStore = new LintStore(this);
-    this.importStore = new ImportStore(this);
+    this.importStore = new ImportStore(this, importOptions);
 
     this.registerEventListeners();
     this.activate();
+  }
+
+  fetchOptions(options) {
+    // @TODO allow only valid options
+    const uiOptions = {
+      view: options?.view || ViewOptions.form,
+    };
+
+    const importOptions = {
+      specUrl: options?.specUrl,
+    };
+    return {uiOptions, importOptions};
   }
 
   generateOasSchemaCollection(currentInstance) {

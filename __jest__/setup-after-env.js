@@ -6,9 +6,6 @@ import Worker from './workerStub';
 window.Worker = Worker;
 
 jest.mock('../src/Stores/lintStore', () => require('../__mocks__/lintStore'));
-jest.mock('../src/Stores/importStore', () =>
-  require('../__mocks__/importStore'),
-);
 
 expect.extend(matchers);
 //import {createSerializer} from 'enzyme-to-json';
