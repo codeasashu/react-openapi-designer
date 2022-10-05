@@ -15,7 +15,13 @@ function autoInit() {
   if (!element) {
     return;
   }
-  render(<App />, element);
+  const specUrl = element.getAttribute('spec-url');
+  const showHeader = (element.getAttribute('show-header') || '1') == '1';
+  const view = element.getAttribute('view');
+  render(
+    <App specUrl={specUrl} showHeader={showHeader} view={view} />,
+    element,
+  );
 }
 
 autoInit();

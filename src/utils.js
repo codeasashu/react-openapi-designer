@@ -3,7 +3,7 @@ import React from 'react';
 import {get, compact, unset, update} from 'lodash';
 import {pathMethods, methodColors} from './datasets/http';
 
-function escapeRegExpChars(text: string) {
+function escapeRegExpChars(text) {
   return text.replace(/([.*+?^=!:${}()|[\]/\\])/g, '\\$1');
 }
 
@@ -31,7 +31,7 @@ export const unsetCompact = (object, path) => {
   }
 };
 
-export const highlightText = (text: string, query: string) => {
+export const highlightText = (text, query) => {
   if (!text || typeof text != 'string') {
     return [];
   }
@@ -66,7 +66,7 @@ export const highlightText = (text: string, query: string) => {
   return tokens;
 };
 
-export const getLongestIndex = (items: Array, pattern: String) => {
+export const getLongestIndex = (items, pattern) => {
   let longestIndex = 0;
   items
     .filter((x) => !!x)
@@ -79,7 +79,7 @@ export const getLongestIndex = (items: Array, pattern: String) => {
   return longestIndex;
 };
 
-export const generateExampleName = (examples: Object) => {
+export const generateExampleName = (examples) => {
   const longestIndex = getLongestIndex(
     Object.keys(examples),
     /example-([\d]+)/g,
@@ -87,12 +87,12 @@ export const generateExampleName = (examples: Object) => {
   return `example-${longestIndex + 1}`;
 };
 
-export const generateHeaderName = (headers: Object) => {
+export const generateHeaderName = (headers) => {
   const longestIndex = getLongestIndex(Object.keys(headers), /header-([\d]+)/g);
   return `header-${longestIndex + 1}`;
 };
 
-export const sortContentTypes = (contentTypes: Array, order = []) => {
+export const sortContentTypes = (contentTypes, order = []) => {
   return contentTypes.sort((a, b) => {
     const firstIndex = order.indexOf(a);
     const secondIndex = order.indexOf(b);
@@ -109,7 +109,7 @@ export const sortContentTypes = (contentTypes: Array, order = []) => {
 export const escapeUri = (path) => path.replaceAll(/\//g, '~1');
 export const unescapeUri = (path) => path.replaceAll(/~1/g, '/');
 
-export const getJsonPointerFromUrl = (pointer: string) => {
+export const getJsonPointerFromUrl = (pointer) => {
   // When there is no pointer, we show info as default module
   const jsonPointer = pointer || '#/info';
   return jsonPointer
@@ -258,4 +258,12 @@ export const startsWith = (needle, haystack) => {
   }
 
   return true;
+};
+
+export const isValidUrl = (urlString) => {
+  try {
+    return Boolean(new URL(urlString, 'http://localhost'));
+  } catch (e) {
+    return false;
+  }
 };
