@@ -113,9 +113,14 @@
     background-color: var(--color-canvas)!important;
 }
 
-.bg-canvas {
+.bp4-dark .bg-canvas {
     background-color: #0f141b;
 }
+
+.bg-canvas {
+    background-color: #fff;
+}
+
 
 .TreeListItem {
     height: 30px;
@@ -138,6 +143,9 @@
     font-weight: 400;
 }
 .bp4-dark .bp4-simple-tab.selected-tab {
+	background-color: rgb(55 65 81)!important;
+}
+.bp4-simple-tab.selected-tab {
 	background-color: rgb(55 65 81)!important;
 }
 .bp4-simple-tab.bp4-dark:hover, .bp4-dark .bp4-simple-tab:hover {

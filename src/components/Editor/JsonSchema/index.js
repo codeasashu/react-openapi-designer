@@ -70,7 +70,7 @@ const JsonSchema = observer(
       <div className={className}>
         <Tabs
           className="react-tabs"
-          selectedTabClassName="selected-tab bg-gray-700"
+          selectedTabClassName="selected-tab"
           selectedTabPanelClassName="block"
           selectedIndex={selectedTab}
           onSelect={(tab) => setSelectedTab(tab)}>

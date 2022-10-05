@@ -71,7 +71,8 @@ const Content = observer(() => {
 
   return (
     <StyledContent className={'flex flex-col flex-1'}>
-      <div className="bp4-dark relative flex flex-1 flex-col bg-canvas">
+      {/* <div className="bp4-dark relative flex flex-1 flex-col bg-canvas"> */}
+      <div className="relative flex flex-1 flex-col bg-canvas">
         <Options
           relativeJsonPath={relativeJsonPath}
           node={node}

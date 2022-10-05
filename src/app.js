@@ -20,7 +20,8 @@ const Designer = observer(({showHeader = true}) => {
   return (
     <>
       {stores.importStore.importState !== ImportState.progress && (
-        <div className="dark bp4-dark">
+        <div>
+          {/* <div className="dark bp4-dark"> */}
           <div className={'OasContainer h-screen w-full'}>
             <div className={'Studio h-full flex flex-1 flex-col'}>
               {stores.uiStore.fullscreen === false && !!showHeader && (

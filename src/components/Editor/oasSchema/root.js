@@ -127,7 +127,8 @@ const RootSchema = observer(({store, stores, className, onChange}) => {
   }, [schema]);
 
   return (
-    <div className={classnames('json-schema-react-editor bp4-dark', className)}>
+    // <div className={classnames('json-schema-react-editor bp4-dark', className)}>
+    <div className={classnames('json-schema-react-editor', className)}>
       <Tabs
         className="react-tabs"
         selectedTabClassName="selected-tab bg-gray-700"
