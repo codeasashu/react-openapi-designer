@@ -1,6 +1,6 @@
 {
   "name": "react-openapi-designer",
-  "version": "0.11.0",
+  "version": "0.11.1",
   "main": "dist/main.js",
   "homepage": "https://codeasashu.github.io/react-openapi-designer/",
   "repository": {
