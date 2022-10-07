@@ -3,9 +3,21 @@ import {render} from 'react-dom';
 import 'highlight.js/styles/monokai.css';
 import App from './app';
 
-import './css/overrides.scss';
 import './css/app.css';
 import './css/styles.min.css';
+
+function getOptions(element) {
+  const specUrl = element.getAttribute('spec-url');
+  const showHeader = element.hasAttribute('show-header') || true;
+  const readOnly = element.hasAttribute('readonly');
+  const view = element.getAttribute('view');
+  return {
+    specUrl,
+    showHeader,
+    readOnly,
+    view,
+  };
+}
 
 function autoInit() {
   if (document == null) {
@@ -15,13 +27,9 @@ function autoInit() {
   if (!element) {
     return;
   }
-  const specUrl = element.getAttribute('spec-url');
-  const showHeader = (element.getAttribute('show-header') || '1') == '1';
-  const view = element.getAttribute('view');
-  render(
-    <App specUrl={specUrl} showHeader={showHeader} view={view} />,
-    element,
-  );
+
+  const options = getOptions(element);
+  render(<App {...options} />, element);
 }
 
 autoInit();

@@ -2,6 +2,10 @@
 @import "@blueprintjs/popover2/lib/css/blueprint-popover2";
 @import "@blueprintjs/icons/lib/css/blueprint-icons";
 
+@import "tailwindcss/base";
+@import "tailwindcss/components";
+@import "tailwindcss/utilities";
+
 .DesignTreeListItem {
   cursor: pointer;
 }
@@ -83,6 +87,10 @@
     border-top-left-radius: 0;
 }
 
+.bp4-simple-tab-panel.block {
+    display: block;
+}
+
 :root {
     --canvas-h: 218;
     --canvas-s: 32%;
@@ -93,9 +101,7 @@
     --sidebar-bg: var(--color-canvas-pure) !important;
     --gutter-bg: var(--color-canvas) !important;
 }
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+
 
 *, :after, :before {
     border: 0 solid #8694ad80;
@@ -193,3 +199,4 @@
     border-radius: 2px;
     height: 30px;
 }
+

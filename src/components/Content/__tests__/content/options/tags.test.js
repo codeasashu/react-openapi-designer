@@ -30,6 +30,15 @@ describe('Tags', () => {
       expect(_stores).toHaveSchemaAt(['tags'], [{name: 'ab'}, {name: 'cc'}]);
     });
   });
+
+  it('does not show up in readonly mode', async () => {
+    const {stores, rootNode} = initStore({}, {readOnly: true});
+    render(<Options relativeJsonPath={[]} node={rootNode} />, {
+      providerProps: {value: stores},
+    });
+    expect(ContentUtils.options().tagsBtn()).not.toBeInTheDocument();
+  });
+
   describe('empty tag', () => {
     let _stores;
     beforeEach(() => {

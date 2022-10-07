@@ -87,12 +87,7 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
     ); //s
 
     if (selectedOperation) {
-      if (
-        activeOperationNode &&
-        selectedOperation.id !== activeOperationNode.id
-      ) {
-        setActiveNode(selectedOperation);
-      }
+      setActiveNode(selectedOperation);
     } else {
       if (activePathNode) {
         setActiveNode(activePathNode);
@@ -187,7 +182,7 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
         )}
       </div>
       <Tabs
-        className="flex flex-col flex-1"
+        className="flex flex-col flex-1 w-full m-auto p-10"
         selectedTabClassName="selected-tab"
         selectedTabPanelClassName="block"
         selectedIndex={selectedTab}
@@ -223,12 +218,12 @@ const PathContent = observer(({relativeJsonPath, ...props}) => {
                 },
               )}>
               <div
-                className="relative"
+                className="relative pt-10"
                 role={`operation-${e.method.toLowerCase()}`}>
                 {operation ? (
                   <Operation
                     operation={operation}
-                    relativeJsonPath={relativeJsonPath}
+                    relativeJsonPath={mJsonPath}
                     onChange={() => {}}
                   />
                 ) : (

@@ -20,6 +20,8 @@ class UiStore {
   activeView;
   activeWidget;
 
+  readOnly = false;
+
   views = ViewOptions;
 
   widgets = {
@@ -32,6 +34,7 @@ class UiStore {
       toggleFullscreen: action.bound,
       setActiveSidebarTree: action,
       activeSidebarTree: computed,
+      readOnly: observable,
       //activeLayout: computed,
 
       _chosenSourceNodeUri: observable,
@@ -66,6 +69,7 @@ class UiStore {
     this._chosenSymbolNodeUri = undefined;
     this.activeView = this.defaultView();
     this.activeWidget = null;
+    this.readOnly = this.options?.readOnly || false;
     this._preferences = observable.object(
       {
         activeSidebarTree: 'design',
@@ -213,9 +217,13 @@ class UiStore {
   }
 
   defaultView() {
-    const optionView = this.options?.view;
+    let optionView = this.options?.view;
     if (!optionView || !Object.keys(this.views).includes(optionView)) {
-      return this.views.form;
+      optionView = this.views.form;
+    }
+    if (this.options?.readOnly === true) {
+      // force only preview view in readonly mode
+      optionView = this.views.preview;
     }
     return optionView;
   }

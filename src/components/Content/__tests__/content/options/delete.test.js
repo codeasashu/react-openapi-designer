@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   render,
-  StoreCreator,
+  initStore,
   userEvent,
   ContentUtils,
 } from '../../../../../../test-utils';
@@ -11,26 +11,32 @@ describe('Delete button', () => {
   const user = userEvent.setup();
 
   it('is not present on overview page', () => {
-    const {stores} = StoreCreator();
-    const node = stores.graphStore.getNodeByUri('/p/reference.yaml');
-    stores.uiStore.setActiveNode(node);
+    const {stores, node} = initStore();
     render(<Options relativeJsonPath={[]} node={node} />, {
       providerProps: {value: stores},
     });
     expect(ContentUtils.options().deleteBtn()).not.toBeInTheDocument();
   });
 
+  it('does not show up in readonly mode', async () => {
+    const {stores, rootNode} = initStore({}, {readOnly: true});
+    render(<Options relativeJsonPath={[]} node={rootNode} />, {
+      providerProps: {value: stores},
+    });
+    expect(ContentUtils.options().deleteBtn()).not.toBeInTheDocument();
+  });
+
   describe('on path', () => {
-    let _stores, relativeJsonPath;
-    let deleteCb = jest.fn();
-    beforeEach(() => {
-      const {stores, creator} = StoreCreator();
-      const node = creator.createPath('/user/abc', {post: 'Hello'});
+    it('can delete path', async () => {
+      const deleteCb = jest.fn();
+      const {stores, findNode} = initStore({
+        paths: {'/user/abc': {post: {summary: 'Hello'}}},
+      });
+      const node = findNode.path('~1user~1abc');
       stores.uiStore.setActiveNode(node);
-      relativeJsonPath = node.relativeJsonPath;
       render(
         <Options
-          relativeJsonPath={relativeJsonPath}
+          relativeJsonPath={node.relativeJsonPath}
           node={node}
           onDelete={deleteCb}
         />,
@@ -38,18 +44,46 @@ describe('Delete button', () => {
           providerProps: {value: stores},
         },
       );
-      _stores = stores;
-    });
-
-    it('can add tags to path', async () => {
       expect(ContentUtils.options().deleteBtn()).toBeInTheDocument();
       await user.click(ContentUtils.options().deleteBtn());
       await user.click(ContentUtils.options().confirmDeleteBtn());
       expect(deleteCb).toHaveBeenCalledOnce();
-      expect(_stores.uiStore.activeNode.relativeJsonPath).toStrictEqual([
+      expect(stores.uiStore.activeNode.relativeJsonPath).toStrictEqual([
         'paths',
         '/user/abc',
-        'post',
+      ]);
+    });
+
+    it('can delete path with multiple methods', async () => {
+      const deleteCb = jest.fn();
+      const {stores, findNode} = initStore({
+        paths: {
+          '/user/abc': {
+            get: {summary: 'Hello GET'},
+            post: {summary: 'Hello POST'},
+          },
+        },
+      });
+      const node = findNode.path('~1user~1abc/get');
+      stores.uiStore.setActiveNode(node);
+      render(
+        <Options
+          relativeJsonPath={node.relativeJsonPath}
+          node={node}
+          onDelete={deleteCb}
+        />,
+        {
+          providerProps: {value: stores},
+        },
+      );
+      expect(ContentUtils.options().deleteBtn()).toBeInTheDocument();
+      await user.click(ContentUtils.options().deleteBtn());
+      await user.click(ContentUtils.options().confirmDeleteBtn());
+      expect(deleteCb).toHaveBeenCalledWith();
+      expect(stores.uiStore.activeNode.relativeJsonPath).toStrictEqual([
+        'paths',
+        '/user/abc',
+        'get',
       ]);
     });
   });

@@ -96,10 +96,12 @@ describe('Path tests', () => {
 
   it('can switch methods', async () => {
     expect(ContentUtils.path().pathInput()).toHaveValue('/user/abc');
+    expect(_operationPath).toStrictEqual(['paths', '/user/abc', 'post']);
     let parsedData = _getParsedOasData(relativeJsonPath.slice(0, -1));
     expect(Object.keys(parsedData)).toStrictEqual(['post']);
     await user.click(ContentUtils.path().methodTab('get'));
     await user.click(ContentUtils.path().addOperationBtn('get'));
+
     // Get method has been added
     expect(ContentUtils.path().activeMethodTab()).toHaveTextContent('get');
     expect(ContentUtils.path().operationTab('get')).toHaveClass('active');
@@ -109,11 +111,13 @@ describe('Path tests', () => {
       responses: {200: {description: 'OK'}},
       summary: '',
     });
+    expect(_operationPath).toStrictEqual(['paths', '/user/abc', 'get']);
     parsedData = _getParsedOasData(relativeJsonPath.slice(0, -1));
     expect(Object.keys(parsedData)).toStrictEqual(['post', 'get']);
     expect(ContentUtils.path().pathInput()).toHaveValue('/user/abc');
 
     await user.click(ContentUtils.path().methodTab('post'));
+    expect(_operationPath).toStrictEqual(['paths', '/user/abc', 'post']);
     expect(ContentUtils.path().operationTab('get')).not.toHaveClass('active');
     expect(ContentUtils.path().operationTab('post')).toHaveClass('active');
     parsedData = _getParsedOasData(relativeJsonPath.slice(0, -1));

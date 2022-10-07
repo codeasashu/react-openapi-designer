@@ -34,7 +34,7 @@ const Designer = observer(({showHeader = true}) => {
                       maxWidth: '375px',
                       minWidth: '290px',
                     }}
-                    className={'flex flex-col border-r'}
+                    className={'flex flex-col border-r bg-gray-900'}
                   />
                 )}
                 <Gutter layout="horizontal" />

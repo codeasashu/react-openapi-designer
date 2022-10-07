@@ -65,7 +65,7 @@ exports[`Path tests matches snapshot 1`] = `
       </div>
     </div>
     <div
-      class="flex flex-col flex-1"
+      class="flex flex-col flex-1 w-full m-auto p-10"
       data-tabs="true"
     >
       <ul
@@ -201,7 +201,7 @@ exports[`Path tests matches snapshot 1`] = `
         role="tabpanel"
       >
         <div
-          class="relative"
+          class="relative pt-10"
           role="operation-post"
         >
           <div

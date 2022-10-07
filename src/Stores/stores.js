@@ -1,5 +1,5 @@
 import GraphStore from './graphStore';
-import UiStore, {ViewOptions} from './uiStore';
+import UiStore from './uiStore';
 import OasStore from './oasStore';
 import EditorStore from './editorStore';
 import DesignTreeStore from './designTreeStore';
@@ -35,7 +35,8 @@ class Stores {
   fetchOptions(options) {
     // @TODO allow only valid options
     const uiOptions = {
-      view: options?.view || ViewOptions.form,
+      view: options?.view,
+      readOnly: options?.readOnly,
     };
 
     const importOptions = {

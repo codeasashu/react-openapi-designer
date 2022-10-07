@@ -1,5 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import styled from 'styled-components';
 import {observer} from 'mobx-react-lite';
 import {cloneDeep} from 'lodash';
@@ -41,20 +42,8 @@ const getPanelKind = (node) => {
 };
 
 const Panel = observer(({node, relativeJsonPath}) => {
-  const stores = React.useContext(StoresContext);
-  const {activeWidget, widgets} = stores.uiStore;
   const PanelKind = getPanelKind(node);
-  return activeWidget ? (
-    <div className="flex-1 relative flex">
-      <PanelKind relativeJsonPath={relativeJsonPath} node={node} />
-      <div className="relative flex-1 border-l">
-        {activeWidget === widgets.lint && <LintWidget />}
-        {activeWidget === widgets.samples && <SamplesWidget />}
-      </div>
-    </div>
-  ) : (
-    <PanelKind relativeJsonPath={relativeJsonPath} node={node} />
-  );
+  return <PanelKind relativeJsonPath={relativeJsonPath} node={node} />;
 });
 
 Panel.propTypes = {
@@ -63,7 +52,8 @@ Panel.propTypes = {
 
 const Content = observer(() => {
   const stores = React.useContext(StoresContext);
-  const {activeNode, activeView, views} = stores.uiStore;
+  const {activeNode, activeView, views, readOnly, activeWidget, widgets} =
+    stores.uiStore;
   const sourceNode = stores.graphStore.rootNode;
   const node = activeNode || sourceNode;
   const relativeJsonPath =
@@ -79,13 +69,25 @@ const Content = observer(() => {
             stores.graphStore.removeNode(activeNode.id);
           }}
         />
-        {activeView === views.form && (
-          <Panel node={node} relativeJsonPath={relativeJsonPath} />
-        )}
-        {activeView === views.code && <MonacoEditor />}
-        {activeView === views.preview && (
-          <Redoc spec={cloneDeep(sourceNode.data.parsed)} />
-        )}
+        <div
+          className={classnames({
+            'flex-1 relative flex': activeWidget !== null,
+            'flex-1': activeWidget === null,
+          })}>
+          {activeView === views.form && !readOnly && (
+            <Panel node={node} relativeJsonPath={relativeJsonPath} />
+          )}
+          {activeView === views.code && !readOnly && <MonacoEditor />}
+          {activeView === views.preview && (
+            <Redoc spec={cloneDeep(sourceNode.data.parsed)} />
+          )}
+          {activeWidget !== null && (
+            <div className="relative flex-1 border-l">
+              {activeWidget === widgets.lint && <LintWidget />}
+              {activeWidget === widgets.samples && <SamplesWidget />}
+            </div>
+          )}
+        </div>
       </div>
     </StyledContent>
   );

@@ -9,7 +9,7 @@ import Tags from './tags';
 
 const Options = observer(({relativeJsonPath, node, onDelete}) => {
   const stores = React.useContext(StoresContext);
-  const {activeWidget, activeView, widgets, views} = stores.uiStore;
+  const {activeWidget, activeView, widgets, views, readOnly} = stores.uiStore;
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const {errors, hints, info, warning} = stores.lintStore;
 
@@ -30,7 +30,7 @@ const Options = observer(({relativeJsonPath, node, onDelete}) => {
         },
       )}>
       <div className="flex items-center">
-        <Tags relativeJsonPath={relativeJsonPath} node={node} />
+        {!readOnly && <Tags relativeJsonPath={relativeJsonPath} node={node} />}
         {node && node.category === NodeCategories.SourceMap && (
           <Button
             small
@@ -54,20 +54,24 @@ const Options = observer(({relativeJsonPath, node, onDelete}) => {
       <div className="flex-1" />
       <div>
         <ButtonGroup>
-          <Button
-            active={activeView === views.form}
-            small
-            icon={<Icon size={14} icon="form" />}
-            text="Form"
-            onClick={() => stores.uiStore.setActiveView(views.form)}
-          />
-          <Button
-            active={activeView === views.code}
-            small
-            icon={<Icon size={14} icon="code" />}
-            text="Code"
-            onClick={() => stores.uiStore.setActiveView(views.code)}
-          />
+          {!readOnly && (
+            <Button
+              active={activeView === views.form}
+              small
+              icon={<Icon size={14} icon="form" />}
+              text="Form"
+              onClick={() => stores.uiStore.setActiveView(views.form)}
+            />
+          )}
+          {!readOnly && (
+            <Button
+              active={activeView === views.code}
+              small
+              icon={<Icon size={14} icon="code" />}
+              text="Code"
+              onClick={() => stores.uiStore.setActiveView(views.code)}
+            />
+          )}
         </ButtonGroup>
       </div>
       <div className="ml-3">
@@ -150,6 +154,7 @@ Options.propTypes = {
   view: PropTypes.string,
   onToggleView: PropTypes.func,
   onDelete: PropTypes.func,
+  readonly: PropTypes.bool,
 };
 
 export default Options;

@@ -653,7 +653,7 @@ const ContentUtils = {
     const optionsContainer = document.querySelector('.PanelActionBar');
 
     return {
-      tagsBtn: () => within(optionsContainer).getByLabelText('tags'),
+      tagsBtn: () => within(optionsContainer).queryByLabelText('tags'),
       tagsPopup: () =>
         document.querySelector(
           `.${PopoverClasses.POPOVER2}.bp4-popover2-placement-bottom .tag-suggest`,
@@ -684,6 +684,8 @@ const ContentUtils = {
         within(optionsContainer).queryByRole('button', {name: 'delete'}),
       confirmDeleteBtn: () =>
         within(optionsContainer).queryByRole('button', {name: 'Are you sure?'}),
+      samplesBtn: () =>
+        within(optionsContainer).queryByRole('button', {name: 'Samples'}),
     };
   },
 
@@ -829,7 +831,7 @@ const SidebarUtils = {
   },
 };
 
-function initStore(data = {}) {
+function initStore(data = {}, options = {}) {
   if (!isObject(data)) {
     data = {};
   }
@@ -838,7 +840,7 @@ function initStore(data = {}) {
   const mockBrowserStore = {reloadWindow: jest.fn()};
   const storage = new StorageStore({browserStore: mockBrowserStore});
   storage.save(data);
-  const stores = new Stores();
+  const stores = new Stores(options);
   const rootNode = stores.graphStore.rootNode;
 
   const getData = (path) => {
