@@ -6,9 +6,9 @@ import {Import} from './components/Common';
 import pjson from '../package.json';
 import Stores from './Stores';
 import {ImportState} from './Stores/importStore';
-import {observer} from 'mobx-react-lite';
 
-const Designer = observer(({showHeader = true}) => {
+const Designer = ({showHeader = true}) => {
+  console.log('React version', React.version);
   const stores = React.useContext(Context.StoresContext);
   const {activeView, views, fullscreen} = stores.uiStore;
   const shouldShowSidebar =
@@ -47,11 +47,12 @@ const Designer = observer(({showHeader = true}) => {
       <Import open={stores.importStore.importState === ImportState.progress} />
     </>
   );
-});
+};
 
 Designer.propTypes = {
   dark: PropTypes.bool,
   openapi: PropTypes.object,
+  showHeader: PropTypes.bool,
 };
 
 const App = (props) => {

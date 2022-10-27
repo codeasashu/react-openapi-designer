@@ -7,11 +7,6 @@ import ModelNode from './src/Stores/nodes/modelNode';
 import PathNode from './src/Stores/nodes/pathNode';
 import {Classes as PopoverClasses} from '@blueprintjs/popover2';
 import {Classes as CoreClasses} from '@blueprintjs/core';
-//import {configureStore} from '@reduxjs/toolkit';
-//import {Provider} from 'react-redux';
-// Import your own reducer
-//import schemaReducer from './src/redux/modules/schema';
-//import dropdownReducer from './src/redux/modules/dropdown';
 import {NodeTypes, nodeOperations} from './src/datasets/tree';
 import securitySchemes from './src/datasets/securitySchemes';
 import Stores from './src/Stores';

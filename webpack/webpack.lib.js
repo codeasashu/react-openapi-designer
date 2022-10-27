@@ -1,20 +1,23 @@
 const path = require('path');
 const webpack = require('webpack');
+// const TerserPlugin = require('terser-webpack-plugin');
 const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin');
 
 module.exports = {
   mode: 'development',
-  entry: {
-    app: './src/index.js',
-  },
-  target: 'web',
+  entry: './src/app.js',
   output: {
-    filename: '[name].js',
-    //chunkFilename: '[id].[chunkhash].js',
-    sourceMapFilename: '[name].js.map',
-    path: path.join(__dirname, '../dist'),
+    filename: 'bundle.js',
+    path: path.join(__dirname, '../lib'),
     libraryTarget: 'umd',
+    globalObject: 'this',
     clean: true,
+  },
+  devtool: 'source-map',
+  performance: false,
+  externals: {
+    react: 'react',
+    'react-dom': 'react-dom',
   },
   resolve: {
     aliasFields: ['browser'],
